@@ -1,0 +1,32 @@
+/* src/styles/main.css */
+
+/* Restablece los estilos base */
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-sizing: border-box;
+  background-color: #e4e3e3;
+}
+
+/* 1. Contenedor principal de la aplicación */
+/* Define un contenedor que ocupa toda la altura de la ventana y organiza sus hijos en una fila */
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* 2. Contenedor del contenido principal */
+/* Ocupa el espacio restante junto al Sidebar y organiza su propio contenido en una columna */
+.main-content {
+  flex: 1; /* Esto hace que el contenedor ocupe todo el espacio horizontal sobrante */
+  display: flex;
+  flex-direction: column; /* Organiza el Navbar y el contenido de la página uno debajo del otro */
+  overflow-y: auto; /* Permite el scroll vertical si el contenido es más largo que la pantalla */
+}
+
+/* Estilos para el contenido de la página */
+.contenedorPagina {
+  padding: 2rem;
+  padding-top: 80px; /* Para dejar espacio debajo del Navbar fijo */
+}

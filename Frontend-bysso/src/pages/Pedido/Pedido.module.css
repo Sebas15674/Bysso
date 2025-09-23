@@ -1,0 +1,21 @@
+/* src/pages/Pedido/Pedido.module.css */
+.contenedorPagina {
+  flex: 1;
+  padding: 2rem;
+
+  margin: 0 auto; /* Centra el contenedor en la pantalla */
+}
+
+.encabezadoPedidos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.tituloPagina {
+  font-size: 3rem;
+  font-weight: 600;
+  color: #0b3675;
+  margin: 3;
+}

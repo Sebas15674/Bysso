@@ -1,0 +1,49 @@
+.navbar {
+  display: flex;
+  /* Espacia los elementos del inicio y del final */
+  justify-content: space-between; 
+  align-items: center;
+  padding: 0rem 2rem;
+  background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  height: 4rem;
+}
+
+.leftContent {
+  /* Alinea el botón de hamburguesa y el título */
+  display: flex;
+  align-items: center;
+}
+
+.botonHamburguesa {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  margin-right: 1.5rem;
+}
+
+.tituloPagina {
+  text-align: left;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.logoContainer {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.logoContainer:hover {
+  transform: scale(1.05);
+}
+
+.logo {
+  height: 4rem; /* Ajusta el tamaño del logo */
+  width: auto;
+}

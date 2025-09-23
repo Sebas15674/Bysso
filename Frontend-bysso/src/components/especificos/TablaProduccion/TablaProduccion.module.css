@@ -1,0 +1,89 @@
+/* src/components/especificos/TablaPedidos/TablaPedidos.module.css */
+
+.contenedorTabla {
+    background-color: #b4adad;
+    border-radius: 12px;
+     box-shadow: 0 10px 40px rgba(59, 60, 70, 0.986);
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1500px;
+    overflow-x: auto;
+}
+
+.tabla {
+    min-width: 1200px;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.3rem;
+    table-layout: fixed;
+}
+
+.tabla thead {
+    background: linear-gradient(90deg, #4d7c8f, #0a0a0a);;
+    color: #fdf8f8;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.tabla th,
+.tabla td {
+    padding: 16px;
+    text-align: center;
+    white-space: normal; 
+    word-wrap: break-word;
+}
+
+.tabla th {
+    letter-spacing: 1.5px;
+}
+
+.tabla th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.tabla th:last-child {
+    border-top-right-radius: 12px;
+}
+
+/* Práctica recomendada: definir anchos proporcionales para las celdas */
+/* Suma de los anchos: 10% + 15% + 40% + 15% + 20% = 100% */
+.tabla th:nth-child(1), .tabla td:nth-child(1) { width: 29%; } /* Cliente */
+.tabla th:nth-child(2), .tabla td:nth-child(2) { width: 130%; } /* descripcion */
+.tabla th:nth-child(3), .tabla td:nth-child(3) { width: 60%; } /* Descripción */
+.tabla th:nth-child(4), .tabla td:nth-child(4) { width: 30%; } /* Estado */
+.tabla th:nth-child(5), .tabla td:nth-child(5) { width: 40%; } /* Acción */ /* Acción */
+
+.tabla tbody tr {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s ease;
+}
+
+.tabla tbody tr:hover {
+    background-color: #f0f4f8;
+}
+
+.tabla tbody tr:last-child {
+    border-bottom: none;
+}
+
+
+
+.acciones .boton {
+    /* Aquí puedes ajustar el tamaño del botón si lo necesitas */
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.mensajeVacio {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+    font-style: italic;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}

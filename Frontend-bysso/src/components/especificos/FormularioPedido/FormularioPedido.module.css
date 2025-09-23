@@ -1,0 +1,68 @@
+/* src/components/especificos/FormularioPedido/FormularioPedido.module.css */
+.contenedorFormulario {
+  padding: 1.0rem;
+}
+.tituloFormulario {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 3.6rem;
+  color: #000000;
+  font-weight: 700;
+}
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.grupoCampos {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.grupoCampos > * {
+  flex: 1 1 30%;
+}
+.entrada, .areaTexto, .contenedorArchivo {
+  padding: 0.85rem;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  font-size: 1.7rem;
+}
+.areaTexto {
+  resize: vertical;
+  min-height: 90px;
+}
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.contenedorArchivo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  padding: 0;
+  border: none;
+}
+.etiquetaArchivo {
+  background-color: #007bff;
+  color: rgb(0, 0, 0);
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+}
+.inputArchivo {
+  display: none;
+}
+.nombreArchivo {
+  color: #000000;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}

@@ -1,0 +1,24 @@
+/* src/pages/Produccion/Produccion.module.css */
+.contenedorApp {
+  display: flex;
+}
+
+.contenedorPagina {
+  flex: 1;
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+.encabezadoPedidos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.tituloPagina {
+  font-size: 3rem;
+  font-weight: 600;
+  color: #0b3675;
+  margin: 2;
+}

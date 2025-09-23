@@ -1,0 +1,67 @@
+.contenedorHome {
+    padding: 0rem;
+    max-width: 1900px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #2c3e50;
+    line-height: 1.9;
+}
+
+.encabezadoHome {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4rem;
+}
+
+.titulo {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #083f77;
+    margin: 1;
+}
+
+.tarjetasResumen {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 2.9rem;
+    margin-bottom: 5rem;
+}
+
+.tarjeta {
+    flex: 1 1 280px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 15px rgba(125, 148, 190, 0.973);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: center;
+    border-left: 6px solid;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.tarjeta:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgb(109, 101, 211);
+}
+
+.tarjetaTitulo {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.85rem;
+}
+
+.tarjetaNumero {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #0a4e92;
+    margin: 0;
+}
