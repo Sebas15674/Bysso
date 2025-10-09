@@ -31,8 +31,8 @@ const Sidebar = ({ estaAbierto, alCerrarMenu }) => {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/basedatos" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)} onClick={alCerrarMenu}>
-            Base de Datos
+          <NavLink to="/historial" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)} onClick={alCerrarMenu}>
+            Historial de pedidos
           </NavLink>
         </li>
       </ul>

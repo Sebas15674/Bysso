@@ -1,32 +1,53 @@
-/* src/styles/main.css */
-
 /* Restablece los estilos base */
-body, html, #root {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  box-sizing: border-box;
-  background-color: #e4e3e3;
+body, 
+html, 
+#root {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+    background-color: #e4e3e3;
+    
+    /* Mantenemos la altura total y el control vertical */
+    height: 100vh; 
+    overflow-y: hidden; 
+    /* CRÍTICO: NO forzamos overflow-x: hidden aquí. El overflow horizontal debe estar en auto. */
+    overflow-x: auto; 
 }
 
 /* 1. Contenedor principal de la aplicación */
-/* Define un contenedor que ocupa toda la altura de la ventana y organiza sus hijos en una fila */
 .app-container {
-  display: flex;
-  height: 100vh;
+    display: flex;
+    height: 100%; 
+    /* No debe haber overflow-x: hidden aquí */
 }
 
 /* 2. Contenedor del contenido principal */
-/* Ocupa el espacio restante junto al Sidebar y organiza su propio contenido en una columna */
 .main-content {
-  flex: 1; /* Esto hace que el contenedor ocupe todo el espacio horizontal sobrante */
-  display: flex;
-  flex-direction: column; /* Organiza el Navbar y el contenido de la página uno debajo del otro */
-  overflow-y: auto; /* Permite el scroll vertical si el contenido es más largo que la pantalla */
+    flex: 1; 
+    display: flex;
+    flex-direction: column; 
+    min-height: 0; 
+    /* No debe haber scroll */
 }
 
-/* Estilos para el contenido de la página */
+/* CRÍTICO: Contenedor de las Rutas (Content Area) */
+/* ESTE ES EL QUE DEBE MANEJAR EL SCROLL HORIZONTAL */
+.content-area {
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column;
+    min-height: 0; 
+    
+    /* Scroll vertical condicional (para contenido largo) */
+    overflow-y: auto; 
+    /* CRÍTICO: Scroll horizontal condicional (para tablas anchas) */
+    overflow-x: auto; 
+}
+
+/* Estilos para el contenedor de la página que está dentro del content-area */
 .contenedorPagina {
-  padding: 2rem;
-  padding-top: 80px; /* Para dejar espacio debajo del Navbar fijo */
+    padding: 2rem;
+    padding-top: 80px; 
+    flex-grow: 1; 
 }

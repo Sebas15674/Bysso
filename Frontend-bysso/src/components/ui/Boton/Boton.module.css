@@ -11,6 +11,19 @@
   font-size: 1.1rem;
 }
 
+.neutro {
+    background-color: #9c9c9c;
+    color: #000000; /* Texto oscuro */
+    border: 1px solid #4c8ef0; /* Borde azul que querías */
+    box-shadow: 0 1px 3px rgba(120, 149, 228, 0.61); /* Sombra verde que querías */
+    font-size: 1.1rem;
+}
+/* Asegúrate de añadir la transición al estilo base .boton para que el hover sea suave */
+.boton {
+    transition: all 0.3s ease; /* Debe ser más lenta para el efecto de movimiento */
+    /* ... */
+}
+
 
 /* Estilo para el botón primario (el predeterminado) */
 .primario {

@@ -1,10 +1,15 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; 
 import styles from './Home.module.css';
 import Boton from '../../components/ui/Boton/Boton.jsx';
+import marcaLogo from '../../assets/images/marca.png';
 
 const Home = ({ pedidos, abrirModal }) => {
     const navigate = useNavigate();
+
+    const irAHistorial = () => {
+        navigate('/historial');
+    };
 
     const conteos = useMemo(() => {
         const conteosEstado = {
@@ -50,17 +55,37 @@ const Home = ({ pedidos, abrirModal }) => {
 
     return (
         <div className={styles.contenedorHome}>
+            
+            {/* 1. Logo a la izquierda */}
+            <div className={styles.logoContenedor}>
+                <img src={marcaLogo} alt="Logo de la Marca" className={styles.logoDashboard} />
+            </div>
+
+            {/* 2. Encabezado principal: Título y botón Crear Pedido */}
             <div className={styles.encabezadoHome}>
                 <h1 className={styles.titulo}>Dashboard de Pedidos</h1>
+                <div className={styles.accionesEncabezado}>
+                    {/* Solo el botón Crear Pedido se queda en este flujo */}
+                    <Boton 
+                        tipo="primario" 
+                        onClick={() => abrirModal(null)}
+                    >
+                        Crear Pedido ✚
+                    </Boton>
+                </div>
+            </div>
+
+            {/* 3. Botón Historial: Posicionado de forma absoluta para sobresalir */}
+            <div className={styles.historialBotonContenedor}>
                 <Boton 
-                    tipo="primario" 
-                    onClick={() => abrirModal(null)} // <- La corrección está aquí
+                    tipo="neutro" 
+                    onClick={irAHistorial}
                 >
-                    Crear Pedido ✚
+                    Historial de Pedidos 📚
                 </Boton>
             </div>
+            
             <div className={styles.tarjetasResumen}>
-                
                 {Object.keys(conteos).map((estado, index) => (
                     <div 
                         key={index} 
