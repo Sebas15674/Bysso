@@ -1,0 +1,116 @@
+/* ----------------------------------
+   Contenedor de Tabla (Estilo de Tarjeta)
+   ---------------------------------- */
+.contenedorTabla {
+    /* Coherencia con TablaPedidos.module.css (aunque con ligeros ajustes de color para el fondo de la tarjeta) */
+    background-color: #ffffff; /* Fondo blanco para la tarjeta, no gris */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.685); /* Sombra clara */
+    margin: 0 auto; /* Centrado */
+    width: 100%;
+    max-width: 1500px;
+    overflow-x: auto;
+}
+
+.tabla {
+    min-width: 1200px; /* Ancho mínimo para la tabla de historial */
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.1rem; /* Ligeramente más pequeño que tu 1.3rem original para encajar más datos */
+    table-layout: fixed;
+}
+
+/* ----------------------------------
+   Encabezado de Tabla (Degradado Oscuro)
+   ---------------------------------- */
+.tabla thead {
+    /* Mismo degradado de color que usaste */
+    background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+    color: #fdf8f8;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.tabla th,
+.tabla td {
+    padding: 16px;
+    text-align: center;
+    white-space: normal; 
+    word-wrap: break-word;
+}
+
+.tabla th {
+    letter-spacing: 1px;
+}
+
+.tabla th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.tabla th:last-child {
+    border-top-right-radius: 12px;
+}
+
+/* ----------------------------------
+   Ajuste de Anchos de Columna
+   ---------------------------------- */
+/* Adaptado para las 7 columnas del historial */
+.tabla th:nth-child(1), .tabla td:nth-child(1) { width: 10%; } /* # BOLSA */
+.tabla th:nth-child(2), .tabla td:nth-child(2) { width: 15%; } /* CLIENTE */
+.tabla th:nth-child(3), .tabla td:nth-child(3) { width: 12%; } /* TIPO */
+.tabla th:nth-child(4), .tabla td:nth-child(4) { width: 15%; } /* TOTAL */
+.tabla th:nth-child(5), .tabla td:nth-child(5) { width: 18%; } /* FECHA ENTREGA */
+.tabla th:nth-child(6), .tabla td:nth-child(6) { width: 15%; } /* TRABAJADOR */
+.tabla th:nth-child(7), .tabla td:nth-child(7) { width: 15%; } /* ESTADO */
+
+
+/* ----------------------------------
+   Cuerpo de la Tabla (Filas)
+   ---------------------------------- */
+.tabla tbody tr {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s ease;
+}
+
+.tabla tbody tr:hover {
+    background-color: #f0f4f8;
+}
+
+.tabla tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* ----------------------------------
+   Insignia de Estado (Badge)
+   ---------------------------------- */
+.colEstado {
+    /* Centrado del badge */
+    text-align: center;
+}
+
+.badgeEntregado {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #155724; 
+    background-color: #50eb74; 
+}
+
+
+/* ----------------------------------
+   Mensaje Vacío
+   ---------------------------------- */
+.mensajeVacio {
+    text-align: center;
+    padding: 40px 20px;
+    color: #888;
+    font-style: italic;
+    font-size: 1.1rem;
+    background-color: #f9f9f9;
+    /* Asegura que el mensaje se vea bien al final de la tabla */
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}

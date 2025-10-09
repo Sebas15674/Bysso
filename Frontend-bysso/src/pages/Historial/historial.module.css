@@ -1,0 +1,54 @@
+/* ----------------------------------
+   Contenedor Principal (Coherente con Finalizacion)
+   ---------------------------------- */
+.contenedorPagina {
+    flex: 1;
+    padding: 2rem;
+    margin: 0 auto;
+    /* La altura min-height ya no es tan crítica gracias al flex-grow en main.css */
+    min-height: 90%; 
+}
+
+.tituloPagina {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #0b3675;
+    /* Reducimos el margen inferior aquí y lo manejamos en .header para el layout */
+    margin-bottom: 1; 
+    text-align: left;
+}
+
+/* ----------------------------------
+   Header y Controles (CRÍTICO: Ubicación del Botón)
+   ---------------------------------- */
+.header {
+    /* Agrupamos el título y el subtítulo */
+    display: flex;
+    flex-direction: column; 
+    /* El margen aquí reemplaza al margin-bottom de .tituloPagina */
+    margin-bottom: 2.5rem; 
+}
+
+/* Nuevo contenedor para Título, Subtítulo y Botón */
+.tituloControles {
+    /* CRÍTICO: Flexbox para alinear el título y el botón a los extremos */
+    display: flex;
+    justify-content: space-between; /* Empuja el botón a la derecha */
+    align-items: center; /* Centra verticalmente los elementos */
+    width: 100%; /* Ocupa todo el ancho */
+    margin-bottom: 0.5rem; /* Pequeño margen debajo de la línea Título/Botón */
+}
+
+.botonReset {
+    /* Eliminamos el margin-top para que se alinee perfectamente con el título */
+    background-color: #dc3545; 
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 0.7rem 1rem;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease;
+    white-space: nowrap; /* Evita que el texto del botón se rompa */
+}
+/* ... El resto de los estilos del historial (tablaWrapper, tabla, etc.) se mantienen igual ... */

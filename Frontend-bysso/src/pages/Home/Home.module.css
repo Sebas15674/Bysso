@@ -1,17 +1,46 @@
 .contenedorHome {
-    padding: 0rem;
+    padding-left: 100px;
     max-width: 1900px;
     margin: 0 auto;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #2c3e50;
     line-height: 1.9;
+    position: relative; /* CRÍTICO: El punto de referencia para el botón absoluto */
+}
+
+.logoContenedor {
+    position: fixed;
+    margin: 2.5rem;
+    left: 0rem;
+    z-index: 10;
+}
+
+/* CRÍTICO: Estilo para posicionar el botón de Historial "saliendo" del borde derecho */
+.historialBotonContenedor {
+    position: absolute;
+    top: 4.1rem; 
+    right: -350px; 
+    z-index: 5;
+}
+
+
+.logoDashboard {
+    width: 160px;
+    height: auto;
 }
 
 .encabezadoHome {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; 
     align-items: center;
     margin-bottom: 4rem;
+}
+
+.accionesEncabezado {
+    /* Solo para el botón Crear Pedido */
+    display: flex;
+    gap: 1.5rem; 
+    align-items: center;
 }
 
 .titulo {
@@ -19,12 +48,13 @@
     font-weight: 700;
     color: #083f77;
     margin: 1;
+    margin-right: 2rem;
 }
 
 .tarjetasResumen {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start; 
     gap: 2.9rem;
     margin-bottom: 5rem;
 }
@@ -39,15 +69,16 @@
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    text-align: center;
+    text-align: left;
     border-left: 6px solid;
     transition: all 0.3s ease-in-out;
     cursor: pointer;
+    min-height: 150px;
 }
 
 .tarjeta:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgb(109, 101, 211);
+    box-shadow: 0 12px 20px rgba(109, 101, 211, 0.5); 
 }
 
 .tarjetaTitulo {

@@ -9,7 +9,6 @@ const Produccion = ({ pedidos, setPedidos }) => {
     const [estaModalAbierto, setEstaModalAbierto] = useState(false);
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
 
-    // Nuevo: obtenemos los parámetros de búsqueda de la URL
     const [searchParams] = useSearchParams();
     const filtroEstado = searchParams.get('estado');
 
@@ -24,14 +23,24 @@ const Produccion = ({ pedidos, setPedidos }) => {
         abrirModal();
     };
     
-    // Filtramos los pedidos basándonos en el filtro de la URL
-    // Si no hay filtro, mostramos todos los pedidos en producción o en proceso
+    // CRÍTICO: El filtro ahora excluye explícitamente los estados finales ('Listo para Entrega', 'Entregado')
     const pedidosFiltrados = pedidos.filter(pedido => {
-        const esValido = pedido.estado === 'En Producción' || pedido.estado === 'En Proceso';
+        // Los pedidos activos en producción son: 'En Producción' o 'En Proceso'
+        const estadoActivo = pedido.estado === 'En Producción' || pedido.estado === 'En Proceso';
+
+        // Aseguramos que NO esté en un estado de entrega o historial
+        const esExcluido = pedido.estado === 'Listo para Entrega' || pedido.estado === 'Entregado';
+        
+        if (esExcluido) return false;
+
+        // Si hay un filtro de URL, aplicarlo solo a los estados activos
         if (filtroEstado) {
-            return esValido && pedido.estado === filtroEstado;
+             // Solo muestra si el estado coincide con el filtro y está activo
+            return estadoActivo && pedido.estado === filtroEstado;
         }
-        return esValido;
+
+        // Si no hay filtro de URL, muestra todos los estados activos
+        return estadoActivo;
     });
 
     const tomarPedido = (nBolsa) => {

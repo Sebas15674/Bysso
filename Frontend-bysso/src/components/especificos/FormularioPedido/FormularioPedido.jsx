@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './FormularioPedido.module.css';
 
-const FormularioPedido = ({ alGuardar, alCancelar }) => {
+// Recibimos la prop bolsasDisponibles
+const FormularioPedido = ({ alGuardar, alCancelar, bolsasDisponibles }) => { 
   // Lista de trabajadores de la microempresa
   const trabajadores = ['Juan Pérez', 'María Gómez', 'Luis García'];
 
@@ -23,7 +24,10 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
-    setDatosFormulario({ ...datosFormulario, [name]: value });
+    // CRÍTICO: Si el campo es 'bolsa', aseguramos que el valor se guarde como NÚMERO
+    const valorCorregido = name === 'bolsa' ? Number(value) : value;
+
+    setDatosFormulario({ ...datosFormulario, [name]: valorCorregido });
   };
 
   const manejarImagen = (e) => {
@@ -32,6 +36,10 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
 
   const manejarEnvio = (e) => {
     e.preventDefault();
+    if (!datosFormulario.bolsa) {
+        alert('Por favor, seleccione un número de bolsa disponible.');
+        return;
+    }
     alGuardar(datosFormulario);
   };
 
@@ -47,14 +55,24 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
         <div className={styles.grupoCampos}>
           <select name="tipo" className={styles.entrada} onChange={manejarCambio} required>
             <option value="">Seleccione un tipo</option>
-            <option value="bordado">Bordado</option>
-            <option value="estampado">Estampado</option>
+            <option value="Bordado">Bordado</option>
+            <option value="Estampado">Estampado</option>
+            <option value="Estampado y Bordado">Estampado y Bordado</option>
           </select>
           <input type="date" name="fechaEntrega" className={styles.entrada} onChange={manejarCambio} required />
         </div>
         <textarea name="descripcion" placeholder="Descripción del pedido" className={styles.areaTexto} onChange={manejarCambio} required></textarea>
         <div className={styles.grupoCampos}>
-          <input type="number" name="bolsa" placeholder="Nº Bolsa" className={styles.entrada} onChange={manejarCambio} required />
+          {/* CRÍTICO: CAMBIAMOS INPUT A SELECT Y USAMOS LA LISTA DE BOLSAS DISPONIBLES */}
+          <select name="bolsa" className={styles.entrada} onChange={manejarCambio} required>
+            <option value="">Nº Bolsa (Disponible)</option>
+            {bolsasDisponibles.map((bolsa) => (
+                <option key={bolsa} value={bolsa}>
+                    {bolsa}
+                </option>
+            ))}
+          </select>
+          {/* <input type="number" name="bolsa" placeholder="Nº Bolsa" className={styles.entrada} onChange={manejarCambio} required /> */}
           <input type="number" name="prendas" placeholder="Nº Prendas" className={styles.entrada} onChange={manejarCambio} required />
           <input type="number" name="abono" placeholder="Abono" className={styles.entrada} onChange={manejarCambio} />
         </div>

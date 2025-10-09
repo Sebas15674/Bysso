@@ -16,6 +16,7 @@ const Pedido = ({
     const enviarAProduccion = (nBolsa) => {
         const pedidosActualizados = pedidos.map(pedido => {
             if (pedido.bolsa === nBolsa) {
+                // Estado: De 'Pendiente' a 'En Producción'
                 return { ...pedido, estado: 'En Producción' };
             }
             return pedido;
@@ -23,12 +24,14 @@ const Pedido = ({
         setPedidos(pedidosActualizados);
     };
 
+    // CRÍTICO: Filtra para mostrar SOLO los pedidos en estado 'Pendiente'. 
+    // Esto excluye automáticamente a los 'Entregado', 'Producción', etc.
     const pedidosPendientes = pedidos.filter(pedido => pedido.estado === 'Pendiente');
 
     return (
         <div className={styles.contenedorPagina}>
             <div className={styles.encabezadoPedidos}>
-                <h1 className={styles.tituloPagina}>Pedidos</h1>
+                <h1 className={styles.tituloPagina}>Pedidos (Pendientes)</h1>
                 <Boton tipo="primario" onClick={() => abrirModal(null)}>
                     Crear Pedido ✚
                 </Boton>
