@@ -9,8 +9,8 @@ const TablaPedidos = ({ pedidos, alVerDetalles, alEnviarProduccion }) => {
       <table className={styles.tabla}>
         <thead>
           <tr>
-            <th>Cliente</th>
             <th>Nº Bolsa</th>
+            <th>Tipo</th>
             <th>Descripción</th>
             <th>Estado</th>
             <th>Acción</th>
@@ -24,8 +24,8 @@ const TablaPedidos = ({ pedidos, alVerDetalles, alEnviarProduccion }) => {
           ) : (
             pedidos.map(pedido => (
               <tr key={pedido.bolsa}>
-                <td>{pedido.cliente}</td>
                 <td>{pedido.bolsa}</td>
+                <td>{pedido.tipo}</td>
                 <td>{pedido.descripcion}</td>
                 <td>{pedido.estado}</td>
                 <td className={styles.acciones}>
