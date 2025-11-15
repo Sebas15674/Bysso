@@ -100,9 +100,9 @@ const FormularioPedido = ({ alGuardar, alCancelar, bolsasDisponibles }) => {
         if (fileInput) fileInput.value = '';
     };
 
-    /**
-     * 🚀 FUNCIÓN CORREGIDA: Asegura que 'bolsa' se serialice como string.
-     */
+    
+    
+     
     const manejarEnvio = (e) => {
         e.preventDefault();
 

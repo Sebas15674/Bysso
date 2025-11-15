@@ -36,9 +36,18 @@ const TablaHistorial = ({ pedidos }) => {
                                 </td>
                                 
                                 <td data-label="TRABAJADOR">{pedido.trabajadorAsignado || 'N/A'}</td>
-                                <td data-label="ESTADO" className={styles.colEstado}>
-                                    <span className={styles.badgeEntregado}>{pedido.estado}</span>
-                                </td>
+                               <td data-label="ESTADO" className={styles.colEstado}>
+                                <span 
+                                    // 🔑 CLAVE: Aplicar la clase condicional aquí
+                                    className={
+                                        pedido.estado === 'Cancelado' 
+                                            ? styles.badgeCancelado // Nueva clase para Cancelado (rojo)
+                                            : styles.badgeEntregado  // Clase existente para Entregado (verde)
+                                    }
+                                >
+                                    {pedido.estado}
+                                </span>
+                            </td>
                             </tr>
                         ))
                     )}

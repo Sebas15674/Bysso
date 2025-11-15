@@ -2,13 +2,14 @@
 
 /* Estilos base del botón */
 .boton {
-  padding: 11px 20px;
-  border-radius: 5px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.2s, color 0.2s, transform 0.2s;
-  font-size: 1.1rem;
+    padding: 11px 20px;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s, color 0.2s, transform 0.2s;
+    font-size: 1.1rem;
+    transition: all 0.3s ease; /* Transición */
 }
 
 .neutro {
@@ -18,71 +19,80 @@
     box-shadow: 0 1px 3px rgba(120, 149, 228, 0.61); /* Sombra verde que querías */
     font-size: 1.1rem;
 }
-/* Asegúrate de añadir la transición al estilo base .boton para que el hover sea suave */
-.boton {
-    transition: all 0.3s ease; /* Debe ser más lenta para el efecto de movimiento */
-    /* ... */
+
+/* ======================================= */
+/* 🔑 NUEVA CLASE PARA 'DESACTIVAR CANCELACIÓN' */
+/* ======================================= */
+.desactivar-cancelacion {
+    background-color: #cde9ad; /* Gris oscuro para neutralidad (Diferente al rojo) */
+    color: #000000; /* Texto blanco */
+    border-color: #000000;
 }
 
+.desactivar-cancelacion:hover {
+    background-color: #8ace9f;
+    border-color: #545b62;
+    transform: translateY(-2px);
+}
+/* ======================================= */
 
 /* Estilo para el botón primario (el predeterminado) */
 .primario {
-  background-color: #7face7;
-  color: rgb(0, 0, 0);
-  border-color: #000000;
-  margin-left: 6px;
+    background-color: #7face7;
+    color: rgb(0, 0, 0);
+    border-color: #000000;
+    /* MARGEN ELIMINADO para Flexbox: margin-left: 6px; */
 }
 
 .primario:hover {
-  background-color: #88db93;
-  border-color: #084ee6;
-  transform: translateY(-2px);
+    background-color: #88db93;
+    border-color: #084ee6;
+    transform: translateY(-2px);
 }
 
 /* Estilo para el botón exitoso (estado 'Enviado') */
 .exitoso {
-  background-color: #2ecc71; /* Color verde */
-  color: rgb(0, 0, 0);
-  border-color: #2ecc71;
-  cursor: default; /* Cambia el cursor para indicar que ya no se puede hacer clic */
+    background-color: #2ecc71; /* Color verde */
+    color: rgb(0, 0, 0);
+    border-color: #2ecc71;
+    cursor: default; /* Cambia el cursor para indicar que ya no se puede hacer clic */
 }
 
 .exitoso:hover {
-  background-color: #27ae60;
-  border-color: #27ae60;
-  transform: none; /* Evita el efecto de elevación en el hover */
+    background-color: #27ae60;
+    border-color: #27ae60;
+    transform: none; /* Evita el efecto de elevación en el hover */
 }
 
 .exito {
-  background-color: #2ecc71; /* Color verde */
-  color: rgb(0, 0, 0);
-  border-color: #2ecc71;
-  margin-left: 9px;
-  margin-top: 6px;
+    background-color: #2ecc71; /* Color verde */
+    color: rgb(0, 0, 0);
+    border-color: #2ecc71;
+    /* MÁRGENES ELIMINADOS para Flexbox: margin-left: 9px; margin-top: 6px; */
 }
 
 .exito:hover {
-  background-color: #27ae60;
-  border-color: #27ae60;
+    background-color: #27ae60;
+    border-color: #27ae60;
 }
 
 /* Estilo para el botón de Cancelar (peligro) */
 .peligro {
-  background-color: #e74c3c; /* Color rojo */
-  color: rgb(0, 0, 0);
-  border-color: #e74c3c;
+    background-color: #da6052; /* Color rojo */
+    color: rgb(0, 0, 0);
+    border-color: #000000;
 }
 
 .peligro:hover {
-  background-color: #c0392b;
-  border-color: #c0392b;
+    background-color: #c0392b;
+    border-color: #c0392b;
 }
 
 .info {
-  background-color: #83888a; /* Un azul de información */
-  color: rgb(0, 0, 0);
+    background-color: #83888a; /* Un azul de información */
+    color: rgb(0, 0, 0);
 }
 
 .info:hover {
-  background-color: #5377ad;
+    background-color: #5377ad;
 }

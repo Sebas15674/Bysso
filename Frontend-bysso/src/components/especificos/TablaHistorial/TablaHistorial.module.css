@@ -89,14 +89,26 @@
     text-align: center;
 }
 
-.badgeEntregado {
+/* Estilos comunes del badge, ya los tienes */
+.badgeEntregado, 
+.badgeCancelado {
     display: inline-block;
     padding: 0.4rem 0.8rem;
     border-radius: 9999px;
     font-weight: 700;
     font-size: 1.2rem;
-    color: #155724; 
-    background-color: #50eb74; 
+}
+
+/* Estilo para pedidos ENTREGADOS (verde) */
+.badgeEntregado {
+    color: #030303; 
+    background-color: #0af340; 
+}
+
+/* 🔑 NUEVO: Estilo para pedidos CANCELADOS (rojo) */
+.badgeCancelado {
+    color: #050505; /* Rojo oscuro para el texto */
+    background-color: #ec6370; /* Rojo suave para el fondo */
 }
 
 

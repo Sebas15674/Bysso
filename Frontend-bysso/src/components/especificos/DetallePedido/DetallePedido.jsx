@@ -304,9 +304,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
             <div className={styles.acciones}>
                 {isEditing ? (
                     <>
-                        <Boton tipo="primario" onClick={handleGuardarCambios}>
-                            Guardar Cambios ✅
-                        </Boton>
+                      
                         <Boton tipo="neutro" onClick={() => {
                                 setIsEditing(false);
                                 // Recargar datos originales
@@ -320,6 +318,10 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
                                 });
                             }}>
                             Cancelar Edición ❌
+                        </Boton>
+
+                          <Boton tipo="primario" onClick={handleGuardarCambios}>
+                            Guardar Cambios ✅
                         </Boton>
                     </>
                 ) : (

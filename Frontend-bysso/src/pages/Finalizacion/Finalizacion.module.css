@@ -1,14 +1,85 @@
-/* src/pages/Finalizacion/Finalizacion.module.css */
 .contenedorPagina {
-  flex: 1;
-  padding: 2rem;
-  margin: 0 auto;
+    flex: 1;
+    padding: 2rem;
+    margin: 0 auto;
+}
+
+/* 🔑 NUEVO: Contenedor para el título y futuros botones de acción */
+.encabezadoFinalizacion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
 }
 
 .tituloPagina {
-  font-size: 3rem;
-  font-weight: 600;
-  color: #0b3675;
-  margin-bottom: 5rem;
-  text-align: left;
+    font-size: 3rem;
+    font-weight: 600;
+    color: #0b3675;
+    margin: 2; /* Limpiamos el margin-bottom para usar el del contenedor padre */
+    text-align: left;
+}
+
+
+/* 🔑 ESTILOS PARA LA BARRA DE FILTROS Y LUPA */
+
+.barraFiltros {
+    margin: 1.5rem 0; /* Espacio arriba y abajo */
+    padding: 0.8rem 1.5rem;
+    background-color: #f8f9fa; /* Fondo claro */
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* CLAVE: Contenedor para posicionar la lupa */
+.inputContainer {
+    position: relative;
+    flex-grow: 1;
+    max-width: 450px;
+}
+
+/* ÍCONO DE LUPA (USANDO UNICODE Y PSEUDO-ELEMENTO) */
+.inputContainer::before {
+  
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.8rem;
+    color: #6c757d; 
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* --- Estilo del Campo de Búsqueda --- */
+.barraFiltros {
+    margin: 2rem 0; /* Espacio arriba y abajo */
+    padding: 0.5rem 1.4rem;
+    background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+    border-radius: 8px;
+    border: 1px solid #afacac;
+    
+    display: flex; /* Para manejar si agregas más filtros a futuro */
+    gap: 1rem;
+    align-items: center;
+}
+
+.inputFiltro {
+    flex-grow: 0; 
+    padding: 0.7rem 1rem;
+    border: 1px solid #6c6f72;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    transition: border-color 0.2s;
+    max-width: 450px; /* Limita el ancho del input */
+}
+
+.inputFiltro:focus {
+    border-color: #087efc;
+ 
+    outline: none;
 }

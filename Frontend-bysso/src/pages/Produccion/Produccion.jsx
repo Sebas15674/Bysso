@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import styles from './Produccion.module.css';
 import TablaProduccion from '../../components/especificos/TablaProduccion/TablaProduccion.jsx';
@@ -8,11 +8,15 @@ import DetalleProduccion from '../../components/especificos/DetalleProduccion/De
 const Produccion = ({ pedidos, setPedidos }) => {
     const [estaModalAbierto, setEstaModalAbierto] = useState(false);
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
+    
+    // 🔑 NUEVO ESTADO PARA EL FILTRO DE TEXTO
+    const [filtroTexto, setFiltroTexto] = useState('');
 
     const [searchParams] = useSearchParams();
-    const filtroEstado = searchParams.get('estado');
+    const filtroEstadoURL = searchParams.get('estado');
 
     const abrirModal = () => setEstaModalAbierto(true);
+    
     const cerrarModal = () => {
         setEstaModalAbierto(false);
         setPedidoSeleccionado(null);
@@ -23,25 +27,48 @@ const Produccion = ({ pedidos, setPedidos }) => {
         abrirModal();
     };
     
-    // CRÍTICO: El filtro ahora excluye explícitamente los estados finales ('Listo para Entrega', 'Entregado')
-    const pedidosFiltrados = pedidos.filter(pedido => {
-        // Los pedidos activos en producción son: 'En Producción' o 'En Proceso'
-        const estadoActivo = pedido.estado === 'En Producción' || pedido.estado === 'En Proceso';
+    // 🔑 OPTIMIZACIÓN: useMemo para el filtrado complejo
+    const pedidosFiltrados = useMemo(() => {
+        // 1. FILTRADO POR ESTADO BASE (Activos en Producción)
+        let listaFiltrada = pedidos.filter(pedido => {
+            const estadoActivo = pedido.estado === 'En Producción' || pedido.estado === 'En Proceso';
 
-        // Aseguramos que NO esté en un estado de entrega o historial
-        const esExcluido = pedido.estado === 'Listo para Entrega' || pedido.estado === 'Entregado';
+            // Excluir estados finales o cancelados
+            const esExcluido = pedido.estado === 'Listo para Entrega' || pedido.estado === 'Entregado' || pedido.estado === 'Cancelado';
+            
+            if (esExcluido) return false;
+
+            // Aplica filtro de URL si existe
+            if (filtroEstadoURL) {
+                return estadoActivo && pedido.estado === filtroEstadoURL;
+            }
+
+            // Muestra todos los estados activos si no hay filtro de URL
+            return estadoActivo;
+        });
         
-        if (esExcluido) return false;
-
-        // Si hay un filtro de URL, aplicarlo solo a los estados activos
-        if (filtroEstado) {
-             // Solo muestra si el estado coincide con el filtro y está activo
-            return estadoActivo && pedido.estado === filtroEstado;
+        // 2. FILTRADO POR TEXTO DE BÚSQUEDA
+        if (filtroTexto.trim() !== '') {
+            const textoBusqueda = filtroTexto.toLowerCase().trim();
+            
+            listaFiltrada = listaFiltrada.filter(p => {
+                const bolsa = String(p.bolsa).toLowerCase(); 
+                const cliente = p.cliente ? p.cliente.toLowerCase() : '';
+                const descripcion = p.descripcion ? p.descripcion.toLowerCase() : '';
+                const estado = p.estado ? p.estado.toLowerCase() : '';
+                
+                return (
+                    cliente.includes(textoBusqueda) ||
+                    bolsa.includes(textoBusqueda) ||
+                    descripcion.includes(textoBusqueda) ||
+                    estado.includes(textoBusqueda)
+                );
+            });
         }
-
-        // Si no hay filtro de URL, muestra todos los estados activos
-        return estadoActivo;
-    });
+        
+        return listaFiltrada;
+        
+    }, [pedidos, filtroEstadoURL, filtroTexto]); // ⬅️ Dependencias para re-ejecutar solo cuando es necesario
 
     const tomarPedido = (nBolsa) => {
         const pedidosActualizados = pedidos.map(pedido => {
@@ -78,19 +105,38 @@ const Produccion = ({ pedidos, setPedidos }) => {
             <div className={styles.encabezadoPedidos}>
                 <h1 className={styles.tituloPagina}>
                     Ordenes de Producción
-                    {filtroEstado && ` - (${filtroEstado})`}
+                    {filtroEstadoURL && ` - (${filtroEstadoURL})`}
                 </h1>
             </div>
+            
+            {/* 🔑 NUEVA BARRA DE FILTROS */}
+            <div className={styles.barraFiltros}>
+                <div className={styles.inputContainer}> 
+                    <input 
+                        type="text"
+                        placeholder="Buscar "
+                        value={filtroTexto}
+                        onChange={(e) => setFiltroTexto(e.target.value)}
+                        className={styles.inputFiltro}
+                    />
+                </div>
+            </div>
+
             <TablaProduccion
                 pedidos={pedidosFiltrados}
                 alVerDetalles={verDetalles}
                 alTomarPedido={tomarPedido}
                 alFinalizar={finalizarProduccion}
             />
-            <Modal estaAbierto={estaModalAbierto} alCerrar={cerrarModal}
-            cierraAlHacerClickAfuera={true}>
-            
-                <DetalleProduccion pedido={pedidoSeleccionado} alCerrarModal={cerrarModal} />
+            <Modal 
+                estaAbierto={estaModalAbierto} 
+                alCerrar={cerrarModal}
+                cierraAlHacerClickAfuera={true}
+            >
+                <DetalleProduccion 
+                    pedido={pedidoSeleccionado} 
+                    alCerrarModal={cerrarModal} 
+                />
             </Modal>
         </div>
     );

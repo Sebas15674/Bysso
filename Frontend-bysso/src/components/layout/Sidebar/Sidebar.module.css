@@ -1,7 +1,7 @@
 /* src/components/layout/sidebar/Sidebar.module.css */
 .menu {
   position: fixed;
-  top: 4rem;
+  top: 5.4rem;
   left: -250px;
   width: 250px;
   height: calc(100vh - 4rem); 

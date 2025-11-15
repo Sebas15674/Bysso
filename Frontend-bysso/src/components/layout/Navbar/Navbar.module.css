@@ -3,8 +3,8 @@
   /* Espacia los elementos del inicio y del final */
   justify-content: space-between; 
   align-items: center;
-  padding: 0rem 2rem;
-  background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+  padding: 0.7rem 2rem;
+  background: linear-gradient(90deg, #4d7c8f, #2b2a2a);
   color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: sticky;
@@ -30,7 +30,7 @@
 
 .tituloPagina {
   text-align: left;
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 600;
 }
 

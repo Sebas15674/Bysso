@@ -5,7 +5,7 @@ import Navbar from './components/layout/Navbar/Navbar.jsx';
 import Footer from './components/layout/Footer/Footer.jsx';
 import Modal from './components/ui/Modal/Modal.jsx';
 import FormularioPedido from './components/especificos/FormularioPedido/FormularioPedido.jsx';
-import DetallePedido from './components/especificos/DetallePedido/DetallePedido.jsx'; // 👈 Asegúrate de que DetallePedido maneje el tipo de bolsa.
+import DetallePedido from './components/especificos/DetallePedido/DetallePedido.jsx';
 import Home from './pages/Home/Home.jsx'; 
 import Pedido from './pages/Pedido/Pedido.jsx'; 
 import Produccion from './pages/Produccion/Produccion.jsx'; 
@@ -177,7 +177,6 @@ const AppLayout = ({
                         imagenFinal = null;
                     } else if (datosActualizados.imagen === 'FILE_UPLOADING') {
                         // El modal tenía una imagen File cargada, pero no se envió un nuevo File.
-                        // Mantenemos la imagen original (pedido.imagen) que puede ser un File o un string.
                         imagenFinal = pedido.imagen;
                     } else {
                         // Mantiene la imagen original si no hay cambios.
@@ -196,6 +195,58 @@ const AppLayout = ({
         );
         cerrarModal(); 
     };
+
+    // ======================================================================
+    // 🔑 FUNCIÓN DE CANCELACIÓN DE PEDIDOS (MOVIMIENTO AL ESTADO 'CANCELADO')
+    // ======================================================================
+
+    /**
+     * Mueve los pedidos seleccionados al estado 'Cancelado' y libera sus bolsas.
+     * @param {string[]} bolsasACancelar - Array de IDs de bolsa de los pedidos a cancelar.
+     */
+    const handleCancelarPedidos = (bolsasACancelar) => {
+        if (!window.confirm(`¿Estás seguro de que deseas CANCELAR ${bolsasACancelar.length} pedido(s)? Se moverán al historial y se liberarán las bolsas.`)) {
+            return;
+        }
+
+        const bolsasLiberadas = [];
+
+        // 1. Actualizar el estado de los pedidos a 'Cancelado'
+        setPedidos(prevPedidos => 
+            prevPedidos.map(pedido => {
+                // Solo cancelamos pedidos que NO están entregados.
+                if (bolsasACancelar.includes(pedido.bolsa) && pedido.estado !== 'Entregado' && pedido.estado !== 'Cancelado') {
+                    bolsasLiberadas.push(pedido.bolsa); // Marcamos la bolsa para liberar
+                    return { 
+                        ...pedido, 
+                        estado: 'Cancelado', 
+                        fechaCancelacion: new Date().toLocaleString('es-CO', { 
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        })
+                    };
+                }
+                return pedido;
+            })
+        );
+
+        // 2. Liberar las bolsas que se hayan cancelado
+        setBolsasOcupadas(prevOcupadas => prevOcupadas.filter(bolsa => !bolsasLiberadas.includes(bolsa)));
+        
+        setBolsasDisponibles(prevDisponibles => {
+            const nuevasDisponibles = new Set([...prevDisponibles, ...bolsasLiberadas]);
+            return Array.from(nuevasDisponibles).sort(sortBags);
+        });
+
+        console.log(`✅ Pedidos con bolsas: ${bolsasACancelar.join(', ')} han sido cancelados y sus bolsas liberadas.`);
+    };
+
+    // ======================================================================
+    // FIN: FUNCIÓN DE CANCELACIÓN
+    // ======================================================================
 
 
     const handleEntregarPedido = (nBolsa) => {
@@ -252,7 +303,17 @@ const AppLayout = ({
                 <div className="content-area"> 
                     <Routes>
                         <Route path="/" element={<Home pedidos={pedidos} abrirModal={abrirModal} />} />
-                        <Route path="/pedidos" element={<Pedido pedidos={pedidos} setPedidos={setPedidos} abrirModal={abrirModal} />} />
+                        <Route 
+                            path="/pedidos" 
+                            element={
+                                <Pedido 
+                                    pedidos={pedidos} 
+                                    setPedidos={setPedidos} 
+                                    abrirModal={abrirModal} 
+                                    alCancelarPedidos={handleCancelarPedidos} // PROP CANCELACIÓN
+                                />
+                            } 
+                        />
                         <Route path="/produccion" element={<Produccion pedidos={pedidos} setPedidos={setPedidos} abrirModal={abrirModal} />} />
                         <Route path="/finalizacion" element={<Finalizacion pedidos={pedidos} setPedidos={setPedidos} handleEntregarPedido={handleEntregarPedido} />} />
                         <Route path="/historial" element={<Historial pedidos={pedidos} handleResetTodo={handleResetTodo} />} /> 

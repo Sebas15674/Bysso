@@ -21,6 +21,7 @@
     top: 4.1rem; 
     right: -350px; 
     z-index: 5;
+    background-color: #000000;
 }
 
 
@@ -33,7 +34,7 @@
     display: flex;
     justify-content: space-between; 
     align-items: center;
-    margin-bottom: 4rem;
+    margin-bottom: 6rem;
 }
 
 .accionesEncabezado {

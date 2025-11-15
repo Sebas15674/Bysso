@@ -1,6 +1,6 @@
 /* ----------------------------------
-   Contenedor Principal (Coherente con Finalizacion)
-   ---------------------------------- */
+    Contenedor Principal (Coherente con Finalizacion)
+    ---------------------------------- */
 .contenedorPagina {
     flex: 1;
     padding: 2rem;
@@ -19,8 +19,8 @@
 }
 
 /* ----------------------------------
-   Header y Controles (CRÍTICO: Ubicación del Botón)
-   ---------------------------------- */
+    Header y Controles (CRÍTICO: Ubicación del Botón)
+    ---------------------------------- */
 .header {
     /* Agrupamos el título y el subtítulo */
     display: flex;
@@ -51,4 +51,54 @@
     transition: background-color 0.3s ease;
     white-space: nowrap; /* Evita que el texto del botón se rompa */
 }
-/* ... El resto de los estilos del historial (tablaWrapper, tabla, etc.) se mantienen igual ... */
+
+
+/* 🔑 ESTILOS PARA LA BARRA DE FILTROS Y LUPA */
+
+.barraFiltros {
+    margin: 1.5rem 0; /* Espacio arriba y abajo */
+    padding: 0.8rem 1.5rem;
+    background-color: #f8f9fa; /* Fondo claro */
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* CLAVE: Contenedor para posicionar la lupa */
+.inputContainer {
+    position: relative;
+    flex-grow: 1;
+    max-width: 450px;
+}
+
+/* 🔑 NUEVOS ESTILOS PARA LA BARRA DE FILTROS */
+
+.barraFiltros {
+    margin: 2rem 0; /* Espacio arriba y abajo */
+    padding: 0.5rem 1.4rem;
+    background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+    border-radius: 8px;
+    border: 1px solid #afacac;
+    
+    display: flex; /* Para manejar si agregas más filtros a futuro */
+    gap: 1rem;
+    align-items: center;
+}
+
+.inputFiltro {
+    flex-grow: 0; 
+    padding: 0.7rem 1rem;
+    border: 1px solid #6c6f72;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    transition: border-color 0.2s;
+    max-width: 450px; /* Limita el ancho del input */
+}
+
+.inputFiltro:focus {
+    border-color: #087efc;
+    outline: none;
+}

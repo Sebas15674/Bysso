@@ -1,21 +1,55 @@
-/* src/pages/Pedido/Pedido.module.css */
 .contenedorPagina {
-  flex: 1;
-  padding: 2rem;
-
-  margin: 0 auto; /* Centra el contenedor en la pantalla */
+    flex: 1;
+    padding: 2rem;
+    margin: 0 auto; /* Centra el contenedor en la pantalla */
 }
 
 .encabezadoPedidos {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+/* NUEVO: Contenedor para alinear los botones de acción (Cancelar y Crear) */
+.controlesAcciones {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 .tituloPagina {
-  font-size: 3rem;
-  font-weight: 600;
-  color: #0b3675;
-  margin: 3;
+    font-size: 3rem;
+    font-weight: 600;
+    color: #0b3675;
+    margin: 3;
+}
+
+/* 🔑 NUEVOS ESTILOS PARA LA BARRA DE FILTROS */
+
+.barraFiltros {
+    margin: 2rem 0; /* Espacio arriba y abajo */
+    padding: 0.5rem 1.4rem;
+    background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+    border-radius: 8px;
+    border: 1px solid #afacac;
+    
+    display: flex; /* Para manejar si agregas más filtros a futuro */
+    gap: 1rem;
+    align-items: center;
+}
+
+.inputFiltro {
+    flex-grow: 0; 
+    padding: 0.7rem 1rem;
+    border: 1px solid #6c6f72;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    transition: border-color 0.2s;
+    max-width: 450px; /* Limita el ancho del input */
+}
+
+.inputFiltro:focus {
+    border-color: #087efc;
+    outline: none;
 }
