@@ -170,6 +170,7 @@ const FormularioPedido = ({ alGuardar, alCancelar, bolsasDisponibles }) => {
                         <option value="Bordado">Bordado</option>
                         <option value="Estampado">Estampado</option>
                         <option value="Estampado y Bordado">Estampado y Bordado</option>
+                        <option value="otros">Otros</option>
                     </select>
                     <input type="date" name="fechaEntrega" className={styles.entrada} onChange={manejarCambio} required value={datosFormulario.fechaEntrega} />
                 </div>
