@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Definición del modelo para la tabla de Pedidos
+model Pedido {
+  id        String   @id @default(uuid())
+  
+  nombreCompleto String   @map("nombre_completo")
+  numeroTelefono String   @map("numero_telefono")
+  cedula         String
+  numeroPrendas  Int      @map("numero_prendas")
+  elegirDiseno   String   @map("elegir_diseno")
+  numeroBolsa    Int      @map("numero_bolsa")
+  descripcion    String?
+  
+  abono          Float
+  totalPagar     Float    @map("total_pagar")
+  
+  posibleFechaEntrega    DateTime? @map("posible_fecha_entrega")
+  fechaProduccionIniciada  DateTime? @map("fecha_produccion_iniciada")
+  fechaProduccionFinalizada DateTime? @map("fecha_produccion_finalizada")
+  fechaEntregaFinalizada   DateTime? @map("fecha_entrega_finalizada")
+
+  estado         EstadoPedido @default(PENDIENTE)
+  creadoPor      String       @map("creado_por")
+
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("pedidos")
+}
+
+// Enum para los estados de un pedido
+enum EstadoPedido {
+  PENDIENTE
+  EN_PRODUCCION
+  EN_PROCESO
+  FINALIZADO
+  ENTREGADO
+  CANCELADO
+}
