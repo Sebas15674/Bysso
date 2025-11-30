@@ -1,45 +1,71 @@
-import { PrismaClient, EstadoPedido } from '@prisma/client';
+// server/prisma/seed.ts
 
-// Inicializa el cliente de Prisma
+import { PrismaClient, OrderStatus, OrderType, BagStatus, Prisma } from '@prisma/client';
+
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Iniciando el proceso de seeding...');
+  console.log('Start seeding...');
 
-  // Limpiar datos existentes para evitar duplicados
-  await prisma.pedido.deleteMany();
-  console.log('Datos antiguos eliminados.');
+  // ----------------------------------------------------------------------
+  // 1. Seed Bags (Bolsas)
+  // ----------------------------------------------------------------------
+  console.log('Seeding Bags...');
+  // Explicitly define the type of bagsToCreate
+  const bagsToCreate: Prisma.BagCreateInput[] = []; // Corrected: Added explicit type
 
-  // Crear un pedido de ejemplo
-  const pedido1 = await prisma.pedido.create({
-    data: {
-      nombreCompleto: 'Juan Pérez',
-      numeroTelefono: '3001234567',
-      cedula: '123456789',
-      numeroPrendas: 3,
-      elegirDiseno: 'Diseño personalizado #123',
-      numeroBolsa: 101,
-      descripcion: 'Camiseta negra talla M, con logo en el pecho.',
-      abono: 50000,
-      totalPagar: 150000,
-      posibleFechaEntrega: new Date('2025-12-24T10:00:00Z'),
-      estado: EstadoPedido.EN_PRODUCCION,
-      creadoPor: 'admin_user',
-      fechaProduccionIniciada: new Date(),
-    },
-  });
+  const tipos = ['a', 'v']; // 'a' para azul, 'v' para verde
 
-  console.log('Seeding completado.');
-  console.log(`Creado pedido con ID: ${pedido1.id}`);
+  // Bolsas Duales (1 al 20) -> '1a', '1v', ..., '20a', '20v'
+  for (let i = 1; i <= 20; i++) {
+    tipos.forEach(tipo => {
+      bagsToCreate.push({ id: `${i}${tipo}`, status: BagStatus.DISPONIBLE });
+    });
+  }
+
+  // Bolsas Simples (21 al 180) -> '21', '22', ..., '180'
+  for (let i = 21; i <= 180; i++) {
+    bagsToCreate.push({ id: String(i), status: BagStatus.DISPONIBLE });
+  }
+
+  // Use a transaction to create all bags
+  await prisma.$transaction(
+    bagsToCreate.map(bag => prisma.bag.upsert({
+      where: { id: bag.id },
+      update: { status: BagStatus.DISPONIBLE }, // Ensure they are available on update
+      create: bag,
+    }))
+  );
+  console.log(`Created/Updated ${bagsToCreate.length} Bags.`);
+
+  // ----------------------------------------------------------------------
+  // 2. Seed Workers (Trabajadores)
+  // ----------------------------------------------------------------------
+  console.log('Seeding Workers...');
+  const workersToCreate = [
+    { nombre: 'Alba lucia Noreña' },
+    { nombre: 'Dayana Gallego' },
+    { nombre: 'Rosa Sanchez' },
+    { nombre: 'Juliana Betancur Noreña' },
+  ];
+
+  for (const worker of workersToCreate) {
+    await prisma.worker.upsert({
+      where: { nombre: worker.nombre },
+      update: worker,
+      create: worker,
+    });
+  }
+  console.log(`Created/Updated ${workersToCreate.length} Workers.`);
+
+  console.log('Seeding finished.');
 }
 
-// Ejecutar la función main y manejar errores
 main()
   .catch((e) => {
     console.error(e);
     process.exit(1);
   })
   .finally(async () => {
-    // Cerrar la conexión a la base de datos
     await prisma.$disconnect();
   });
