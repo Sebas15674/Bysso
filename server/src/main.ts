@@ -1,19 +1,23 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule); //toma appmodule como parametro porque es el que se encarga de permisos y ejecución
-  //Se trae el validationPipe de NestJS para validar los DTOs y las peticiones entrantes.
-  //El ValidationPipe se encarga de validar los datos de entrada y aplicar transformaciones.
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true, // elimina propiedades no definidas en el DTO
-      forbidNonWhitelisted: true, // lanza error si envían propiedades extra
-      transform: true, // convierte tipos (ej: string a number)
-    }),
-  );
+  const app = await NestFactory.create(AppModule);
 
-  await app.listen(process.env.PORT ?? 3000);
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true, // Automatically transform payloads to DTO instances
+    whitelist: true, // Strip properties that do not exist in the DTO
+    forbidNonWhitelisted: true, // Throw an error if non-whitelisted properties are present
+  }));
+
+  // Assuming CORS is needed for frontend communication
+  app.enableCors({
+    origin: 'http://localhost:5173', // Replace with your frontend URL
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
+  await app.listen(3000);
 }
-bootstrap(); //ejecuta la función
+bootstrap();

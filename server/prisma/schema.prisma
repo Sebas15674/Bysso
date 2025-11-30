@@ -1,5 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -10,41 +9,116 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Definición del modelo para la tabla de Pedidos
-model Pedido {
-  id        String   @id @default(uuid())
-  
-  nombreCompleto String   @map("nombre_completo")
-  numeroTelefono String   @map("numero_telefono")
-  cedula         String
-  numeroPrendas  Int      @map("numero_prendas")
-  elegirDiseno   String   @map("elegir_diseno")
-  numeroBolsa    Int      @map("numero_bolsa")
-  descripcion    String?
-  
-  abono          Float
-  totalPagar     Float    @map("total_pagar")
-  
-  posibleFechaEntrega    DateTime? @map("posible_fecha_entrega")
-  fechaProduccionIniciada  DateTime? @map("fecha_produccion_iniciada")
-  fechaProduccionFinalizada DateTime? @map("fecha_produccion_finalizada")
-  fechaEntregaFinalizada   DateTime? @map("fecha_entrega_finalizada")
+// ================================================================
+// ENUMS
+// ================================================================
 
-  estado         EstadoPedido @default(PENDIENTE)
-  creadoPor      String       @map("creado_por")
-
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  @@map("pedidos")
+enum OrderStatus {
+  PENDIENTE        // Pedido recién creado
+  EN_PRODUCCION    // Enviado a la fase de producción
+  EN_PROCESO       // Alguien ha tomado el pedido para trabajar en él
+  LISTO_PARA_ENTREGA // Producción finalizada, listo para ser entregado
+  ENTREGADO        // Pedido entregado al cliente
+  CANCELADO        // Pedido cancelado
 }
 
-// Enum para los estados de un pedido
-enum EstadoPedido {
-  PENDIENTE
-  EN_PRODUCCION
-  EN_PROCESO
-  FINALIZADO
-  ENTREGADO
-  CANCELADO
+enum OrderType {
+  BORDADO
+  ESTAMPADO
+  ESTAMPADO_Y_BORDADO
+  OTROS
+}
+
+enum BagStatus {
+  DISPONIBLE
+  OCUPADA
+}
+
+// ================================================================
+// MODELOS
+// ================================================================
+
+model Order {
+  id                 String      @id @default(uuid())
+  
+  // --- CAMBIOS CLAVE AQUÍ: RELACIONES EN LUGAR DE CAMPOS DUPLICADOS ---
+  clienteId          String      // Clave foránea para el Cliente
+  cliente            Client      @relation(fields: [clienteId], references: [id]) // Relación con el modelo Cliente
+
+  trabajadorId       String      // Clave foránea para el Trabajador asignado
+  trabajador         Worker      @relation(fields: [trabajadorId], references: [id]) // Relación con el modelo Worker
+
+  tipo               OrderType
+  descripcion        String
+  abono              Decimal     @default(0) @db.Decimal(10, 2) // Total 10 dígitos, 2 decimales
+  prendas            Int         @default(0) // Asumo que esto es un conteo de prendas, no la relación a prendas individuales
+  fechaEntrega       DateTime    @db.Date // Solo la fecha
+  total              Decimal     @default(0) @db.Decimal(10, 2)
+  imagenUrl          String?     @db.VarChar(500) // URL de la imagen en el almacenamiento
+
+  // Campos de control de estado
+  estado             OrderStatus @default(PENDIENTE)
+
+  // Fechas de ciclo de vida
+  fechaFinalizacion  DateTime?   @db.Date // Fecha en que se marca como LISTO_PARA_ENTREGA
+  fechaCancelacion   DateTime?   // Fecha y hora de cancelación
+  fechaEntregaReal   DateTime?   // Fecha y hora de entrega
+
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  // Relación con Bag (1:1, un Order tiene una Bag, una Bag puede estar ocupada por un Order)
+  bagId              String      // El ID de la bolsa es el identificador (ej: "1a", "21")
+  bag                Bag         @relation(fields: [bagId], references: [id])
+
+  @@index([estado])
+  @@index([clienteId]) // Nuevo índice para búsquedas por cliente
+  @@index([trabajadorId]) // Nuevo índice para búsquedas por trabajador
+  @@index([fechaEntrega])
+  @@index([fechaFinalizacion])
+  @@index([fechaCancelacion])
+  @@index([fechaEntregaReal])
+  @@map("orders") // Nombre de la tabla en la base de datos
+}
+
+model Bag {
+  id          String    @id @db.VarChar(10) // ej: "1a", "21". Es el identificador de la bolsa.
+  status      BagStatus @default(DISPONIBLE)
+  pedidos     Order[] 
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([id]) // Asegura que no haya bolsas duplicadas
+  @@index([status])
+  @@map("bolsas") // Nombre de la tabla en la base de datos (se cambia de "bags" a "bolsas" para consistencia)
+}
+
+model Client {
+  id        String    @id @default(uuid())
+  nombre    String    @db.VarChar(255)
+  cedula    String    @unique @db.VarChar(20)
+  celular   String    @db.VarChar(20)
+
+  // --- NUEVA RELACIÓN INVERSA ---
+  pedidos   Order[] // Un cliente puede tener muchos pedidos
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("clientes") // Nombre de la tabla en la base de datos
+}
+
+model Worker {
+  id        String    @id @default(uuid())
+  nombre    String    @unique @db.VarChar(255) // Nombre completo del trabajador
+  activo    Boolean   @default(true)
+
+  // --- NUEVA RELACIÓN INVERSA ---
+  pedidosAsignados Order[] // Un trabajador puede tener muchos pedidos asignados
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("workers")
 }
