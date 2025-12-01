@@ -8,7 +8,8 @@ import {
   ArrayMaxSize,
   ArrayMinSize,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer'; // Importar Transform
+
 import { OrderStatus } from '@prisma/client';
 
 export class OrderQueryDto {
@@ -21,8 +22,8 @@ export class OrderQueryDto {
   @IsEnum(OrderStatus, { each: true, message: 'Cada estado en la lista de estados debe ser un valor válido.' })
   @ArrayMinSize(1, { message: 'Debe proporcionar al menos un estado si utiliza el filtro de estados.' })
   @ArrayMaxSize(Object.values(OrderStatus).length, { message: 'No se pueden especificar más estados que los disponibles.' })
-  @Type(() => String) // Ensure that array elements are transformed to string if they come as single string "PENDIENTE,EN_PRODUCCION"
-  estado?: OrderStatus[]; // Can be a single status or comma-separated for multiple
+  @Transform(({ value }) => value.split(',').map((item: string) => item.toUpperCase())) // Transforma la cadena en un array de strings en mayúsculas
+  estado?: OrderStatus[];
 
   @IsOptional()
   @Type(() => Number)

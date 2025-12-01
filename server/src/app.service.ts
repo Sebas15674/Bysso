@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  
   solicitud(): string {
     return 'Confirmación de solicitud';
   }

@@ -10,13 +10,12 @@ import {
   HttpCode,
   HttpStatus,
   Query,
-  ParseBoolPipe,
-  DefaultValuePipe,
-} from '@nestjs/common';
+} from '@nestjs/common'; // Se eliminan ParseBoolPipe y DefaultValuePipe
 import { WorkersService } from './workers.service';
 import { CreateWorkerDto } from './dto/create-worker.dto';
 import { UpdateWorkerDto } from './dto/update-worker.dto';
-import { ApiOperation, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
+import { QueryWorkerDto } from './dto/query-worker.dto'; // Importar el nuevo DTO
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'; // Se elimina ApiQuery
 
 @ApiTags('Trabajadores')
 @Controller('workers')
@@ -26,24 +25,19 @@ export class WorkersController {
   @Post()
   @ApiOperation({ summary: 'Crear un nuevo trabajador' })
   @ApiResponse({ status: 201, description: 'Trabajador creado exitosamente.' })
-  @ApiResponse({ status: 409, description: 'El nombre del trabajador ya existe.' })
+  @ApiResponse({
+    status: 409,
+    description: 'El nombre del trabajador ya existe.',
+  })
   create(@Body() createWorkerDto: CreateWorkerDto) {
     return this.workersService.create(createWorkerDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Obtener una lista de trabajadores' })
-  @ApiQuery({
-    name: 'activo',
-    required: false,
-    type: Boolean,
-    description: 'Filtrar trabajadores por su estado de actividad.',
-  })
   @ApiResponse({ status: 200, description: 'Lista de trabajadores obtenida.' })
-  findAll(
-    @Query('activo', new DefaultValuePipe(undefined), ParseBoolPipe) activo?: boolean,
-  ) {
-    return this.workersService.findAll(activo);
+  findAll(@Query() query: QueryWorkerDto) { // Usar QueryWorkerDto
+    return this.workersService.findAll(query.activo);
   }
 
   @Get(':id')
@@ -73,7 +67,8 @@ export class WorkersController {
   @ApiResponse({ status: 404, description: 'Trabajador no encontrado.' })
   @ApiResponse({
     status: 409,
-    description: 'El trabajador no se puede eliminar porque tiene pedidos asignados.',
+    description:
+      'El trabajador no se puede eliminar porque tiene pedidos asignados.',
   })
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.workersService.remove(id);

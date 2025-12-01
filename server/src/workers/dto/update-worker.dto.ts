@@ -25,6 +25,8 @@ export class UpdateWorkerDto {
     example: false,
   })
   @IsOptional()
-  @IsBoolean({ message: 'El estado activo debe ser un valor booleano (true/false).' })
+  @IsBoolean({
+    message: 'El estado activo debe ser un valor booleano (true/false).',
+  })
   activo?: boolean;
 }

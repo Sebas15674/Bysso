@@ -8,7 +8,8 @@ import {
   Delete,
   ParseUUIDPipe, // Novedad: Para validar IDs
   HttpCode, // Novedad: Para códigos de estado específicos
-  HttpStatus, // Novedad: Para códigos de estado específicos
+  HttpStatus,
+  NotFoundException // Novedad: Para códigos de estado específicos
 } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { QueryClientDto } from './dto/query-client.dto';
@@ -21,11 +22,33 @@ export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Buscar clientes para autocompletado', description: 'Permite buscar clientes por nombre, cédula o celular. Ideal para campos de autocompletado.' })
-  @ApiResponse({ status: 200, description: 'Lista de clientes que coinciden con la búsqueda.' })
-  @ApiResponse({ status: 400, description: 'Parámetros de consulta inválidos.' })
-  searchClients(@Query() query: QueryClientDto) {
-    return this.clientsService.search(query);
+  @ApiOperation({
+    summary: 'Obtener una lista general de clientes',
+    description: 'Permite obtener todos los clientes o filtrar por un término de búsqueda.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de clientes obtenida, con o sin filtro de búsqueda.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Parámetros de consulta inválidos.',
+  })
+  findAllClients(@Query() query: QueryClientDto) {
+    return this.clientsService.findAll(query);
+  }
+
+  // Novedad: Endpoint para obtener un cliente por su número de cédula
+  @Get('cedula/:cedula')
+  @ApiOperation({ summary: 'Obtener un cliente por su número de cédula' })
+  @ApiResponse({ status: 200, description: 'Cliente encontrado.' })
+  @ApiResponse({ status: 404, description: 'Cliente no encontrado.' })
+  async findOneByCedula(@Param('cedula') cedula: string) {
+    const client = await this.clientsService.findOneByCedula(cedula);
+    if (!client) {
+      throw new NotFoundException(`Cliente con cédula "${cedula}" no encontrado.`);
+    }
+    return client;
   }
 
   // Novedad: Endpoint para obtener un cliente por su ID
@@ -40,10 +63,19 @@ export class ClientsController {
   // Novedad: Endpoint para actualizar un cliente
   @Patch(':id')
   @ApiOperation({ summary: 'Actualizar un cliente por su ID' })
-  @ApiResponse({ status: 200, description: 'Cliente actualizado exitosamente.' })
-  @ApiResponse({ status: 400, description: 'Datos de actualización inválidos.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Cliente actualizado exitosamente.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos de actualización inválidos.',
+  })
   @ApiResponse({ status: 404, description: 'Cliente no encontrado.' })
-  @ApiBody({ type: UpdateClientDto, description: 'Datos para actualizar el cliente' })
+  @ApiBody({
+    type: UpdateClientDto,
+    description: 'Datos para actualizar el cliente',
+  })
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateClientDto: UpdateClientDto,
