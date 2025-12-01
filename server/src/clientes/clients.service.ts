@@ -1,5 +1,5 @@
 // server/src/clientes/clients.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { QueryClientDto } from './dto/query-client.dto';
@@ -30,22 +30,40 @@ export class ClientsService {
   }
 
   /**
-   * Busca clientes para el autocompletado por nombre, cédula o celular.
-   * @param query Objeto de consulta con el término de búsqueda.
-   * @returns Lista de clientes que coinciden.
+   * Obtiene una lista de clientes, con posibilidad de filtrar por un término de búsqueda.
+   * Si no se proporciona un término de búsqueda, devuelve todos los clientes.
+   * @param query Objeto de consulta que puede contener un término de búsqueda.
+   * @returns Lista de clientes que coinciden con la búsqueda o todos los clientes.
    */
-  async search(query: QueryClientDto): Promise<Client[]> {
+  async findAll(query?: QueryClientDto): Promise<Client[]> {
+    const where: Prisma.ClientWhereInput = {};
+    if (query?.search) {
+      const searchLower = query.search.toLowerCase();
+      where.OR = [
+        { nombre: { contains: searchLower, mode: 'insensitive' } },
+        { cedula: { contains: searchLower, mode: 'insensitive' } },
+        { celular: { contains: searchLower, mode: 'insensitive' } },
+      ];
+    }
+    // Aquí se pueden añadir filtros adicionales o lógica de paginación si QueryClientDto la soporta.
+    return this.prisma.client.findMany({
+      where,
+      orderBy: { nombre: 'asc' },
+    });
+  }
+
+  /**
+   * Busca clientes para el autocompletado por nombre, cédula o celular.
+   * Si no hay término de búsqueda, devuelve un array vacío.
+   * @param query Objeto de consulta con el término de búsqueda.
+   * @returns Lista de clientes que coinciden (limitada a 10 resultados).
+   */
+  async autocompleteSearch(query: QueryClientDto): Promise<Client[]> {
     const { search } = query;
     if (!search) {
-      // Si no hay término de búsqueda, podríamos devolver un límite o nada.
-      // Para autocompletado, lo ideal es devolver un array vacío o un límite pequeño.
-      return []; // Devolver vacío si no hay búsqueda
-      // O, para un comportamiento más "fuzzy":
-      // return this.prisma.client.findMany({ take: 10 }); // Devolver los primeros 10 si no hay búsqueda
+      return []; // Devolver vacío si no hay búsqueda para autocompletado
     }
-
     const searchLower = search.toLowerCase();
-
     return this.prisma.client.findMany({
       where: {
         OR: [
@@ -56,6 +74,12 @@ export class ClientsService {
       },
       take: 10, // Limitar los resultados para el autocompletado
       orderBy: { nombre: 'asc' },
+    });
+  }
+
+  async findOneByCedula(cedula: string): Promise<Client | null> {
+    return this.prisma.client.findUnique({
+      where: { cedula },
     });
   }
 
@@ -74,7 +98,7 @@ export class ClientsService {
     }
     return client;
   }
-  
+
   // Novedad: Método para actualizar un cliente
   async update(id: string, updateClientDto: UpdateClientDto): Promise<Client> {
     await this.findOne(id); // Verifica si el cliente existe
@@ -91,11 +115,18 @@ export class ClientsService {
 
   // Novedad: Método para eliminar un cliente
   async remove(id: string): Promise<Client> {
-    await this.findOne(id); // Verifica si el cliente existe
+    const client = await this.findOne(id); // Asegura que el cliente exista
 
-    // Considerar verificar si el cliente tiene pedidos asociados antes de eliminarlo
-    // Si tiene pedidos, se podría optar por un "soft delete" o lanzar una excepción
-    // Por ahora, implementamos una eliminación directa.
+    const assignedOrdersCount = await this.prisma.order.count({
+      where: { clienteId: id },
+    });
+
+    if (assignedOrdersCount > 0) {
+      throw new ConflictException(
+        `El cliente "${client.nombre}" no puede ser eliminado porque tiene ${assignedOrdersCount} pedido(s) asignado(s).`,
+      );
+    }
+
     return this.prisma.client.delete({
       where: { id },
     });

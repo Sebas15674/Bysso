@@ -11,7 +11,13 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderQueryDto } from './dto/order-query.dto';
 import { CancelOrdersDto } from './dto/cancel-orders.dto';
-import { Order, OrderStatus, BagStatus, Prisma, OrderType } from '@prisma/client';
+import {
+  Order,
+  OrderStatus,
+  BagStatus,
+  Prisma,
+  OrderType,
+} from '@prisma/client';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Decimal } from '@prisma/client/runtime/library';
@@ -26,7 +32,9 @@ export class OrdersService {
   // ======================================================================
   // MEJORA: Lógica de Transición de Estados Centralizada
   // ======================================================================
-  private readonly validTransitions: Partial<Record<OrderStatus, OrderStatus[]>> = {
+  private readonly validTransitions: Partial<
+    Record<OrderStatus, OrderStatus[]>
+  > = {
     PENDIENTE: [OrderStatus.EN_PRODUCCION, OrderStatus.CANCELADO],
     EN_PRODUCCION: [OrderStatus.EN_PROCESO, OrderStatus.CANCELADO],
     EN_PROCESO: [OrderStatus.LISTO_PARA_ENTREGA, OrderStatus.CANCELADO],
@@ -49,7 +57,9 @@ export class OrdersService {
     orderId: string,
     nextStatus: OrderStatus,
   ): Promise<Order> {
-    const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
 
     if (!order) {
       throw new NotFoundException(`Pedido con ID "${orderId}" no encontrado.`);
@@ -97,15 +107,17 @@ export class OrdersService {
         throw new NotFoundException(`Bolsa con ID "${bagId}" no encontrada.`);
       }
       if (bag.status === BagStatus.OCUPADA) {
-        throw new ConflictException(
-          `Bolsa con ID "${bagId}" ya está ocupada.`,
-        );
+        throw new ConflictException(`Bolsa con ID "${bagId}" ya está ocupada.`);
       }
 
       // Novedad: Verificar que el trabajador existe
-      const workerExists = await tx.worker.findUnique({ where: { id: trabajadorId } });
+      const workerExists = await tx.worker.findUnique({
+        where: { id: trabajadorId },
+      });
       if (!workerExists) {
-        throw new NotFoundException(`Trabajador con ID "${trabajadorId}" no encontrado.`);
+        throw new NotFoundException(
+          `Trabajador con ID "${trabajadorId}" no encontrado.`,
+        );
       }
 
       let imageUrl: string | undefined;
@@ -119,7 +131,7 @@ export class OrdersService {
           abono: new Decimal(orderData.abono),
           total: new Decimal(orderData.total),
           fechaEntrega: new Date(orderData.fechaEntrega),
-          
+
           bag: { connect: { id: bagId } },
           cliente: {
             connectOrCreate: {
@@ -132,7 +144,7 @@ export class OrdersService {
             },
           },
           trabajador: { connect: { id: trabajadorId } },
-          
+
           estado: OrderStatus.PENDIENTE,
           imagenUrl: imageUrl,
         },
@@ -152,7 +164,13 @@ export class OrdersService {
   // ======================================================================
   // 3.3. Endpoint: Obtención de Pedidos (GET /pedidos) - MODIFICADO
   // ======================================================================
-  async findAll(query: OrderQueryDto): Promise<{ data: Order[]; total: number; page: number; pageSize: number; lastPage: number }> {
+  async findAll(query: OrderQueryDto): Promise<{
+    data: Order[];
+    total: number;
+    page: number;
+    pageSize: number;
+    lastPage: number;
+  }> {
     const { search, estado } = query;
     const orderBy = query.orderBy ?? 'createdAt';
     const orderDirection = query.orderDirection ?? 'asc';
@@ -179,22 +197,24 @@ export class OrdersService {
         { descripcion: { contains: search, mode: 'insensitive' } },
         { bagId: { contains: search, mode: 'insensitive' } },
         {
-          cliente: { // Búsqueda en los campos del cliente relacionado
+          cliente: {
+            // Búsqueda en los campos del cliente relacionado
             OR: [
               { nombre: { contains: search, mode: 'insensitive' } },
               { cedula: { contains: search, mode: 'insensitive' } },
               { celular: { contains: search, mode: 'insensitive' } },
-            ]
-          }
+            ],
+          },
         },
         {
-          trabajador: { // Búsqueda en los campos del trabajador relacionado
-            nombre: { contains: search, mode: 'insensitive' }
-          }
-        }
+          trabajador: {
+            // Búsqueda en los campos del trabajador relacionado
+            nombre: { contains: search, mode: 'insensitive' },
+          },
+        },
       ];
     }
-    
+
     // Novedad: Incluimos el cliente y trabajador en la respuesta por defecto
     const [data, total] = await this.prisma.$transaction([
       this.prisma.order.findMany({
@@ -202,11 +222,12 @@ export class OrdersService {
         skip,
         take: limit,
         orderBy: { [orderBy]: orderDirection },
-        include: { // Novedad: Incluimos datos relacionados
+        include: {
+          // Novedad: Incluimos datos relacionados
           cliente: true,
           trabajador: true,
           bag: true, // Asumo que ya la incluías o la necesitarás
-        }
+        },
       }),
       this.prisma.order.count({ where }),
     ]);
@@ -222,11 +243,12 @@ export class OrdersService {
   async findOne(id: string): Promise<Order> {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: { // Novedad: Incluimos datos relacionados
+      include: {
+        // Novedad: Incluimos datos relacionados
         cliente: true,
         trabajador: true,
         bag: true,
-      }
+      },
     });
     if (!order) {
       throw new NotFoundException(`Pedido con ID "${id}" no encontrado.`);
@@ -250,7 +272,8 @@ export class OrdersService {
     }
 
     // Novedad: Separar datos del cliente y del pedido
-    const { clienteNombre, clienteCelular, ...orderSpecificUpdates } = updateOrderDto;
+    const { clienteNombre, clienteCelular, ...orderSpecificUpdates } =
+      updateOrderDto;
 
     // Novedad: Actualizar datos del cliente si se proporcionan
     if (clienteNombre || clienteCelular) {
@@ -259,7 +282,7 @@ export class OrdersService {
           'El pedido no tiene un cliente asociado para actualizar.',
         );
       }
-      
+
       // Novedad: Construir objeto de actualización solo con campos definidos
       const clientUpdateData: UpdateClientDto = {};
       if (clienteNombre) {
@@ -269,7 +292,10 @@ export class OrdersService {
         clientUpdateData.celular = clienteCelular;
       }
 
-      await this.clientsService.update(existingOrder.clienteId, clientUpdateData);
+      await this.clientsService.update(
+        existingOrder.clienteId,
+        clientUpdateData,
+      );
     }
 
     const updatedOrder = await this.prisma.$transaction(async (tx) => {
@@ -309,7 +335,6 @@ export class OrdersService {
       delete (dataToUpdate as any).clienteCelular;
       delete (dataToUpdate as any).clienteCedula;
 
-
       return tx.order.update({ where: { id }, data: dataToUpdate });
     });
 
@@ -325,7 +350,7 @@ export class OrdersService {
     return this.prisma.order.update({
       where: { id },
       data: { estado: OrderStatus.EN_PRODUCCION },
-      include: { cliente: true, trabajador: true, bag: true }
+      include: { cliente: true, trabajador: true, bag: true },
     });
   }
 
@@ -334,7 +359,7 @@ export class OrdersService {
     return this.prisma.order.update({
       where: { id },
       data: { estado: OrderStatus.EN_PROCESO },
-      include: { cliente: true, trabajador: true, bag: true }
+      include: { cliente: true, trabajador: true, bag: true },
     });
   }
 
@@ -342,8 +367,11 @@ export class OrdersService {
     await this.validateTransition(id, OrderStatus.LISTO_PARA_ENTREGA);
     return this.prisma.order.update({
       where: { id },
-      data: { estado: OrderStatus.LISTO_PARA_ENTREGA, fechaFinalizacion: new Date() },
-      include: { cliente: true, trabajador: true, bag: true }
+      data: {
+        estado: OrderStatus.LISTO_PARA_ENTREGA,
+        fechaFinalizacion: new Date(),
+      },
+      include: { cliente: true, trabajador: true, bag: true },
     });
   }
 
@@ -353,7 +381,7 @@ export class OrdersService {
       const updatedOrder = await tx.order.update({
         where: { id },
         data: { estado: OrderStatus.ENTREGADO, fechaEntregaReal: new Date() },
-        include: { cliente: true, trabajador: true, bag: true }
+        include: { cliente: true, trabajador: true, bag: true },
       });
       await tx.bag.update({
         where: { id: order.bagId },
@@ -369,7 +397,7 @@ export class OrdersService {
       const updatedOrder = await tx.order.update({
         where: { id },
         data: { estado: OrderStatus.CANCELADO, fechaCancelacion: new Date() },
-        include: { cliente: true, trabajador: true, bag: true }
+        include: { cliente: true, trabajador: true, bag: true },
       });
       await tx.bag.update({
         where: { id: order.bagId },
@@ -388,18 +416,20 @@ export class OrdersService {
       const ordersToCancel = await tx.order.findMany({
         where: {
           bagId: { in: bagIds },
-          NOT: { estado: { in: [OrderStatus.ENTREGADO, OrderStatus.CANCELADO] } },
+          NOT: {
+            estado: { in: [OrderStatus.ENTREGADO, OrderStatus.CANCELADO] },
+          },
         },
       });
       if (ordersToCancel.length !== bagIds.length) {
-        const foundBagIds = ordersToCancel.map(o => o.bagId);
-        const notFoundBagIds = bagIds.filter(id => !foundBagIds.includes(id));
+        const foundBagIds = ordersToCancel.map((o) => o.bagId);
+        const notFoundBagIds = bagIds.filter((id) => !foundBagIds.includes(id));
         throw new NotFoundException(
           `No se pudieron encontrar o cancelar todos los pedidos. Bolsas no válidas o ya en estado final: ${notFoundBagIds.join(', ')}.`,
         );
       }
       await tx.order.updateMany({
-        where: { id: { in: ordersToCancel.map(o => o.id) } },
+        where: { id: { in: ordersToCancel.map((o) => o.id) } },
         data: { estado: OrderStatus.CANCELADO, fechaCancelacion: new Date() },
       });
       await tx.bag.updateMany({
@@ -408,8 +438,8 @@ export class OrdersService {
       });
       // Novedad: Incluir cliente y trabajador en las órdenes devueltas
       return tx.order.findMany({
-        where: { id: { in: ordersToCancel.map(o => o.id) } },
-        include: { cliente: true, trabajador: true, bag: true }
+        where: { id: { in: ordersToCancel.map((o) => o.id) } },
+        include: { cliente: true, trabajador: true, bag: true },
       });
     });
     return canceledOrders;
@@ -420,7 +450,10 @@ export class OrdersService {
     await this.prisma.$transaction(async (tx) => {
       await tx.order.deleteMany({});
       this.logger.log('All orders deleted.');
-      await tx.bag.updateMany({ where: {}, data: { status: BagStatus.DISPONIBLE } });
+      await tx.bag.updateMany({
+        where: {},
+        data: { status: BagStatus.DISPONIBLE },
+      });
       this.logger.log('All bags reset to DISPONIBLE.');
     });
     this.logger.warn('✅ System reset completed successfully.');
@@ -433,7 +466,9 @@ export class OrdersService {
       fs.writeFile(filePath, file.buffer, (err) => {
         if (err) {
           this.logger.error(`Error saving image file: ${err.message}`);
-          return reject(new BadRequestException('Error al guardar el archivo de imagen.'));
+          return reject(
+            new BadRequestException('Error al guardar el archivo de imagen.'),
+          );
         }
         resolve(`/uploads/${filename}`);
       });
@@ -454,7 +489,9 @@ export class OrdersService {
           resolve();
         });
       } else {
-        this.logger.warn(`Attempted to delete non-existent image file: ${filePath}`);
+        this.logger.warn(
+          `Attempted to delete non-existent image file: ${filePath}`,
+        );
         resolve();
       }
     });

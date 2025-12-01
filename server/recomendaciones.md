@@ -94,10 +94,7 @@ Estas recomendaciones buscan mejorar la consistencia y la mantenibilidad de la A
 *   **Recomendación:** **Estandarizar toda la comunicación a la nomenclatura en inglés** (`/orders`, `/clients`, `/bags`). Es una práctica estándar en APIs RESTful y el backend ya la utiliza mayoritariamente.
 *   **Acción Inmediata:** El frontend debe actualizar todas las llamadas a la API para usar `/orders` en lugar de `/pedidos`.
 
-### 2.2. Centralización de la Lógica de Negocio
 
-*   **Problema:** La lógica de negocio, como las validaciones de transición de estado, debe residir en la capa de servicio del backend, no en los controladores.
-*   **Recomendación:** Asegurarse de que los controladores (`*.controller.ts`) se limiten a recibir peticiones y devolver respuestas, delegando toda la lógica de negocio a los servicios (`*.service.ts`). Esto hace que el código sea más reutilizable, testeable y fácil de mantener.
 
 
 

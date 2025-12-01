@@ -1,5 +1,11 @@
 // server/src/clientes/dto/create-client.dto.ts
-import { IsString, IsNotEmpty, IsOptional, Matches, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  Matches,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateClientDto {
   @IsString()
@@ -17,5 +23,5 @@ export class CreateClientDto {
   @IsNotEmpty() // Celular es requerido
   @Matches(/^[0-9]+$/, { message: 'El celular debe contener solo números.' })
   @MaxLength(20)
-  celular: string; 
+  celular: string;
 }

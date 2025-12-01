@@ -7,7 +7,6 @@ export class CreateWorkerDto {
     example: 'Juan Pérez',
     maxLength: 255,
   })
-  
   @IsString({ message: 'El nombre debe ser un texto.' })
   @IsNotEmpty({ message: 'El nombre no puede estar vacío.' })
   @MaxLength(255)
