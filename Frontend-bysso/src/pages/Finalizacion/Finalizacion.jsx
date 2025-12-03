@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom'; // Import useLocation
 import styles from './Finalizacion.module.css';
 import TablaFinalizacion from '../../components/especificos/TablaFinalizacion/TablaFinalizacion.jsx';
 import Modal from '../../components/ui/Modal/Modal.jsx';
@@ -17,10 +18,15 @@ const Finalizacion = () => {
     const [filtroTexto, setFiltroTexto] = useState('');
     const isInitialMount = useRef(true);
 
+    const location = useLocation(); // Get location object for filtering
+    const queryParams = new URLSearchParams(location.search);
+    const estadoFiltrado = queryParams.get('estado'); // Get 'estado' query param
+
     const fetchPedidosFinalizacion = async (searchQuery = '') => {
         setLoading(true);
         try {
-            const data = await getPedidosByEstado('LISTO_PARA_ENTREGA', searchQuery);
+            const estadoActual = estadoFiltrado || 'LISTO_PARA_ENTREGA'; // Use filtered state or default
+            const data = await getPedidosByEstado(estadoActual, searchQuery);
             setPedidos(data.data);
         } catch (err) {
             setError(err);
@@ -32,10 +38,10 @@ const Finalizacion = () => {
         }
     };
 
-    // Efecto para la carga inicial
+    // Efecto para la carga inicial y re-fetch al cambiar filtro de URL
     useEffect(() => {
         fetchPedidosFinalizacion();
-    }, []);
+    }, [estadoFiltrado]); // Depend on estadoFiltrado
 
     // Efecto para la búsqueda debounced
     useEffect(() => {
@@ -47,7 +53,7 @@ const Finalizacion = () => {
             fetchPedidosFinalizacion(filtroTexto);
         }, 300);
         return () => clearTimeout(debounceFetch);
-    }, [filtroTexto]);
+    }, [filtroTexto, estadoFiltrado]); // Also depend on estadoFiltrado for debounced search
 
 
     const abrirModal = () => setEstaModalAbierto(true);
@@ -78,13 +84,23 @@ const Finalizacion = () => {
 
     const pedidosListosParaEntrega = useMemo(() => pedidos, [pedidos]);
 
+    const getTituloDisplay = (estado) => {
+        switch (estado) {
+            case 'LISTO_PARA_ENTREGA': return 'Pedidos Listos para Entrega';
+            case 'PENDIENTE': return 'Pedidos (Pendientes)'; // Fallback/Other states for clarity
+            case 'EN_PRODUCCION': return 'Pedidos (En Producción)';
+            case 'EN_PROCESO': return 'Pedidos (En Proceso)';
+            default: return 'Pedidos para Finalización';
+        }
+    };
+
     if (isInitialLoading) return <div>Cargando pedidos para entrega...</div>;
     if (error) return <div>Error al cargar los pedidos: {error.message}</div>;
 
     return (
         <div className={styles.contenedorPagina}>
             <div className={styles.encabezadoFinalizacion}>
-                <h1 className={styles.tituloPagina}>Pedidos Listos para Entrega</h1>
+                <h1 className={styles.tituloPagina}>{getTituloDisplay(estadoFiltrado || 'LISTO_PARA_ENTREGA')}</h1>
             </div>
 
             <div className={styles.barraFiltros}>

@@ -1,57 +1,77 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import styles from './Home.module.css';
 import Boton from '../../components/ui/Boton/Boton.jsx';
 import marcaLogo from '../../assets/images/marca.png';
+import { getDashboardStats } from '../../services/pedidosService'; // Import the new service
 
-const Home = ({ pedidos, abrirModal }) => {
+const statusMap = {
+    PENDIENTE: { display: 'Pendiente', color: '#FACC15', route: '/pedidos', backendValue: 'PENDIENTE' },
+    EN_PRODUCCION: { display: 'En Producción', color: '#3B82F6', route: '/produccion', backendValue: 'EN_PRODUCCION' },
+    EN_PROCESO: { display: 'En Proceso', color: '#F97316', route: '/produccion', backendValue: 'EN_PROCESO' },
+    LISTO_PARA_ENTREGA: { display: 'Listo para Entrega', color: '#10B981', route: '/finalizacion', backendValue: 'LISTO_PARA_ENTREGA' },
+   // Assuming cancelled goes to historial
+};
+
+const Home = ({ abrirModal, refreshDashboardKey }) => {
     const navigate = useNavigate();
+    const [dashboardStats, setDashboardStats] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setLoading(true);
+                const stats = await getDashboardStats();
+                setDashboardStats(stats);
+            } catch (err) {
+                console.error("Error fetching dashboard stats:", err);
+                setError("No se pudieron cargar las estadísticas del dashboard.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, [refreshDashboardKey]); // Add refreshDashboardKey to dependency array
 
     const irAHistorial = () => {
         navigate('/historial');
     };
 
+    // Recalculate conteos based on fetched dashboardStats
     const conteos = useMemo(() => {
-        const conteosEstado = {
-            'Pendiente': 0,
-            'En Producción': 0,
-            'En Proceso': 0,
-            'Listo para Entrega': 0,
-        };
-        
-        pedidos.forEach(pedido => {
-            if (conteosEstado.hasOwnProperty(pedido.estado)) {
-                conteosEstado[pedido.estado]++;
-            }
-        });
-        
-        return conteosEstado;
-    }, [pedidos]);
+        const newConteos = {};
+        for (const backendStatus in statusMap) {
+            newConteos[statusMap[backendStatus].display] = dashboardStats[backendStatus] || 0;
+        }
+        return newConteos;
+    }, [dashboardStats]);
 
-    const estadoColores = {
-        'Pendiente': '#FACC15',
-        'En Producción': '#3B82F6',
-        'En Proceso': '#F97316',
-        'Listo para Entrega': '#10B981',
-    };
+    // Map display names for rendering and routing logic (simplified as all relevant statuses are in statusMap)
+    // No need for displayedStatuses useMemo as all statusMap entries are relevant for cards
     
-    const estadoRutaMap = {
-        'Pendiente': '/pedidos',
-        'En Producción': '/produccion',
-        'En Proceso': '/produccion',
-        'Listo para Entrega': '/finalizacion'
-    };
-    
-    const handleCardClick = (estado) => {
-        const ruta = estadoRutaMap[estado];
-        if (conteos[estado] > 0) {
-            if (estado === 'En Producción' || estado === 'En Proceso') {
-                navigate(`${ruta}?estado=${encodeURIComponent(estado)}`);
-            } else {
-                navigate(ruta);
-            }
+    const handleCardClick = (displayStatus) => {
+        // Find the backend status from the displayStatus
+        const backendStatusEntry = Object.values(statusMap).find(s => s.display === displayStatus);
+        if (!backendStatusEntry) return;
+
+        const { route: ruta, backendValue } = backendStatusEntry;
+        const count = conteos[displayStatus];
+
+        if (count > 0 && ruta) {
+            navigate(`${ruta}?estado=${encodeURIComponent(backendValue)}`);
         }
     };
+
+    if (loading) {
+        return <div className={styles.contenedorHome}>Cargando estadísticas...</div>;
+    }
+
+    if (error) {
+        return <div className={`${styles.contenedorHome} ${styles.error}`}>Error: {error}</div>;
+    }
 
     return (
         <div className={styles.contenedorHome}>
@@ -65,7 +85,6 @@ const Home = ({ pedidos, abrirModal }) => {
             <div className={styles.encabezadoHome}>
                 <h1 className={styles.titulo}>Dashboard de Pedidos</h1>
                 <div className={styles.accionesEncabezado}>
-                    {/* Solo el botón Crear Pedido se queda en este flujo */}
                     <Boton 
                         tipo="primario" 
                         onClick={() => abrirModal(null)}
@@ -86,15 +105,17 @@ const Home = ({ pedidos, abrirModal }) => {
             </div>
             
             <div className={styles.tarjetasResumen}>
-                {Object.keys(conteos).map((estado, index) => (
+                {Object.values(statusMap)
+                    .filter(s => s.display !== 'Entregado' && s.display !== 'Cancelado')
+                    .map((statusEntry, index) => (
                     <div 
                         key={index} 
                         className={styles.tarjeta} 
-                        style={{ borderLeftColor: estadoColores[estado] }}
-                        onClick={() => handleCardClick(estado)}
+                        style={{ borderLeftColor: statusEntry.color }}
+                        onClick={() => handleCardClick(statusEntry.display)}
                     >
-                        <h3 className={styles.tarjetaTitulo}>{estado}</h3>
-                        <p className={styles.tarjetaNumero}>{conteos[estado]}</p>
+                        <h3 className={styles.tarjetaTitulo}>{statusEntry.display}</h3>
+                        <p className={styles.tarjetaNumero}>{conteos[statusEntry.display]}</p>
                     </div>
                 ))}
             </div>

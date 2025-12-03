@@ -26,6 +26,7 @@ const AppLayout = () => {
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
     const [onSaveCallback, setOnSaveCallback] = useState(null);
     const [onUpdateCallback, setOnUpdateCallback] = useState(null);
+    const [refreshDashboardKey, setRefreshDashboardKey] = useState(0);
 
     const abrirModal = (pedido, callbacks) => {
         setPedidoSeleccionado(pedido || null);
@@ -50,7 +51,10 @@ const AppLayout = () => {
                 onSaveCallback();
             }
             refetchBags(); // Refetch bags after creating a new order
+            setRefreshDashboardKey(prevKey => prevKey + 1); // Increment key to trigger dashboard refresh
             cerrarModal();
+
+
         } catch (error) {
             console.error("Error al crear el pedido:", error);
             if (error.response) {
@@ -99,7 +103,7 @@ const AppLayout = () => {
                 />
                 <div className="content-area">
                     <Routes>
-                        <Route path="/" element={<Home abrirModal={abrirModal} />} />
+                        <Route path="/" element={<Home abrirModal={abrirModal} refreshDashboardKey={refreshDashboardKey} />} />
                         <Route path="/pedidos" element={<Pedido abrirModal={abrirModal} />} />
                         <Route path="/produccion" element={<Produccion abrirModal={abrirModal} />} />
                         <Route path="/finalizacion" element={<Finalizacion />} />
