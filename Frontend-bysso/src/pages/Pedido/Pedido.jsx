@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from './Pedido.module.css';
 import Boton from '../../components/ui/Boton/Boton.jsx';
 import TablaPedidos from '../../components/especificos/TablaPedidos/TablaPedidos.jsx';
@@ -17,10 +18,15 @@ const Pedido = ({ abrirModal }) => {
     const [filtroTexto, setFiltroTexto] = useState('');
     const isInitialMount = useRef(true);
 
+    const location = useLocation(); // Get location object
+    const queryParams = new URLSearchParams(location.search);
+    const estadoFiltrado = queryParams.get('estado'); // Get 'estado' query param
+
     const fetchPedidos = async (searchQuery = '') => {
         setLoading(true);
         try {
-            const data = await getPedidosByEstado('PENDIENTE', searchQuery);
+            const estadoActual = estadoFiltrado || 'PENDIENTE'; // Use filtered state or default to PENDIENTE
+            const data = await getPedidosByEstado(estadoActual, searchQuery);
             setPedidos(data.data);
         } catch (err) {
             setError(err);
@@ -32,10 +38,10 @@ const Pedido = ({ abrirModal }) => {
         }
     };
 
-    // Efecto para la carga inicial de datos
+    // Efecto para la carga inicial de datos y re-fetch al cambiar filtro de URL
     useEffect(() => {
         fetchPedidos();
-    }, []);
+    }, [estadoFiltrado]); // Depend on estadoFiltrado
 
     // Efecto para la búsqueda debounced
     useEffect(() => {
@@ -49,7 +55,7 @@ const Pedido = ({ abrirModal }) => {
         }, 300);
 
         return () => clearTimeout(debounceFetch);
-    }, [filtroTexto]);
+    }, [filtroTexto, estadoFiltrado]);
 
     const toggleModoSeleccion = () => {
         setModoSeleccion(prev => !prev);
@@ -121,13 +127,23 @@ const Pedido = ({ abrirModal }) => {
         }
     };
 
-    if (isInitialLoading) return <div>Cargando pedidos pendientes...</div>;
+    const getTituloDisplay = (estado) => {
+        switch (estado) {
+            case 'PENDIENTE': return 'Pedidos (Pendientes)';
+            case 'EN_PRODUCCION': return 'Pedidos (En Producción)';
+            case 'EN_PROCESO': return 'Pedidos (En Proceso)';
+            case 'LISTO_PARA_ENTREGA': return 'Pedidos (Listos para Entrega)';
+            default: return 'Pedidos';
+        }
+    };
+
+    if (isInitialLoading) return <div>Cargando pedidos...</div>;
     if (error) return <div>Error al cargar los pedidos: {error.message}</div>;
 
     return (
         <div className={styles.contenedorPagina}>
             <div className={styles.encabezadoPedidos}>
-                <h1 className={styles.tituloPagina}>Pedidos (Pendientes)</h1>
+                <h1 className={styles.tituloPagina}>{getTituloDisplay(estadoFiltrado || 'PENDIENTE')}</h1>
                 <div className={styles.controlesAcciones}>
                     <Boton
                         tipo="primario"

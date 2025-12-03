@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom'; // Import useLocation
 import styles from './Produccion.module.css';
 import TablaProduccion from '../../components/especificos/TablaProduccion/TablaProduccion.jsx';
 import Modal from '../../components/ui/Modal/Modal.jsx';
@@ -18,14 +18,25 @@ const Produccion = () => {
     const [filtroTexto, setFiltroTexto] = useState('');
     const isInitialMount = useRef(true);
 
-    const [searchParams] = useSearchParams();
+    const location = useLocation(); // Get location object for filtering
+    const queryParams = new URLSearchParams(location.search);
+    const estadoFiltrado = queryParams.get('estado'); // Get 'estado' query param
 
     const fetchPedidosProduccion = async (searchQuery = '') => {
         setLoading(true);
         try {
-            const enProduccion = await getPedidosByEstado('EN_PRODUCCION', searchQuery);
-            const enProceso = await getPedidosByEstado('EN_PROCESO', searchQuery);
-            setPedidos([...enProduccion.data, ...enProceso.data]);
+            let fetchedPedidos = [];
+            if (estadoFiltrado) {
+                // If a specific state is filtered, fetch only that state
+                const data = await getPedidosByEstado(estadoFiltrado, searchQuery);
+                fetchedPedidos = data.data;
+            } else {
+                // Default behavior: fetch both EN_PRODUCCION and EN_PROCESO
+                const enProduccion = await getPedidosByEstado('EN_PRODUCCION', searchQuery);
+                const enProceso = await getPedidosByEstado('EN_PROCESO', searchQuery);
+                fetchedPedidos = [...enProduccion.data, ...enProceso.data];
+            }
+            setPedidos(fetchedPedidos);
         } catch (err) {
             setError(err);
         } finally {
@@ -36,10 +47,10 @@ const Produccion = () => {
         }
     };
 
-    // Efecto para la carga inicial
+    // Efecto para la carga inicial y re-fetch al cambiar filtro de URL
     useEffect(() => {
         fetchPedidosProduccion();
-    }, []);
+    }, [estadoFiltrado]); // Depend on estadoFiltrado
 
     // Efecto para la búsqueda debounced
     useEffect(() => {
@@ -51,7 +62,7 @@ const Produccion = () => {
             fetchPedidosProduccion(filtroTexto);
         }, 300);
         return () => clearTimeout(debounceFetch);
-    }, [filtroTexto]);
+    }, [filtroTexto, estadoFiltrado]); // Also depend on estadoFiltrado for debounced search
 
     const cerrarModal = () => {
         setEstaModalAbierto(false);
@@ -93,14 +104,22 @@ const Produccion = () => {
         }
     };
 
-    if (isInitialLoading) return <div>Cargando pedidos en producción...</div>;
+    const getTituloDisplay = (estado) => {
+        switch (estado) {
+            case 'EN_PRODUCCION': return 'Ordenes de Producción (En Producción)';
+            case 'EN_PROCESO': return 'Ordenes de Producción (En Proceso)';
+            default: return 'Ordenes de Producción';
+        }
+    };
+
+    if (isInitialLoading) return <div>Cargando pedidos de producción...</div>;
     if (error) return <div>Error al cargar los pedidos: {error.message}</div>;
 
     return (
         <div className={styles.contenedorPagina}>
             <div className={styles.encabezadoPedidos}>
                 <h1 className={styles.tituloPagina}>
-                    Ordenes de Producción
+                    {getTituloDisplay(estadoFiltrado)}
                 </h1>
             </div>
 

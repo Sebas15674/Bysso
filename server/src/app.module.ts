@@ -8,6 +8,7 @@ import { BagsModule } from './bags/bags.module';
 import { ClientsModule } from './clientes/clients.module';
 import { WorkersModule } from './workers/workers.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { PrismaModule } from './prisma/prisma.module';
     ClientsModule,
     WorkersModule,
     PrismaModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

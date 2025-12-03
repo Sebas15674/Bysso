@@ -138,6 +138,15 @@ export const resetPedidos = async () => {
     return response.data;
 };
 
+/**
+ * Obtiene las estadísticas del dashboard (conteo de pedidos por estado).
+ * @returns {Promise<Object>} Objeto con los conteos de pedidos por estado.
+ */
+export const getDashboardStats = async () => {
+    const response = await axiosInstance.get('/dashboard');
+    return response.data;
+};
+
 // ======================================================================
 // CLIENTES
 // ======================================================================
