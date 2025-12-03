@@ -1,139 +1,150 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './Pedido.module.css';
 import Boton from '../../components/ui/Boton/Boton.jsx';
 import TablaPedidos from '../../components/especificos/TablaPedidos/TablaPedidos.jsx';
+import { updatePedidoToEnProduccion, getPedidosByEstado, cancelMultiplePedidos } from '../../services/pedidosService';
+import { useBags } from '../../context/BagContext';
 
-// ⚠️ NOTA: Asumo que la función de ordenamiento 'sortPedidos'
-// está definida en otro lugar o no es necesaria para este fragmento.
+const Pedido = ({ abrirModal }) => {
+    const { refetchBags } = useBags();
+    const [pedidos, setPedidos] = useState([]);
+    const [isInitialLoading, setIsInitialLoading] = useState(true); // Para la carga inicial
+    const [loading, setLoading] = useState(false); // Para las búsquedas
+    const [error, setError] = useState(null);
 
-const Pedido = ({ 
-    pedidos, 
-    setPedidos,
-    abrirModal,
-    alCancelarPedidos // Prop para la cancelación
-}) => {
-    // 1. Estado para manejar la selección de bolsas (IDs de string)
     const [bolsasSeleccionadas, setBolsasSeleccionadas] = useState([]);
-    
-    // 2. Estado para controlar si los checkboxes están visibles
     const [modoSeleccion, setModoSeleccion] = useState(false);
-
-    // 🔑 NUEVO: ESTADO PARA EL FILTRO DE TEXTO
     const [filtroTexto, setFiltroTexto] = useState('');
+    const isInitialMount = useRef(true);
 
-    // Filtra para mostrar SOLO los pedidos en estado 'Pendiente' (memorizado y filtrado por texto)
-    const pedidosPendientes = useMemo(() => {
-        let listaFiltrada = pedidos.filter(pedido => pedido.estado === 'Pendiente');
-        
-        // Lógica de Filtrado por Texto (Cliente, Bolsa o Tipo)
-        if (filtroTexto.trim() !== '') {
-            const textoBusqueda = filtroTexto.toLowerCase().trim();
-            
-            listaFiltrada = listaFiltrada.filter(p => {
-                
-                const bolsa = String(p.bolsa).toLowerCase(); 
-                const tipo = p.tipo ? p.tipo.toLowerCase() : '';
-                
-                return (
-                    bolsa.includes(textoBusqueda) ||
-                    tipo.includes(textoBusqueda)
-                );
-            });
+    const fetchPedidos = async (searchQuery = '') => {
+        setLoading(true);
+        try {
+            const data = await getPedidosByEstado('PENDIENTE', searchQuery);
+            setPedidos(data.data);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+            if (isInitialLoading) {
+                setIsInitialLoading(false);
+            }
         }
-        
-        // Aquí deberías tener tu función de ordenamiento (si existe)
-        // Ejemplo: return listaFiltrada.sort(sortPedidos);
-        return listaFiltrada;
+    };
 
-    }, [pedidos, filtroTexto]); // 🔑 CLAVE: Dependencia añadida para reactividad
+    // Efecto para la carga inicial de datos
+    useEffect(() => {
+        fetchPedidos();
+    }, []);
 
-    // Función para activar/desactivar el modo de selección
+    // Efecto para la búsqueda debounced
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+
+        const debounceFetch = setTimeout(() => {
+            fetchPedidos(filtroTexto);
+        }, 300);
+
+        return () => clearTimeout(debounceFetch);
+    }, [filtroTexto]);
+
     const toggleModoSeleccion = () => {
         setModoSeleccion(prev => !prev);
-        // Si desactivamos el modo, limpiamos la selección
         setBolsasSeleccionadas([]);
     };
 
-    // Lógica para manejar la selección de una fila (checkbox)
     const toggleSeleccion = (nBolsa) => {
-        setBolsasSeleccionadas(prev => 
+        setBolsasSeleccionadas(prev =>
             prev.includes(nBolsa)
-                ? prev.filter(bolsa => bolsa !== nBolsa) // Deseleccionar
-                : [...prev, nBolsa] // Seleccionar
+                ? prev.filter(bolsa => bolsa !== nBolsa)
+                : [...prev, nBolsa]
         );
     };
 
-    // Lógica para seleccionar/deseleccionar todos
     const toggleSeleccionarTodos = (estaSeleccionado) => {
         if (estaSeleccionado) {
             setBolsasSeleccionadas([]);
         } else {
-            // Se seleccionan solo los que están actualmente visibles (filtrados)
-            const todasLasBolsas = pedidosPendientes.map(p => p.bolsa); 
+            const todasLasBolsas = pedidos.map(pedido => pedido.bagId);
             setBolsasSeleccionadas(todasLasBolsas);
         }
     };
 
-
-    // Función para ver los detalles de un pedido
     const verDetalles = (pedido) => {
-        abrirModal(pedido);
+        abrirModal(pedido, { onUpdate: fetchPedidos });
     };
 
-    const enviarAProduccion = (nBolsa) => {
-        // Al enviar a producción, se deselecciona automáticamente (si estaba seleccionado)
-        setBolsasSeleccionadas(prev => prev.filter(bolsa => bolsa !== nBolsa));
-        
-        const pedidosActualizados = pedidos.map(pedido => {
-            if (pedido.bolsa === nBolsa) {
-                // Estado: De 'Pendiente' a 'En Producción'
-                return { ...pedido, estado: 'En Producción' };
-            }
-            return pedido;
-        });
-        setPedidos(pedidosActualizados);
-    };
-    
-    // Función de acción para el botón de cancelar
-    const handleCancelarSeleccionados = () => {
-        if (bolsasSeleccionadas.length > 0) {
-            alCancelarPedidos(bolsasSeleccionadas);
-            setBolsasSeleccionadas([]); // Limpiar la selección después de la acción
-            setModoSeleccion(false); // Salir del modo de selección
+    const enviarAProduccion = async (nBolsa) => {
+        const pedidoAActualizar = pedidos.find(p => p.bagId === nBolsa);
+        if (!pedidoAActualizar) {
+            console.error(`No se encontró el pedido con bolsa ${nBolsa}`);
+            alert(`Error: No se encontró el pedido con bolsa ${nBolsa}`);
+            return;
+        }
+
+        try {
+            await updatePedidoToEnProduccion(pedidoAActualizar.id);
+            await fetchPedidos(); // Re-fetch all pending orders
+            refetchBags();
+            setBolsasSeleccionadas(prev => prev.filter(bolsa => bolsa !== nBolsa));
+        } catch (error) {
+            console.error(`Error al enviar el pedido con bolsa ${nBolsa} a producción:`, error);
+            alert(`Error al enviar a producción: ${error.message}`);
         }
     };
 
+    const handleCancelarSeleccionados = async () => {
+        if (bolsasSeleccionadas.length === 0) return;
+
+        if (!window.confirm(`¿Estás seguro de que deseas CANCELAR ${bolsasSeleccionadas.length} pedido(s)? Se moverán al historial y se liberarán las bolsas.`)) {
+            return;
+        }
+
+        try {
+            if(bolsasSeleccionadas.length > 0) {
+                await cancelMultiplePedidos(bolsasSeleccionadas);
+                await fetchPedidos(); // Re-fetch all pending orders
+                refetchBags();
+            }
+            setBolsasSeleccionadas([]);
+            setModoSeleccion(false);
+        } catch (error) {
+            console.error('Error al cancelar pedidos:', error);
+            if (error.response) {
+                console.error('Datos de error del servidor:', error.response.data);
+                console.error('Estado del error del servidor:', error.response.status);
+            }
+            alert('Error al cancelar pedidos. Consulta la consola para más detalles.');
+        }
+    };
+
+    if (isInitialLoading) return <div>Cargando pedidos pendientes...</div>;
+    if (error) return <div>Error al cargar los pedidos: {error.message}</div>;
 
     return (
         <div className={styles.contenedorPagina}>
             <div className={styles.encabezadoPedidos}>
                 <h1 className={styles.tituloPagina}>Pedidos (Pendientes)</h1>
-                
-                {/* 🔑 USAMOS .controlesAcciones COMO CONTENEDOR FLEXBOX PARA ALINEAR A LA DERECHA */}
                 <div className={styles.controlesAcciones}>
-
-                    {/* Botón Crear Pedido (siempre visible) */}
-                    <Boton 
-                        tipo="primario" 
-                        onClick={() => abrirModal(null)}
-                        // Deshabilitado si estamos en modo selección para evitar confusiones
-                        disabled={modoSeleccion} 
+                    <Boton
+                        tipo="primario"
+                        onClick={() => abrirModal(null, { onSave: () => fetchPedidos() })}
+                        disabled={modoSeleccion}
                     >
                         Crear Pedido ✚
                     </Boton>
-                    
-                    {/* Botón de Cancelar / Desactivar Selección */}
-                    <Boton 
-                        tipo={modoSeleccion ? "desactivar-cancelacion" : "peligro"} 
+                    <Boton
+                        tipo={modoSeleccion ? "desactivar-cancelacion" : "peligro"}
                         onClick={toggleModoSeleccion}
                     >
                         {modoSeleccion ? 'Descartar' : 'Cancelar 🗑️'}
                     </Boton>
-
-                    {/* Botón de Confirmar Cancelación (Solo visible en modo selección Y con elementos seleccionados) */}
                     {modoSeleccion && bolsasSeleccionadas.length > 0 && (
-                        <Boton 
-                            tipo="peligro" 
+                        <Boton
+                            tipo="peligro"
                             onClick={handleCancelarSeleccionados}
                         >
                             Confirmar Cancelación ({bolsasSeleccionadas.length})
@@ -142,28 +153,29 @@ const Pedido = ({
                 </div>
             </div>
 
-            {/* ⬅️ ZONA DE LA BARRA DE FILTROS 🔑 */}
             <div className={styles.barraFiltros}>
-                <input 
+                <input
                     type="text"
                     placeholder="Buscar por bolsa o tipo "
                     value={filtroTexto}
                     onChange={(e) => setFiltroTexto(e.target.value)}
                     className={styles.inputFiltro}
+                    
                 />
             </div>
-            
-            <TablaPedidos 
-                pedidos={pedidosPendientes} 
+
+            <TablaPedidos
+                pedidos={pedidos}
                 alEnviarProduccion={enviarAProduccion}
                 alVerDetalles={verDetalles}
-                modoSeleccion={modoSeleccion} // Nuevo: Indica si mostrar los checkboxes
+                modoSeleccion={modoSeleccion}
                 bolsasSeleccionadas={bolsasSeleccionadas}
                 alToggleSeleccion={toggleSeleccion}
                 alToggleSeleccionarTodos={toggleSeleccionarTodos}
+                loading={loading}
             />
         </div>
     );
-};
+}; // <--- Missing closing brace added here
 
 export default Pedido;

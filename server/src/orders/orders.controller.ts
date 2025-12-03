@@ -1,3 +1,4 @@
+import { memoryStorage } from 'multer';
 import {
   Controller,
   Get,
@@ -48,6 +49,7 @@ export class OrdersController {
   @ApiResponse({ status: 409, description: 'La bolsa ya está ocupada.' })
   @UseInterceptors(
     FileInterceptor('imagen', {
+      storage: memoryStorage(), // Forzar el almacenamiento en memoria
       limits: { fileSize: MAX_FILE_SIZE_BYTES },
       fileFilter: (req, file, callback) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
@@ -108,6 +110,20 @@ export class OrdersController {
     return this.ordersService.findOne(id);
   }
 
+  @Patch('cancelar')
+  @ApiOperation({
+    summary: 'Cancela múltiples pedidos basado en una lista de IDs de bolsas',
+  })
+  @ApiResponse({ status: 200, description: 'Pedidos cancelados exitosamente.' })
+  @ApiResponse({
+    status: 404,
+    description:
+      'Alguno de los pedidos no se encontró o no era válido para cancelación.',
+  })
+  CancelMultipleOrders(@Body() cancelOrdersDto: CancelOrdersDto) {
+    return this.ordersService.cancelMultipleOrders(cancelOrdersDto);
+  }
+
   @Patch(':id')
   @ApiOperation({
     summary: 'Actualizar datos de un pedido en estado PENDIENTE',
@@ -122,6 +138,7 @@ export class OrdersController {
   @ApiResponse({ status: 404, description: 'Pedido no encontrado.' })
   @UseInterceptors(
     FileInterceptor('imagen', {
+      storage: memoryStorage(), // Forza el almacenamiento en memoria
       limits: { fileSize: MAX_FILE_SIZE_BYTES },
       fileFilter: (req, file, callback) => {
         if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {

@@ -20,18 +20,16 @@ import {
 } from '@prisma/client';
 import * as path from 'path';
 import * as fs from 'fs';
+import { promises as fsPromises } from 'fs';
 import { Decimal } from '@prisma/client/runtime/library';
 import { UpdateClientDto } from '../clientes/dto/update-client.dto';
-import { ClientsService } from '../clientes/clients.service'; // Novedad: Importamos ClientsService
+import { ClientsService } from '../clientes/clients.service';
 
 @Injectable()
 export class OrdersService {
   private readonly logger = new Logger(OrdersService.name);
   private readonly UPLOAD_DIR = path.join(process.cwd(), 'uploads');
 
-  // ======================================================================
-  // MEJORA: Lógica de Transición de Estados Centralizada
-  // ======================================================================
   private readonly validTransitions: Partial<
     Record<OrderStatus, OrderStatus[]>
   > = {
@@ -43,16 +41,13 @@ export class OrdersService {
 
   constructor(
     private prisma: PrismaService,
-    private clientsService: ClientsService, // Novedad: Inyectamos ClientsService
+    private clientsService: ClientsService,
   ) {
     if (!fs.existsSync(this.UPLOAD_DIR)) {
       fs.mkdirSync(this.UPLOAD_DIR, { recursive: true });
     }
   }
 
-  // ======================================================================
-  // MEJORA: Método auxiliar para validar transiciones
-  // ======================================================================
   private async validateTransition(
     orderId: string,
     nextStatus: OrderStatus,
@@ -77,9 +72,6 @@ export class OrdersService {
     return order;
   }
 
-  // ======================================================================
-  // 3.1. Endpoint: Creación de Pedido (POST /pedidos) - MODIFICADO
-  // ======================================================================
   async create(
     createOrderDto: CreateOrderDto,
     imageFile?: Express.Multer.File,
@@ -89,11 +81,10 @@ export class OrdersService {
       clienteNombre,
       clienteCedula,
       clienteCelular,
-      trabajadorId, // Extraemos trabajadorId
-      ...orderData // El resto de los datos del pedido (tipo, descripcion, abono, etc.)
+      trabajadorId,
+      ...orderData
     } = createOrderDto;
 
-    // Novedad: Primero, buscamos o creamos el cliente
     const client = await this.clientsService.findOrCreate({
       nombre: clienteNombre,
       cedula: clienteCedula,
@@ -110,7 +101,6 @@ export class OrdersService {
         throw new ConflictException(`Bolsa con ID "${bagId}" ya está ocupada.`);
       }
 
-      // Novedad: Verificar que el trabajador existe
       const workerExists = await tx.worker.findUnique({
         where: { id: trabajadorId },
       });
@@ -131,7 +121,6 @@ export class OrdersService {
           abono: new Decimal(orderData.abono),
           total: new Decimal(orderData.total),
           fechaEntrega: new Date(orderData.fechaEntrega),
-
           bag: { connect: { id: bagId } },
           cliente: {
             connectOrCreate: {
@@ -144,7 +133,6 @@ export class OrdersService {
             },
           },
           trabajador: { connect: { id: trabajadorId } },
-
           estado: OrderStatus.PENDIENTE,
           imagenUrl: imageUrl,
         },
@@ -161,9 +149,6 @@ export class OrdersService {
     return newOrder;
   }
 
-  // ======================================================================
-  // 3.3. Endpoint: Obtención de Pedidos (GET /pedidos) - MODIFICADO
-  // ======================================================================
   async findAll(query: OrderQueryDto): Promise<{
     data: Order[];
     total: number;
@@ -186,11 +171,9 @@ export class OrdersService {
 
     if (search) {
       const searchLower = search.toLowerCase();
-      const searchUpper = search.toUpperCase(); // Añadido para la validación del enum
+      const searchUpper = search.toUpperCase();
 
       where.OR = [
-        // El tipo es un enum y no soporta 'contains'.
-        // Solo se añade al OR si el término de búsqueda coincide exactamente con un OrderType.
         ...(Object.values(OrderType).includes(searchUpper as OrderType)
           ? [{ tipo: { equals: searchUpper as OrderType } }]
           : []),
@@ -198,7 +181,6 @@ export class OrdersService {
         { bagId: { contains: search, mode: 'insensitive' } },
         {
           cliente: {
-            // Búsqueda en los campos del cliente relacionado
             OR: [
               { nombre: { contains: search, mode: 'insensitive' } },
               { cedula: { contains: search, mode: 'insensitive' } },
@@ -208,14 +190,12 @@ export class OrdersService {
         },
         {
           trabajador: {
-            // Búsqueda en los campos del trabajador relacionado
             nombre: { contains: search, mode: 'insensitive' },
           },
         },
       ];
     }
 
-    // Novedad: Incluimos el cliente y trabajador en la respuesta por defecto
     const [data, total] = await this.prisma.$transaction([
       this.prisma.order.findMany({
         where,
@@ -223,10 +203,9 @@ export class OrdersService {
         take: limit,
         orderBy: { [orderBy]: orderDirection },
         include: {
-          // Novedad: Incluimos datos relacionados
           cliente: true,
           trabajador: true,
-          bag: true, // Asumo que ya la incluías o la necesitarás
+          bag: true,
         },
       }),
       this.prisma.order.count({ where }),
@@ -237,14 +216,10 @@ export class OrdersService {
     return { data, total, page, pageSize: limit, lastPage };
   }
 
-  // ======================================================================
-  // 3.2. Endpoint: Obtención de Pedido por ID (GET /pedidos/:id) - MODIFICADO
-  // ======================================================================
   async findOne(id: string): Promise<Order> {
     const order = await this.prisma.order.findUnique({
       where: { id },
       include: {
-        // Novedad: Incluimos datos relacionados
         cliente: true,
         trabajador: true,
         bag: true,
@@ -256,9 +231,6 @@ export class OrdersService {
     return order;
   }
 
-  // ======================================================================
-  // 3.4. Endpoint: Actualización de Pedido (PUT/PATCH /pedidos/:id) - Sin cambios sustanciales, pero requiere revisión
-  // ======================================================================
   async update(
     id: string,
     updateOrderDto: UpdateOrderDto,
@@ -271,11 +243,9 @@ export class OrdersService {
       );
     }
 
-    // Novedad: Separar datos del cliente y del pedido
     const { clienteNombre, clienteCelular, ...orderSpecificUpdates } =
       updateOrderDto;
 
-    // Novedad: Actualizar datos del cliente si se proporcionan
     if (clienteNombre || clienteCelular) {
       if (!existingOrder.clienteId) {
         throw new BadRequestException(
@@ -283,7 +253,6 @@ export class OrdersService {
         );
       }
 
-      // Novedad: Construir objeto de actualización solo con campos definidos
       const clientUpdateData: UpdateClientDto = {};
       if (clienteNombre) {
         clientUpdateData.nombre = clienteNombre;
@@ -327,7 +296,6 @@ export class OrdersService {
         imagenUrl: newImageUrl,
       };
 
-      // Novedad: Nos aseguramos de no pasar campos de relaciones directamente
       delete (dataToUpdate as any).bagId;
       delete (dataToUpdate as any).clienteId;
       delete (dataToUpdate as any).trabajadorId;
@@ -338,13 +306,9 @@ export class OrdersService {
       return tx.order.update({ where: { id }, data: dataToUpdate });
     });
 
-    // Novedad: Devolver el pedido actualizado con toda la información
     return this.findOne(id);
   }
 
-  // ======================================================================
-  // MEJORA: Métodos de transición usando el validador central
-  // ======================================================================
   async updateStatusEnProduccion(id: string): Promise<Order> {
     await this.validateTransition(id, OrderStatus.EN_PRODUCCION);
     return this.prisma.order.update({
@@ -407,11 +371,13 @@ export class OrdersService {
     });
   }
 
-  // ======================================================================
-  // OTROS MÉTODOS - Sin cambios
-  // ======================================================================
   async cancelMultipleOrders(cancelDto: CancelOrdersDto): Promise<Order[]> {
     const { bagIds } = cancelDto;
+
+    if (bagIds.length === 0) {
+        return [];
+    }
+
     const canceledOrders = await this.prisma.$transaction(async (tx) => {
       const ordersToCancel = await tx.order.findMany({
         where: {
@@ -421,6 +387,13 @@ export class OrdersService {
           },
         },
       });
+
+      if (ordersToCancel.length === 0) {
+          throw new NotFoundException(`No se encontraron pedidos válidos para cancelar con las bolsas: ${bagIds.join(', ')}. Pueden estar ya en estado final o no existir.`);
+      }
+
+      const orderIdsToUpdate = ordersToCancel.map((o) => o.id);
+
       if (ordersToCancel.length !== bagIds.length) {
         const foundBagIds = ordersToCancel.map((o) => o.bagId);
         const notFoundBagIds = bagIds.filter((id) => !foundBagIds.includes(id));
@@ -429,16 +402,15 @@ export class OrdersService {
         );
       }
       await tx.order.updateMany({
-        where: { id: { in: ordersToCancel.map((o) => o.id) } },
+        where: { id: { in: orderIdsToUpdate } },
         data: { estado: OrderStatus.CANCELADO, fechaCancelacion: new Date() },
       });
       await tx.bag.updateMany({
         where: { id: { in: bagIds } },
         data: { status: BagStatus.DISPONIBLE },
       });
-      // Novedad: Incluir cliente y trabajador en las órdenes devueltas
       return tx.order.findMany({
-        where: { id: { in: ordersToCancel.map((o) => o.id) } },
+        where: { id: { in: orderIdsToUpdate } },
         include: { cliente: true, trabajador: true, bag: true },
       });
     });
@@ -460,40 +432,35 @@ export class OrdersService {
   }
 
   private async saveImageFile(file: Express.Multer.File): Promise<string> {
-    const filename = `${Date.now()}-${file.originalname}`;
+    // Sanitize the filename by replacing spaces with hyphens
+    const sanitizedOriginalName = file.originalname.replace(/\s+/g, '-');
+    const filename = `${Date.now()}-${sanitizedOriginalName}`;
     const filePath = path.join(this.UPLOAD_DIR, filename);
-    return new Promise((resolve, reject) => {
-      fs.writeFile(filePath, file.buffer, (err) => {
-        if (err) {
-          this.logger.error(`Error saving image file: ${err.message}`);
-          return reject(
-            new BadRequestException('Error al guardar el archivo de imagen.'),
-          );
-        }
-        resolve(`/uploads/${filename}`);
-      });
-    });
+
+    try {
+      await fsPromises.writeFile(filePath, file.buffer);
+      return `/uploads/${filename}`;
+    } catch (err) {
+      this.logger.error(`Error saving image file: ${err.message}`, err.stack);
+      throw new BadRequestException('Error al guardar el archivo de imagen.');
+    }
   }
 
   private async deleteImageFile(imageUrl: string): Promise<void> {
+    if (!imageUrl) return;
     const filename = path.basename(imageUrl);
     const filePath = path.join(this.UPLOAD_DIR, filename);
-    return new Promise((resolve) => {
-      if (fs.existsSync(filePath)) {
-        fs.unlink(filePath, (err) => {
-          if (err) {
-            this.logger.error(`Error deleting image file: ${err.message}`);
-          } else {
-            this.logger.log(`Image file deleted: ${filePath}`);
-          }
-          resolve();
-        });
-      } else {
-        this.logger.warn(
-          `Attempted to delete non-existent image file: ${filePath}`,
-        );
-        resolve();
+
+    try {
+      // Check if file exists before trying to delete
+      await fsPromises.access(filePath);
+      await fsPromises.unlink(filePath);
+      this.logger.log(`Image file deleted: ${filePath}`);
+    } catch (error) {
+      // If error is ENOENT, file didn't exist, which is fine. Log other errors.
+      if (error.code !== 'ENOENT') {
+        this.logger.error(`Error deleting image file: ${error.message}`, error.stack);
       }
-    });
+    }
   }
 }

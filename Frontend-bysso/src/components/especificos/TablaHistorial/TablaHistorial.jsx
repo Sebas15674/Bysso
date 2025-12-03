@@ -12,7 +12,7 @@ const TablaHistorial = ({ pedidos }) => {
                         <th>CLIENTE</th>
                         <th>TIPO</th>
                         <th>TOTAL</th>
-                        <th>FECHA ENTREGA</th> 
+                        <th>FECHA ENTREGA/CANCELACIÓN</th> 
                         <th>TRABAJADOR</th>
                         <th>ESTADO</th>
                     </tr>
@@ -27,22 +27,30 @@ const TablaHistorial = ({ pedidos }) => {
                     ) : (
                         pedidos.map(pedido => (
                             <tr key={pedido.id}>
-                                <td data-label="# BOLSA">{pedido.bolsa}</td>
-                                <td data-label="CLIENTE">{pedido.cliente}</td>
+                                <td data-label="# BOLSA">{pedido.bagId}</td>
+                                <td data-label="CLIENTE">{pedido.cliente?.nombre}</td>
                                 <td data-label="TIPO">{pedido.tipo}</td>
-                                <td data-label="TOTAL">${(pedido.total || 0).toLocaleString('es-CO')}</td>
-                                <td data-label="FECHA ENTREGA">
-                                    {pedido.fechaEntregaReal || 'N/A'}
+                                <td data-label="TOTAL">
+                                    ${( (Number(pedido.abono) || 0) + (Number(pedido.total) || 0) ).toLocaleString('es-CO')}
+                                </td>
+                                <td data-label="FECHA ENTREGADO/CANCELADO">
+                                    {pedido.estado === 'ENTREGADO' && pedido.fechaEntregaReal
+                                        ? new Date(pedido.fechaEntregaReal).toLocaleDateString()
+                                        : pedido.estado === 'CANCELADO' && pedido.fechaCancelacion
+                                            ? new Date(pedido.fechaCancelacion).toLocaleDateString()
+                                            : 'N/A'
+                                    }
                                 </td>
                                 
-                                <td data-label="TRABAJADOR">{pedido.trabajadorAsignado || 'N/A'}</td>
+                                <td data-label="TRABAJADOR">{pedido.trabajador?.nombre || 'N/A'}</td>
                                <td data-label="ESTADO" className={styles.colEstado}>
                                 <span 
-                                    // 🔑 CLAVE: Aplicar la clase condicional aquí
                                     className={
-                                        pedido.estado === 'Cancelado' 
-                                            ? styles.badgeCancelado // Nueva clase para Cancelado (rojo)
-                                            : styles.badgeEntregado  // Clase existente para Entregado (verde)
+                                        pedido.estado === 'CANCELADO' 
+                                            ? styles.badgeCancelado 
+                                            : pedido.estado === 'ENTREGADO'
+                                                ? styles.badgeEntregado
+                                                : '' // Fallback or another style if needed
                                     }
                                 >
                                     {pedido.estado}

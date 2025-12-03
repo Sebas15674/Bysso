@@ -7,10 +7,11 @@ const TablaPedidos = ({
     pedidos, 
     alVerDetalles, 
     alEnviarProduccion,
-    modoSeleccion, // <--- NUEVA PROP para controlar la visibilidad
+    modoSeleccion, 
     bolsasSeleccionadas, 
     alToggleSeleccion, 
-    alToggleSeleccionarTodos
+    alToggleSeleccionarTodos,
+    loading // <--- Añadida la prop loading
 }) => {
     
     // Calcular si todos los pedidos visibles están seleccionados
@@ -20,7 +21,9 @@ const TablaPedidos = ({
     const colSpan = modoSeleccion ? 6 : 5; 
 
     return (
-        <div className={styles.contenedorTabla}>
+        <div 
+            className={styles.contenedorTabla} 
+        >
             <table className={styles.tabla}>
                 <thead>
                     <tr className={modoSeleccion ? styles.modoSeleccion : ''}> {/* CLAVE: Clase condicional */}
@@ -50,21 +53,21 @@ const TablaPedidos = ({
                     ) : (
                         pedidos.map(pedido => (
                             <tr 
-                                key={pedido.bolsa} 
-                                className={`${bolsasSeleccionadas.includes(pedido.bolsa) ? styles.filaSeleccionada : ''} ${modoSeleccion ? styles.modoSeleccion : ''}`}
+                                key={pedido.id} // Use the unique order ID as key
+                                className={`${bolsasSeleccionadas.includes(pedido.bagId) ? styles.filaSeleccionada : ''} ${modoSeleccion ? styles.modoSeleccion : ''}`}
                             >
                                 {/* CHECKBOX INDIVIDUAL (Solo visible en modoSeleccion) */}
                                 {modoSeleccion && (
                                     <td>
                                         <input
                                             type="checkbox"
-                                            checked={bolsasSeleccionadas.includes(pedido.bolsa)}
-                                            onChange={() => alToggleSeleccion(pedido.bolsa)}
+                                            checked={bolsasSeleccionadas.includes(pedido.bagId)}
+                                            onChange={() => alToggleSeleccion(pedido.bagId)}
                                             className={styles.checkboxControl}
                                         />
                                     </td>
                                 )}
-                                <td>{pedido.bolsa}</td>
+                                <td>{pedido.bagId}</td>
                                 <td>{pedido.tipo}</td>
                                 <td>{pedido.descripcion}</td>
                                 <td>{pedido.estado}</td>
@@ -75,7 +78,7 @@ const TablaPedidos = ({
                                     </Boton>
                                     
                                     {alEnviarProduccion && (
-                                        <Boton tipo="primario" onClick={() => alEnviarProduccion(pedido.bolsa)} disabled={modoSeleccion}>
+                                        <Boton tipo="primario" onClick={() => alEnviarProduccion(pedido.bagId)} disabled={modoSeleccion}>
                                             Enviar 
                                         </Boton>
                                     )}

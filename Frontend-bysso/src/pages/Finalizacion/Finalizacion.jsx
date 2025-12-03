@@ -1,100 +1,118 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './Finalizacion.module.css';
 import TablaFinalizacion from '../../components/especificos/TablaFinalizacion/TablaFinalizacion.jsx';
 import Modal from '../../components/ui/Modal/Modal.jsx';
-import DetallePedido from '../../components/especificos/DetalleFinalizacion/DetalleFinalizacion.jsx';
-import Boton from '../../components/ui/Boton/Boton.jsx'; // Importamos Boton
+import DetalleFinalizacion from '../../components/especificos/DetalleFinalizacion/DetalleFinalizacion.jsx';
+import { getPedidosByEstado, updatePedidoToEntregado } from '../../services/pedidosService';
+import { useBags } from '../../context/BagContext';
 
-// Ahora acepta handleEntregarPedido para sincronizar la bolsa.
-const Finalizacion = ({ pedidos, setPedidos, handleEntregarPedido }) => {
+const Finalizacion = () => {
+    const { refetchBags } = useBags();
+    const [pedidos, setPedidos] = useState([]);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [estaModalAbierto, setEstaModalAbierto] = useState(false);
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
-
-    // 🔑 NUEVO ESTADO PARA EL FILTRO DE TEXTO
     const [filtroTexto, setFiltroTexto] = useState('');
+    const isInitialMount = useRef(true);
+
+    const fetchPedidosFinalizacion = async (searchQuery = '') => {
+        setLoading(true);
+        try {
+            const data = await getPedidosByEstado('LISTO_PARA_ENTREGA', searchQuery);
+            setPedidos(data.data);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+            if (isInitialLoading) {
+                setIsInitialLoading(false);
+            }
+        }
+    };
+
+    // Efecto para la carga inicial
+    useEffect(() => {
+        fetchPedidosFinalizacion();
+    }, []);
+
+    // Efecto para la búsqueda debounced
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        const debounceFetch = setTimeout(() => {
+            fetchPedidosFinalizacion(filtroTexto);
+        }, 300);
+        return () => clearTimeout(debounceFetch);
+    }, [filtroTexto]);
+
 
     const abrirModal = () => setEstaModalAbierto(true);
-    
+
     const cerrarModal = () => {
         setEstaModalAbierto(false);
         setPedidoSeleccionado(null);
     };
-    
+
     const verDetalles = (pedido) => {
-        setPedidoSeleccionado(pedido);
+        setPedidoSeleccionado(pedido.id);
         abrirModal();
     };
 
-    // CRÍTICO: Esta función ahora solo llama a la función global.
-    const entregarPedidoSincronizado = (nBolsa) => {
-        if (handleEntregarPedido) {
-            handleEntregarPedido(nBolsa);
-        } else {
-            console.error("handleEntregarPedido no está definida. No se liberará la bolsa.");
+    const entregarPedidoSincronizado = async (nBolsa) => {
+        const pedido = pedidos.find(p => p.bagId === nBolsa);
+        if (pedido) {
+            try {
+                await updatePedidoToEntregado(pedido.id);
+                await fetchPedidosFinalizacion(filtroTexto);
+                refetchBags();
+            } catch (error) {
+                console.error("Error delivering order:", error);
+                alert("Error al entregar el pedido.");
+            }
         }
     };
 
-    // 🔑 OPTIMIZACIÓN: useMemo para el filtrado.
-    const pedidosListosParaEntrega = useMemo(() => {
-        // 1. FILTRADO POR ESTADO BASE (Listo para Entrega)
-        let listaFiltrada = pedidos.filter(pedido => 
-            pedido.estado === 'Listo para Entrega'
-        );
+    const pedidosListosParaEntrega = useMemo(() => pedidos, [pedidos]);
 
-        // 2. FILTRADO POR TEXTO DE BÚSQUEDA
-        if (filtroTexto.trim() !== '') {
-            const textoBusqueda = filtroTexto.toLowerCase().trim();
-            
-            listaFiltrada = listaFiltrada.filter(p => {
-                const bolsa = String(p.bolsa).toLowerCase();
-                const cliente = p.cliente ? p.cliente.toLowerCase() : '';
-                // También buscamos en la fecha de finalización
-                const fecha = p.fechaFinalizacion ? p.fechaFinalizacion.toLowerCase() : '';
-                
-                return (
-                    cliente.includes(textoBusqueda) ||
-                    bolsa.includes(textoBusqueda) ||
-                    fecha.includes(textoBusqueda)
-                );
-            });
-        }
-        
-        return listaFiltrada;
-        
-    }, [pedidos, filtroTexto]); // ⬅️ Dependencia añadida para reactividad
+    if (isInitialLoading) return <div>Cargando pedidos para entrega...</div>;
+    if (error) return <div>Error al cargar los pedidos: {error.message}</div>;
 
     return (
         <div className={styles.contenedorPagina}>
-            <div className={styles.encabezadoFinalizacion}> {/* ⬅️ Nuevo contenedor flex para título y filtros */}
+            <div className={styles.encabezadoFinalizacion}>
                 <h1 className={styles.tituloPagina}>Pedidos Listos para Entrega</h1>
             </div>
-            
-            {/* 🔑 NUEVA BARRA DE FILTROS */}
+
             <div className={styles.barraFiltros}>
-                <div className={styles.inputContainer}> 
-                    <input 
+                <div className={styles.inputContainer}>
+                    <input
                         type="text"
                         placeholder="Buscar"
                         value={filtroTexto}
                         onChange={(e) => setFiltroTexto(e.target.value)}
                         className={styles.inputFiltro}
+                        
                     />
                 </div>
             </div>
 
-            <TablaFinalizacion 
-                pedidos={pedidosListosParaEntrega} 
+            <TablaFinalizacion
+                pedidos={pedidosListosParaEntrega}
                 alVerDetalles={verDetalles}
                 alEntregarPedido={entregarPedidoSincronizado}
             />
-            <Modal 
-                estaAbierto={estaModalAbierto} 
-                alCerrar={cerrarModal} 
+            <Modal
+                estaAbierto={estaModalAbierto}
+                alCerrar={cerrarModal}
                 cierraAlHacerClickAfuera={true}
             >
-                <DetallePedido 
-                    pedido={pedidoSeleccionado} 
-                    alCerrarModal={cerrarModal} 
+                <DetalleFinalizacion
+                    pedidoId={pedidoSeleccionado}
+                    alCerrarModal={cerrarModal}
                 />
             </Modal>
         </div>
