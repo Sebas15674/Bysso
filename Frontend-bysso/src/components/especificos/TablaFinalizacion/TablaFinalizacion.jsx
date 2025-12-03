@@ -23,9 +23,9 @@ const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
             </tr>
           ) : (
             pedidos.map(pedido => (
-              <tr key={pedido.bolsa}>
-                <td>{pedido.bolsa}</td>
-                <td>{pedido.cliente}</td>
+              <tr key={pedido.id}>
+                <td>{pedido.bagId}</td>
+                <td>{pedido.cliente?.nombre}</td>
                 <td>{pedido.descripcion}</td>
                 <td>{pedido.estado}</td>
                 <td className={styles.acciones}>
@@ -34,7 +34,7 @@ const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
                     Ver
                   </Boton>
                   
-                  <Boton tipo="exito" onClick={() => alEntregarPedido(pedido.bolsa)}>
+                  <Boton tipo="exito" onClick={() => alEntregarPedido(pedido.bagId)}>
                     Entregar
                   </Boton>
                 </td>

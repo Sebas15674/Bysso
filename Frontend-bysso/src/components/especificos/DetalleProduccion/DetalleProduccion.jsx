@@ -1,57 +1,60 @@
 // src/components/especificos/DetalleProduccion/DetalleProduccion.jsx
-import React, { useState, useEffect } from 'react'; // 🚨 IMPORTAR useEffect y useState
+import React, { useState, useEffect } from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './DetalleProduccion.module.css';
+import { getPedidoById } from '../../../services/pedidosService.js';
 
-const DetalleProduccion = ({ pedido, alCerrarModal }) => {
-    // Estado para guardar la URL temporal de la imagen
-    const [imageURL, setImageURL] = useState(null); 
+const DetalleProduccion = ({ pedidoId, alCerrarModal }) => {
+    const [pedido, setPedido] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // 1. Verificar si hay un archivo 'File' en el objeto pedido.imagen
-        if (pedido && pedido.imagen instanceof File) {
-            // Crea una URL temporal en memoria para el objeto File
-            const url = URL.createObjectURL(pedido.imagen);
-            setImageURL(url);
-
-            // 2. Función de Limpieza: Esto es CRUCIAL. 
-            // Libera la URL temporal cuando el componente se desmonte o el pedido cambie.
-            return () => {
-                URL.revokeObjectURL(url);
-                setImageURL(null);
+        if (pedidoId) {
+            const fetchPedidoDetalle = async () => {
+                try {
+                    setLoading(true);
+                    const data = await getPedidoById(pedidoId);
+                    setPedido(data);
+                } catch (err) {
+                    setError(err);
+                } finally {
+                    setLoading(false);
+                }
             };
-        } else if (pedido && typeof pedido.imagen === 'string') {
-            // Manejar el caso futuro donde el pedido.imagen sea una URL real del backend
-            setImageURL(pedido.imagen);
+            fetchPedidoDetalle();
         } else {
-            setImageURL(null);
+            setPedido(null); // Clear pedido if pedidoId is null
+            setLoading(false);
         }
-    }, [pedido]); // Se ejecuta cada vez que el pedido cambia
+    }, [pedidoId]);
 
-    // Si el pedido es nulo o no se pudo generar la URL, no renderizar
+    if (loading) {
+        return <div className={styles.contenedorDetalles}><p>Cargando detalles del pedido...</p></div>;
+    }
+
+    if (error) {
+        return <div className={styles.contenedorDetalles}><p>Error al cargar los detalles: {error.message}</p></div>;
+    }
+
     if (!pedido) {
         return null;
     }
 
-    // =================================================================
-    // 🎨 RENDERIZADO
-    // =================================================================
+    const imageURL = pedido.imagenUrl ? `http://localhost:3000${pedido.imagenUrl}` : null;
+
     return (
         <div className={styles.contenedorDetalles}>
             <h2 className={styles.titulo}>Detalles del Pedido para Producción</h2>
             <div className={styles.info}>
-                
-                {/* ... (resto de la información) ... */}
-
-                <p><strong>Número de Bolsa:</strong> {pedido.bolsa}</p>
+                <p><strong>Número de Bolsa:</strong> {pedido.bagId}</p>
                 <p><strong>Descripción:</strong> {pedido.descripcion}</p>
                 <p><strong>Tipo:</strong> {pedido.tipo}</p>
-                <p><strong>Trabajador Asignado:</strong> {pedido.trabajadorAsignado}</p>
+                <p><strong>Trabajador Asignado:</strong> {pedido.trabajador?.nombre}</p>
                 <p><strong>Estado:</strong> {pedido.estado}</p>
-                <p><strong>Fecha de Entrega:</strong> {pedido.fechaEntrega}</p>
+                <p><strong>Fecha de Entrega:</strong> {new Date(pedido.fechaEntrega).toLocaleDateString()}</p>
                 <p><strong>Número de Prendas:</strong> {pedido.prendas}</p>
 
-                {/* 🚨 Usar la URL generada en el estado local */}
                 {imageURL && (
                     <div className={styles.contenedorImagen}>
                         <p><strong>Imagen del diseño:</strong></p>
@@ -62,6 +65,7 @@ const DetalleProduccion = ({ pedido, alCerrarModal }) => {
                         />
                     </div>
                 )}
+                {!imageURL && <p><strong>Imagen del diseño:</strong> No disponible</p>}
             </div>
             <div className={styles.acciones}>
                 <Boton tipo="primario" onClick={alCerrarModal}>

@@ -1,66 +1,82 @@
-import React, { useState, useMemo } from 'react'; 
+import React, { useState, useMemo, useEffect, useRef } from 'react'; 
 import styles from './Historial.module.css';
 import TablaHistorial from '../../components/especificos/TablaHistorial/TablaHistorial.jsx';
+import { getPedidosByEstado, resetPedidos } from '../../services/pedidosService';
 
-const Historial = ({ pedidos, handleResetTodo }) => {
-    
-    // 🔑 NUEVO ESTADO PARA EL FILTRO DE TEXTO
+const Historial = () => {
+    const [pedidos, setPedidos] = useState([]);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [filtroTexto, setFiltroTexto] = useState('');
+    const isInitialMount = useRef(true);
 
-    // 🔑 OPTIMIZACIÓN: useMemo para el filtrado y ordenamiento.
-    const pedidosHistorial = useMemo(() => {
-        // 1. FILTRADO POR ESTADO BASE (Entregado o Cancelado)
-        let listaFiltrada = pedidos.filter(pedido => 
-            pedido.estado === 'Entregado' || pedido.estado === 'Cancelado'
-        );
-
-        // 2. FILTRADO POR TEXTO DE BÚSQUEDA
-        if (filtroTexto.trim() !== '') {
-            const textoBusqueda = filtroTexto.toLowerCase().trim();
-            
-            listaFiltrada = listaFiltrada.filter(p => {
-                const bolsa = String(p.bolsa).toLowerCase();
-                const cliente = p.cliente ? p.cliente.toLowerCase() : '';
-                const estado = p.estado ? p.estado.toLowerCase() : '';
-                const tipo = p.tipo ? p.tipo.toLowerCase() : '';
-                const fechaEntregaReal = p.fechaEntregaReal ? p.fechaEntregaReal.toLowerCase() : ''; 
-                
-                return (
-                    cliente.includes(textoBusqueda) ||
-                    bolsa.includes(textoBusqueda) ||
-                    estado.includes(textoBusqueda) ||
-                    tipo.includes(textoBusqueda) ||
-                    fechaEntregaReal.includes(textoBusqueda)
-                );
-            });
+    const fetchHistorial = async (searchQuery = '') => {
+        setLoading(true);
+        try {
+            const entregados = await getPedidosByEstado('ENTREGADO', searchQuery);
+            const cancelados = await getPedidosByEstado('CANCELADO', searchQuery);
+            setPedidos([...entregados.data, ...cancelados.data]);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+            if (isInitialLoading) {
+                setIsInitialLoading(false);
+            }
         }
-        
-        // 3. ORDENAMIENTO (se mantiene)
-        return listaFiltrada.sort((a, b) => b.id - a.id);
-        
-    }, [pedidos, filtroTexto]); // ⬅️ Dependencia añadida para re-ejecutar solo cuando el filtro cambia
+    };
+
+    // Efecto para la carga inicial
+    useEffect(() => {
+        fetchHistorial();
+    }, []);
+
+    // Efecto para la búsqueda debounced
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        const debounceFetch = setTimeout(() => {
+            fetchHistorial(filtroTexto);
+        }, 300);
+        return () => clearTimeout(debounceFetch);
+    }, [filtroTexto]);
+
+    const handleResetTodo = async () => {
+        if (window.confirm("¿Estás seguro de que deseas borrar TODO el historial? Esta acción no se puede deshacer.")) {
+            try {
+                await resetPedidos();
+                await fetchHistorial(filtroTexto);
+            } catch (error) {
+                console.error("Error resetting history:", error);
+                alert("Error al borrar el historial.");
+            }
+        }
+    };
+
+    const pedidosHistorial = useMemo(() => {
+        return pedidos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }, [pedidos]);
+    
+    if (isInitialLoading) return <div>Cargando historial de pedidos...</div>;
+    if (error) return <div>Error al cargar el historial: {error.message}</div>;
 
     return (
         <div className={styles.contenedorPagina}> 
-            
             <div className={styles.header}>
-                
                 <div className={styles.tituloControles}>
                     <h1 className={styles.tituloPagina}>Historial de Pedidos (Entregados y Cancelados)</h1>
-                    
-                    {/* Botón de Reset en la esquina superior derecha */}
-                    {handleResetTodo && (
-                        <button 
-                            onClick={handleResetTodo}
-                            className={styles.botonReset} 
-                        >
-                            Borrar Historial 🗑️
-                        </button>
-                    )}
+                    <button 
+                        onClick={handleResetTodo}
+                        className={styles.botonReset} 
+                    >
+                        Borrar Historial 🗑️
+                    </button>
                 </div>
             </div>
             
-            {/* 🔑 NUEVA BARRA DE FILTROS */}
             <div className={styles.barraFiltros}>
                 <div className={styles.inputContainer}> 
                     <input 
@@ -69,13 +85,12 @@ const Historial = ({ pedidos, handleResetTodo }) => {
                         value={filtroTexto}
                         onChange={(e) => setFiltroTexto(e.target.value)}
                         className={styles.inputFiltro}
+                        
                     />
                 </div>
             </div>
             
-            {/* Llama al componente de tabla, pasándole los pedidos del historial */}
             <TablaHistorial pedidos={pedidosHistorial} />
-
         </div>
     );
 };

@@ -23,22 +23,22 @@ const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar })
             </tr>
           ) : (
             pedidos.map(pedido => (
-              <tr key={pedido.bolsa}>
-                <td>{pedido.bolsa}</td>
+              <tr key={pedido.id}>
+                <td>{pedido.bagId}</td>
                 <td>{pedido.descripcion}</td>
-                <td>{pedido.trabajadorAsignado}</td>
+                <td>{pedido.trabajador?.nombre}</td>
                 <td>{pedido.estado}</td>
                 <td className={styles.acciones}>
                   <Boton tipo="info" onClick={() => alVerDetalles(pedido)}>
                     Ver
                   </Boton>
-                  {pedido.estado === 'En Producción' && (
-                    <Boton tipo="primario" onClick={() => alTomarPedido(pedido.bolsa)}> 
+                  {pedido.estado === 'EN_PRODUCCION' && (
+                    <Boton tipo="primario" onClick={() => alTomarPedido(pedido.bagId)}> 
                       Tomar 
                     </Boton>
                   )}
-                  {pedido.estado === 'En Proceso' && (
-                    <Boton tipo="exito" onClick={() => alFinalizar(pedido.bolsa)}>
+                  {pedido.estado === 'EN_PROCESO' && (
+                    <Boton tipo="exito" onClick={() => alFinalizar(pedido.bagId)}>
                       Completar
                     </Boton>
                   )}
