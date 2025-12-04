@@ -80,7 +80,7 @@ const Pedido = ({ abrirModal }) => {
     };
 
     const verDetalles = (pedido) => {
-        abrirModal(pedido, { onUpdate: fetchPedidos });
+        abrirModal('PEDIDO_DETAIL', pedido, { onUpdate: fetchPedidos });
     };
 
     const enviarAProduccion = async (nBolsa) => {
@@ -147,7 +147,7 @@ const Pedido = ({ abrirModal }) => {
                 <div className={styles.controlesAcciones}>
                     <Boton
                         tipo="primario"
-                        onClick={() => abrirModal(null, { onSave: () => fetchPedidos() })}
+                        onClick={() => abrirModal('PEDIDO_FORM', null, { onSave: fetchPedidos })}
                         disabled={modoSeleccion}
                     >
                         Crear Pedido ✚

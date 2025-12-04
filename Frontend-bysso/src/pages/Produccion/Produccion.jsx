@@ -2,19 +2,15 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom'; // Import useLocation
 import styles from './Produccion.module.css';
 import TablaProduccion from '../../components/especificos/TablaProduccion/TablaProduccion.jsx';
-import Modal from '../../components/ui/Modal/Modal.jsx';
-import DetalleProduccion from '../../components/especificos/DetalleProduccion/DetalleProduccion.jsx';
 import { getPedidosByEstado, updatePedidoToEnProceso, updatePedidoToListoParaEntrega } from '../../services/pedidosService';
 import { useBags } from '../../context/BagContext';
 
-const Produccion = () => {
+const Produccion = ({ abrirModal }) => {
     const { refetchBags } = useBags();
     const [pedidos, setPedidos] = useState([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [estaModalAbierto, setEstaModalAbierto] = useState(false);
-    const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
     const [filtroTexto, setFiltroTexto] = useState('');
     const isInitialMount = useRef(true);
 
@@ -64,14 +60,8 @@ const Produccion = () => {
         return () => clearTimeout(debounceFetch);
     }, [filtroTexto, estadoFiltrado]); // Also depend on estadoFiltrado for debounced search
 
-    const cerrarModal = () => {
-        setEstaModalAbierto(false);
-        setPedidoSeleccionado(null);
-    };
-
     const verDetalles = (pedido) => {
-        setPedidoSeleccionado(pedido.id);
-        setEstaModalAbierto(true);
+        abrirModal('PRODUCCION_DETAIL', pedido.id);
     };
 
     const pedidosFiltrados = useMemo(() => pedidos, [pedidos]);
@@ -143,16 +133,6 @@ const Produccion = () => {
                 alFinalizar={finalizarProduccion}
                 loading={loading}
             />
-            <Modal
-                estaAbierto={estaModalAbierto}
-                alCerrar={cerrarModal}
-                cierraAlHacerClickAfuera={true}
-            >
-                <DetalleProduccion
-                    pedidoId={pedidoSeleccionado}
-                    alCerrarModal={cerrarModal}
-                />
-            </Modal>
         </div>
     );
 };

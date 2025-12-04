@@ -35,6 +35,11 @@ const Sidebar = ({ estaAbierto, alCerrarMenu }) => {
             Historial de pedidos
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/trabajadores" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)} onClick={alCerrarMenu}>
+            Gestion de trabajadores
+          </NavLink>
+        </li>
       </ul>
       {/* Nuevo: El banner con la marca */}
       <div className={styles.footerSidebar}>

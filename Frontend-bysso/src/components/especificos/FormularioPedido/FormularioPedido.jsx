@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './FormularioPedido.module.css';
-import { getClienteByCedula, getActiveWorkers } from '../../../services/pedidosService.js';
+import { getClienteByCedula } from '../../../services/pedidosService.js';
 import { useBags } from '../../../context/BagContext';
+import { useWorkers } from '../../../context/WorkerContext.jsx';
 
 
 
@@ -16,7 +17,7 @@ const cleanSimpleNumber = (formattedValue) => {
 
 const FormularioPedido = ({ alGuardar, alCancelar }) => {
     const { bolsasDisponibles } = useBags();
-    const [trabajadores, setTrabajadores] = useState([]);
+    const { workers: trabajadores, loading: workersLoading } = useWorkers();
     
     const [datosFormulario, setDatosFormulario] = useState(() => {
         const today = new Date();
@@ -42,18 +43,6 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
     });
 
     const [isSearchingClient, setIsSearchingClient] = useState(false);
-
-    useEffect(() => {
-        const fetchWorkers = async () => {
-            try {
-                const activeWorkers = await getActiveWorkers();
-                setTrabajadores(activeWorkers);
-            } catch (error) {
-                console.error("Error fetching workers:", error);
-            }
-        };
-        fetchWorkers();
-    }, []);
 
     const previewUrl = datosFormulario.imagen
         ? URL.createObjectURL(datosFormulario.imagen)
@@ -231,8 +220,10 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
 
                 <div className={styles.grupoCampos}>
                     <select name="trabajadorId" className={styles.entrada} onChange={manejarCambio} required value={datosFormulario.trabajadorId}>
-                        <option value="">Selecciona un trabajador</option>
-                        {trabajadores.map((trabajador) => (
+                        <option value="">{workersLoading ? 'Cargando trabajadores...' : 'Selecciona un trabajador'}</option>
+                        {trabajadores
+                          .filter(trabajador => trabajador.activo)
+                          .map((trabajador) => (
                             <option key={trabajador.id} value={trabajador.id}>
                                 {trabajador.nombre}
                             </option>

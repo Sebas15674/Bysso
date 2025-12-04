@@ -31,11 +31,18 @@ export class WorkersService {
     });
   }
 
-  findAll(activo?: boolean) {
+  findAll(activo?: boolean, search?: string) {
     const where: Prisma.WorkerWhereInput = {};
 
     if (activo !== undefined) {
       where.activo = activo;
+    }
+
+    if (search) {
+      where.nombre = {
+        contains: search,
+        mode: 'insensitive', // Case-insensitive search
+      };
     }
 
     return this.prisma.worker.findMany({

@@ -1,0 +1,66 @@
+.contenedorFormulario {
+    padding: 1rem;
+    background-color: #ecedf0;
+  }
+  
+  .tituloFormulario {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--color-primary-dark);
+    font-weight: 700;
+  }
+  
+  .formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 2.0rem;
+  }
+  
+  .grupoCampo {
+    display: flex;
+    padding: 30px;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  
+  .grupoCampo label {
+    font-weight: 700;
+    color: #000000;
+  }
+  
+  .entrada {
+    padding: 0.85rem;
+    border: 1px solid #363636;
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  .grupoCheckbox {
+    display: flex;
+    font-size: 1.4rem;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 0.5rem;
+  }
+
+  .grupoCheckbox input[type="checkbox"] {
+    transform: scale(1.3);
+  }
+  
+  .acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+  
+  .error {
+    color: var(--color-danger);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+   
