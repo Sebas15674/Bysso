@@ -1,0 +1,65 @@
+.contenedorPagina {
+    flex: 1;
+    padding: 2rem;
+    margin: 0 auto;
+    min-height: 90%; 
+}
+
+.tituloPagina {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #0b3675;
+    margin-bottom: 0; 
+    text-align: left;
+}
+
+.header {
+    display: flex;
+    flex-direction: column; 
+    margin-bottom: 2.5rem; 
+}
+
+.tituloControles {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline; /* Alinea los elementos a su línea base */
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.controlesAcciones { /* This class remains for the button container */
+    display: flex;
+    gap: 10px;
+}
+
+.barraFiltros {
+    margin: 3.8rem 0 3.5rem 0; /* Aumenta el margen inferior para bajar la tabla */
+    padding: 0.5rem 1.4rem;
+    background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+    border-radius: 8px;
+    border: 1px solid #afacac;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.inputContainer {
+    position: relative;
+    flex-grow: 1;
+    max-width: 320px;
+}
+
+.inputFiltro {
+    width: 100%; /* Make input take full width of its container */
+    padding: 0.7rem 1rem;
+    border: 1px solid #6c6f72;
+    border-radius: 10px;
+    font-size: 1.5rem;
+    transition: border-color 0.2s;
+}
+
+.inputFiltro:focus {
+    border-color: #087efc;
+    outline: none;
+}
+  

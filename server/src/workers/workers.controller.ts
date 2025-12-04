@@ -37,7 +37,7 @@ export class WorkersController {
   @ApiOperation({ summary: 'Obtener una lista de trabajadores' })
   @ApiResponse({ status: 200, description: 'Lista de trabajadores obtenida.' })
   findAll(@Query() query: QueryWorkerDto) { // Usar QueryWorkerDto
-    return this.workersService.findAll(query.activo);
+    return this.workersService.findAll(query.activo, query.search);
   }
 
   @Get(':id')

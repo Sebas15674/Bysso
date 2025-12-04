@@ -7,14 +7,12 @@ import DetalleFinalizacion from '../../components/especificos/DetalleFinalizacio
 import { getPedidosByEstado, updatePedidoToEntregado } from '../../services/pedidosService';
 import { useBags } from '../../context/BagContext';
 
-const Finalizacion = () => {
+const Finalizacion = ({ abrirModal }) => {
     const { refetchBags } = useBags();
     const [pedidos, setPedidos] = useState([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [estaModalAbierto, setEstaModalAbierto] = useState(false);
-    const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
     const [filtroTexto, setFiltroTexto] = useState('');
     const isInitialMount = useRef(true);
 
@@ -56,16 +54,8 @@ const Finalizacion = () => {
     }, [filtroTexto, estadoFiltrado]); // Also depend on estadoFiltrado for debounced search
 
 
-    const abrirModal = () => setEstaModalAbierto(true);
-
-    const cerrarModal = () => {
-        setEstaModalAbierto(false);
-        setPedidoSeleccionado(null);
-    };
-
     const verDetalles = (pedido) => {
-        setPedidoSeleccionado(pedido.id);
-        abrirModal();
+        abrirModal('FINALIZACION_DETAIL', pedido.id);
     };
 
     const entregarPedidoSincronizado = async (nBolsa) => {
@@ -121,16 +111,6 @@ const Finalizacion = () => {
                 alVerDetalles={verDetalles}
                 alEntregarPedido={entregarPedidoSincronizado}
             />
-            <Modal
-                estaAbierto={estaModalAbierto}
-                alCerrar={cerrarModal}
-                cierraAlHacerClickAfuera={true}
-            >
-                <DetalleFinalizacion
-                    pedidoId={pedidoSeleccionado}
-                    alCerrarModal={cerrarModal}
-                />
-            </Modal>
         </div>
     );
 };

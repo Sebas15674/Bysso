@@ -87,7 +87,7 @@ const Home = ({ abrirModal, refreshDashboardKey }) => {
                 <div className={styles.accionesEncabezado}>
                     <Boton 
                         tipo="primario" 
-                        onClick={() => abrirModal(null)}
+                        onClick={() => abrirModal('PEDIDO_FORM')}
                     >
                         Crear Pedido ✚
                     </Boton>

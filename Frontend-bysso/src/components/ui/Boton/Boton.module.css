@@ -50,6 +50,18 @@
     transform: translateY(-2px);
 }
 
+.secundario {
+    background-color: #9bc1ec; /* Color gris claro */
+    color: rgb(0, 0, 0);
+    border-color: #000000;
+    /* MÁRGENES ELIMINADOS para Flexbox: margin-left: 6px; margin-top: 6px; */
+}
+
+.secundario:hover {
+    background-color: #9ad8cbf3; /* Un tono más oscuro en hover */
+    transform: translateY(-2px);
+}   
+
 /* Estilo para el botón exitoso (estado 'Enviado') */
 .exitoso {
     background-color: #2ecc71; /* Color verde */

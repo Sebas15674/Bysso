@@ -1,0 +1,107 @@
+.contenedorTabla {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.603);
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1500px; /* Consistencia con TablaPedidos */
+    overflow-x: auto;
+ 
+}
+
+.tabla {
+    min-width: 90px; /* Consistencia de tamaño, ajustado para 3 columnas */
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.4rem;
+    table-layout: fixed; /* Consistencia con TablaPedidos */
+}
+
+.tabla thead {
+    background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+    color: #fdf8f8;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.tabla th,
+.tabla td {
+    padding: 16px;
+    vertical-align: middle; 
+    text-align: center; /* Todo centrado */
+    white-space: normal; 
+    word-wrap: break-word;
+}
+
+.tabla th {
+    letter-spacing: 1px;
+}
+
+.tabla th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.tabla th:last-child {
+    border-top-right-radius: 12px;
+}
+
+/* Anchos de columna ajustados */
+.tabla th:nth-child(1), .tabla td:nth-child(1) { width: 45%; } /* Nombre */
+.tabla th:nth-child(2), .tabla td:nth-child(2) { width: 20%; } /* Estado */
+.tabla th:nth-child(3), .tabla td:nth-child(3) { width: 35%; } /* Acciones */
+
+
+.tabla tbody tr {
+    border-bottom: 1px solid #d6d1d1;
+    transition: background-color 0.2s ease;
+}
+
+.tabla tbody tr:hover {
+    background-color: #eceef0;
+}
+
+.tabla tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Alineación de los botones */
+.acciones {
+    display: flex; 
+    justify-content: center; /* Centrar botones */
+    align-items: center;
+    gap: 1.9rem; 
+    white-space: nowrap;
+}
+
+/* Alineación del contenido de la celda de acciones (se sobrescribe por text-align: center del td) */
+.tabla td:nth-child(3) { 
+    text-align: center; 
+}
+
+.mensajeVacio {
+    text-align: center !important; 
+    padding: 40px 20px;
+    color: #888;
+    font-style: italic;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+}
+
+.estado {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+}
+
+.estadoActivo {
+    background-color: #d4edda; /* green */
+    color: #228b3b;
+}
+
+.estadoInactivo {
+    background-color: #f8d7da; /* red */
+    color: #9c1b28;
+}
+
