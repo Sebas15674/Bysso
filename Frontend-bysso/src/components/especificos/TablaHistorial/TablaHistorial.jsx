@@ -1,13 +1,30 @@
 import React from 'react';
 import styles from './TablaHistorial.module.css';
 
-const TablaHistorial = ({ pedidos }) => {
+const TablaHistorial = ({ 
+    pedidos,
+    modoSeleccion,
+    pedidosSeleccionados,
+    alToggleSeleccion,
+    alToggleSeleccionarTodos
+}) => {
     
+    const todosSeleccionados = pedidos.length > 0 && pedidosSeleccionados.length === pedidos.length;
+    const colSpan = 8; // Always 8 columns now
+
     return (
         <div className={styles.contenedorTabla}>
-            <table className={styles.tabla}>
+            <table className={`${styles.tabla} ${modoSeleccion ? styles.modoSeleccion : ''}`}>
                 <thead>
                     <tr>
+                        <th className={styles.columnaCheckbox}>
+                            <input
+                                type="checkbox"
+                                checked={todosSeleccionados}
+                                onChange={() => alToggleSeleccionarTodos(todosSeleccionados)}
+                                className={styles.checkboxControl}
+                            />
+                        </th>
                         <th># BOLSA</th>
                         <th>CLIENTE</th>
                         <th>TIPO</th>
@@ -20,13 +37,24 @@ const TablaHistorial = ({ pedidos }) => {
                 <tbody>
                     {pedidos.length === 0 ? (
                         <tr>
-                            <td colSpan="7" className={styles.mensajeVacio}>
-                                No hay pedidos entregados en el historial todavía.
+                            <td colSpan={colSpan} className={styles.mensajeVacio}>
+                                No hay pedidos entregados o cancelados en el historial todavía.
                             </td>
                         </tr>
                     ) : (
                         pedidos.map(pedido => (
-                            <tr key={pedido.id}>
+                            <tr 
+                                key={pedido.id}
+                                className={pedidosSeleccionados.includes(pedido.id) ? styles.filaSeleccionada : ''}
+                            >
+                                <td className={styles.columnaCheckbox}>
+                                    <input
+                                        type="checkbox"
+                                        checked={pedidosSeleccionados.includes(pedido.id)}
+                                        onChange={() => alToggleSeleccion(pedido.id)}
+                                        className={styles.checkboxControl}
+                                    />
+                                </td>
                                 <td data-label="# BOLSA">{pedido.bagId}</td>
                                 <td data-label="CLIENTE">{pedido.cliente?.nombre}</td>
                                 <td data-label="TIPO">{pedido.tipo}</td>
@@ -50,7 +78,7 @@ const TablaHistorial = ({ pedidos }) => {
                                             ? styles.badgeCancelado 
                                             : pedido.estado === 'ENTREGADO'
                                                 ? styles.badgeEntregado
-                                                : '' // Fallback or another style if needed
+                                                : ''
                                     }
                                 >
                                     {pedido.estado}

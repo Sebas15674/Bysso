@@ -257,6 +257,20 @@ export class OrdersController {
     return this.ordersService.cancelMultipleOrders(cancelOrdersDto);
   }
 
+  @Delete('delete-multiple')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Elimina múltiples pedidos basado en una lista de IDs de pedidos. Solo para pedidos en estado ENTREGADO o CANCELADO.',
+  })
+  @ApiResponse({ status: 204, description: 'Pedidos eliminados exitosamente.' })
+  @ApiResponse({ status: 404, description: 'No se encontraron pedidos válidos para eliminar.' })
+  deleteMultiple(@Body() body: { orderIds: string[] }) {
+    if (!body.orderIds || !Array.isArray(body.orderIds)) {
+      throw new BadRequestException('El cuerpo de la solicitud debe contener un arreglo de "orderIds".');
+    }
+    return this.ordersService.deleteMultipleOrders(body.orderIds);
+  }
+
   @Delete('reset')
   @ApiOperation({
     summary:

@@ -2,29 +2,27 @@
    Contenedor de Tabla (Estilo de Tarjeta)
    ---------------------------------- */
 .contenedorTabla {
-    /* Coherencia con TablaPedidos.module.css (aunque con ligeros ajustes de color para el fondo de la tarjeta) */
-    background-color: #ffffff; /* Fondo blanco para la tarjeta, no gris */
+    background-color: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.685); /* Sombra clara */
-    margin: 0 auto; /* Centrado */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.685);
+    margin: 0 auto;
     width: 100%;
     max-width: 1500px;
-    overflow-x: auto;
+    overflow: hidden; /* Changed from auto to hidden */
 }
 
 .tabla {
-    min-width: 1200px; /* Ancho mínimo para la tabla de historial */
     width: 100%;
     border-collapse: collapse;
-    font-size: 1.1rem; /* Ligeramente más pequeño que tu 1.3rem original para encajar más datos */
+    font-size: 1.1rem;
     table-layout: fixed;
+    /* Removed: transition: padding-left 0.3s ease; */
 }
 
 /* ----------------------------------
    Encabezado de Tabla (Degradado Oscuro)
    ---------------------------------- */
 .tabla thead {
-    /* Mismo degradado de color que usaste */
     background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
     color: #fdf8f8;
     text-transform: uppercase;
@@ -37,32 +35,45 @@
     text-align: center;
     white-space: normal; 
     word-wrap: break-word;
+    transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease; /* General transition */
 }
 
 .tabla th {
     letter-spacing: 1px;
 }
 
-.tabla th:first-child {
-    border-top-left-radius: 12px;
-}
-
-.tabla th:last-child {
-    border-top-right-radius: 12px;
-}
+/* Removed: border-top-left-radius from th:first-child */
+/* Removed: border-top-right-radius from th:last-child */
 
 /* ----------------------------------
    Ajuste de Anchos de Columna
    ---------------------------------- */
-/* Adaptado para las 7 columnas del historial */
-.tabla th:nth-child(1), .tabla td:nth-child(1) { width: 10%; } /* # BOLSA */
-.tabla th:nth-child(2), .tabla td:nth-child(2) { width: 15%; } /* CLIENTE */
-.tabla th:nth-child(3), .tabla td:nth-child(3) { width: 12%; } /* TIPO */
-.tabla th:nth-child(4), .tabla td:nth-child(4) { width: 15%; } /* TOTAL */
-.tabla th:nth-child(5), .tabla td:nth-child(5) { width: 18%; } /* FECHA ENTREGA */
-.tabla th:nth-child(6), .tabla td:nth-child(6) { width: 15%; } /* TRABAJADOR */
-.tabla th:nth-child(7), .tabla td:nth-child(7) { width: 15%; } /* ESTADO */
+.columnaCheckbox {
+    width: 0;
+    min-width: 0;
+    max-width: 0; /* Added max-width 0 */
+    padding: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease, min-width 0.3s ease, max-width 0.3s ease;
+}
 
+.tabla.modoSeleccion .columnaCheckbox {
+    width: 60px; /* Width when selection is active */
+    min-width: 60px; /* Explicit min-width */
+    max-width: 60px; /* Explicit max-width */
+    padding: 16px;
+    opacity: 1;
+}
+
+/* Widths are adjusted to make space */
+.tabla td:nth-child(2), .tabla th:nth-child(2) { width: 10%; } /* # BOLSA */
+.tabla td:nth-child(3), .tabla th:nth-child(3) { width: 15%; } /* CLIENTE */
+.tabla td:nth-child(4), .tabla th:nth-child(4) { width: 12%; } /* TIPO */
+.tabla td:nth-child(5), .tabla th:nth-child(5) { width: 15%; } /* TOTAL */
+.tabla td:nth-child(6), .tabla th:nth-child(6) { width: 20%; } /* FECHA */
+.tabla td:nth-child(7), .tabla th:nth-child(7) { width: 15%; } /* TRABAJADOR */
+.tabla td:nth-child(8), .tabla th:nth-child(8) { width: 15%; } /* ESTADO */
 
 /* ----------------------------------
    Cuerpo de la Tabla (Filas)
@@ -70,7 +81,7 @@
 .tabla tbody tr {
     background-color: #ffffff;
     border-bottom: 1px solid #e0e0e0;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, border-left 0.3s ease;
 }
 
 .tabla tbody tr:hover {
@@ -81,15 +92,17 @@
     border-bottom: none;
 }
 
+.filaSeleccionada {
+    background-color: #ffeccf !important;
+}
+
 /* ----------------------------------
    Insignia de Estado (Badge)
    ---------------------------------- */
 .colEstado {
-    /* Centrado del badge */
     text-align: center;
 }
 
-/* Estilos comunes del badge, ya los tienes */
 .badgeEntregado, 
 .badgeCancelado {
     display: inline-block;
@@ -99,22 +112,26 @@
     font-size: 1.2rem;
 }
 
-/* Estilo para pedidos ENTREGADOS (verde) */
 .badgeEntregado {
     color: #030303; 
     background-color: #0af340; 
 }
 
-/* 🔑 NUEVO: Estilo para pedidos CANCELADOS (rojo) */
 .badgeCancelado {
-    color: #050505; /* Rojo oscuro para el texto */
-    background-color: #ec6370; /* Rojo suave para el fondo */
+    color: #050505;
+    background-color: #ec6370;
 }
 
-
 /* ----------------------------------
-   Mensaje Vacío
+   Controles y Mensajes
    ---------------------------------- */
+.checkboxControl {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: #0b3675;
+}
+
 .mensajeVacio {
     text-align: center;
     padding: 40px 20px;
@@ -122,7 +139,6 @@
     font-style: italic;
     font-size: 1.1rem;
     background-color: #f9f9f9;
-    /* Asegura que el mensaje se vea bien al final de la tabla */
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
 }
