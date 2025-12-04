@@ -417,6 +417,58 @@ export class OrdersService {
     return canceledOrders;
   }
 
+  async deleteMultipleOrders(orderIds: string[]): Promise<void> {
+    this.logger.log(`Attempting to delete ${orderIds.length} orders.`);
+
+    if (orderIds.length === 0) {
+      this.logger.log('No order IDs provided for deletion.');
+      return;
+    }
+
+    const ordersToDelete = await this.prisma.order.findMany({
+      where: {
+        id: { in: orderIds },
+        estado: { in: [OrderStatus.ENTREGADO, OrderStatus.CANCELADO] },
+      },
+      select: {
+        id: true,
+        imagenUrl: true,
+      },
+    });
+
+    if (ordersToDelete.length !== orderIds.length) {
+      const foundIds = ordersToDelete.map(o => o.id);
+      const notFoundIds = orderIds.filter(id => !foundIds.includes(id));
+      this.logger.warn(`Some orders were not found or not in a deletable state (ENTREGADO, CANCELADO): ${notFoundIds.join(', ')}`);
+      
+      if (ordersToDelete.length === 0) {
+        throw new NotFoundException('No valid orders found to delete.');
+      }
+    }
+    
+    const idsToDelete = ordersToDelete.map(order => order.id);
+
+    await this.prisma.$transaction(async (tx) => {
+      // Delete orders
+      const deleteResult = await tx.order.deleteMany({
+        where: {
+          id: { in: idsToDelete },
+        },
+      });
+
+      this.logger.log(`${deleteResult.count} orders deleted from database.`);
+
+      // Delete associated images
+      for (const order of ordersToDelete) {
+        if (order.imagenUrl) {
+          await this.deleteImageFile(order.imagenUrl);
+        }
+      }
+    });
+
+    this.logger.log('Deletion process completed.');
+  }
+
   async resetSystem(): Promise<void> {
     this.logger.warn('⚠️ Initiating full system reset...');
     await this.prisma.$transaction(async (tx) => {

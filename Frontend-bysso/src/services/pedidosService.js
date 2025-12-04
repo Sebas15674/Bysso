@@ -130,11 +130,14 @@ export const cancelMultiplePedidos = async (bagIds) => {
 };
 
 /**
- * Resetea todos los pedidos (usado para desarrollo/testing).
+ * Elimina múltiples pedidos basado en una lista de IDs de pedidos.
+ * @param {string[]} orderIds - Array de IDs de pedidos a eliminar.
  * @returns {Promise<Object>} Resultado de la operación.
  */
-export const resetPedidos = async () => {
-    const response = await axiosInstance.delete('/pedidos/reset');
+export const deleteMultiplePedidos = async (orderIds) => {
+    const response = await axiosInstance.delete('/pedidos/delete-multiple', {
+        data: { orderIds }, // For DELETE requests, data is passed like this
+    });
     return response.data;
 };
 
