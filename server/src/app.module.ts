@@ -9,6 +9,8 @@ import { ClientsModule } from './clientes/clients.module';
 import { WorkersModule } from './workers/workers.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     WorkersModule,
     PrismaModule,
     DashboardModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

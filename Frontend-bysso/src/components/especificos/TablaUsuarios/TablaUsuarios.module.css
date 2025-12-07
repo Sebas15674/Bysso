@@ -1,0 +1,125 @@
+/* src/components/especificos/TablaUsuarios/TablaUsuarios.module.css */
+
+.contenedorTabla {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.726); /* Más prominente como TablaTrabajadores */
+  margin: 90px auto;
+  width: 100%;
+  max-width: 1500px; /* Consistencia de ancho */
+  overflow: hidden; /* Ocultar el scroll si hay exceso */
+}
+
+.tabla {
+  min-width: 700px; /* Asegura un tamaño mínimo si la pantalla es muy pequeña */
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.4rem; /* Consistencia con TablaTrabajadores */
+  table-layout: fixed; /* Anchos de columna fijos */
+}
+
+.tabla thead {
+  background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+  color: #fdf8f8;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.tabla th,
+.tabla td {
+  padding: 16px;
+  vertical-align: middle;
+  text-align: center; /* Todo centrado por defecto */
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.tabla th {
+  letter-spacing: 1px;
+}
+
+.tabla th:first-child {
+    border-top-left-radius: 12px; /* Redondeado para el encabezado */
+}
+
+.tabla th:last-child {
+    border-top-right-radius: 12px; /* Redondeado para el encabezado */
+}
+
+/* Anchos de columna específicos para TablaUsuarios */
+.tabla th:nth-child(1), .tabla td:nth-child(1) { width: 40%; } /* Email */
+.tabla th:nth-child(2), .tabla td:nth-child(2) { width: 20%; } /* Rol */
+.tabla th:nth-child(3), .tabla td:nth-child(3) { width: 20%; } /* Fecha de Creación */
+.tabla th:nth-child(4), .tabla td:nth-child(4) { width: 20%; } /* Acciones */
+
+
+.tabla tbody tr {
+  border-bottom: 1px solid #d6d1d1; /* Color de borde más consistente */
+  transition: background-color 0.2s ease;
+}
+
+.tabla tbody tr:hover {
+  background-color: #e3ecf5; /* Hover más claro */
+}
+
+.tabla tbody tr:last-child {
+  border-bottom: none;
+}
+
+.columnaAcciones {
+  display: flex;
+  justify-content: center; /* Centrar los botones de acción */
+  gap: 1.9rem; /* Consistencia con TablaTrabajadores */
+  white-space: nowrap;
+}
+
+.botonAccion {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.4rem; /* Consistencia con TablaTrabajadores */
+  transition: transform 0.2s;
+}
+
+.botonAccion:hover {
+  transform: scale(1.2);
+}
+
+.editar {
+  color: #007bff;
+}
+
+.eliminar {
+  color: #dc3545;
+}
+
+.roleBadge {
+  display: inline-block;
+  padding: 0.5rem 1rem; /* Padding adaptado */
+  font-size: 1.1rem; /* Tamaño adaptado */
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 9999px; /* Borde más redondeado como un "pill" */
+  color: #fff;
+}
+
+.admin {
+  background-color: #1aa4b9; /* Info Blue */
+}
+
+.superAdmin {
+  background-color: #159734; /* Success Green */
+}
+
+.mensajeVacio {
+  text-align: center !important;
+  padding: 40px 20px;
+  color: #888;
+  font-style: italic;
+  font-size: 1.4rem; /* Consistencia */
+  background-color: #f9f9f9;
+}

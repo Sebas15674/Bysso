@@ -31,7 +31,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 
-const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_MB = 50;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 @ApiTags('Pedidos')
@@ -52,7 +52,7 @@ export class OrdersController {
       storage: memoryStorage(), // Forzar el almacenamiento en memoria
       limits: { fileSize: MAX_FILE_SIZE_BYTES },
       fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
           return callback(
             new BadRequestException('Solo se permiten archivos de imagen.'),
             false,
@@ -141,7 +141,7 @@ export class OrdersController {
       storage: memoryStorage(), // Forza el almacenamiento en memoria
       limits: { fileSize: MAX_FILE_SIZE_BYTES },
       fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/i)) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
           return callback(
             new BadRequestException('Solo se permiten archivos de imagen.'),
             false,

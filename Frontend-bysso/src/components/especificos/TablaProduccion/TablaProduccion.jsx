@@ -2,6 +2,7 @@
 import React from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaProduccion.module.css';
+import formatStatus from '../../../utils/formatStatus.jsx';
 
 const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar }) => {
   return (
@@ -27,7 +28,7 @@ const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar })
                 <td>{pedido.bagId}</td>
                 <td>{pedido.descripcion}</td>
                 <td>{pedido.trabajador?.nombre}</td>
-                <td>{pedido.estado}</td>
+                <td>{formatStatus(pedido.estado)}</td>
                 <td className={styles.acciones}>
                   <Boton tipo="info" onClick={() => alVerDetalles(pedido)}>
                     Ver

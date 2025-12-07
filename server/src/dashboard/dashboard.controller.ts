@@ -9,4 +9,9 @@ export class DashboardController {
   async getDashboardStats() {
     return this.dashboardService.getOrderStatusCounts();
   }
+
+  @Get('in-flow-orders-count')
+  async getInFlowOrdersCount(): Promise<number> {
+    return this.dashboardService.getInFlowOrdersCount();
+  }
 }

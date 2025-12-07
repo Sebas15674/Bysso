@@ -1,0 +1,46 @@
+
+.statusBadge {
+  padding: 0.3em 0.6em;
+  border-radius: 0.5em;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+  font-size: 0.85em;
+  display: inline-block;
+  margin-right: 5px; /* Adjust as needed for spacing */
+  white-space: nowrap; /* Prevent badge text from wrapping */
+}
+
+/* Specific status styles */
+.statusPending {
+  background-color: #f1ca54; /* Yellow for pending */
+  color: #343a40; /* Dark text for contrast */
+}
+
+.statusInProduction {
+  background-color: #0b6ed8; /* Blue for in production */
+}
+
+.statusInProgress {
+  background-color: #f19946; /* Light orange for in progress */
+  color: #343a40; /* Dark text for contrast */
+}
+
+
+
+.statusCancelled {
+  background-color: #dc3545; /* Red for cancelled */
+}
+
+.statusReadyForDelivery {
+  background-color: #5ac77b;
+  color: #343a40; /* Cyan/Teal for ready for delivery */
+}
+
+.statusDelivered {
+  background-color: #0aa149; /* Indigo/Purple for delivered */
+}
+
+.statusDefault {
+  background-color: #6c757d; /* Grey for default/unknown */
+}

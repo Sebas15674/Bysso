@@ -50,7 +50,7 @@
 .tabla th:nth-child(1), .tabla td:nth-child(1) { width: 29%; } /* Cliente */
 .tabla th:nth-child(2), .tabla td:nth-child(2) { width: 110%; } /* descripcion */
 .tabla th:nth-child(3), .tabla td:nth-child(3) { width: 70%; } /* Descripción */
-.tabla th:nth-child(4), .tabla td:nth-child(4) { width: 50%; } /* Estado */
+.tabla th:nth-child(4), .tabla td:nth-child(4) { width: 60%; } /* Estado */
 .tabla th:nth-child(5), .tabla td:nth-child(5) { width: 50%; } /* Acción */ /* Acción */
 
 .tabla tbody tr {

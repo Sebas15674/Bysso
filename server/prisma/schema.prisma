@@ -34,6 +34,11 @@ enum BagStatus {
   OCUPADA
 }
 
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+
 // ================================================================
 // MODELOS
 // ================================================================
@@ -121,4 +126,16 @@ model Worker {
   updatedAt DateTime  @updatedAt
 
   @@map("workers")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255)
+  role      Role
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
 }

@@ -20,6 +20,14 @@
     font-size: 1.1rem;
 }
 
+.historial {
+    background-color: #7face7;
+    color: #000000; /* Texto oscuro */
+    border: 0px solid #4c8ef0; /* Borde azul que querías */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.61); /* Sombra verde que querías */
+    font-size: 1.1rem;
+} /* Borde negro */        
+
 /* ======================================= */
 /* 🔑 NUEVA CLASE PARA 'DESACTIVAR CANCELACIÓN' */
 /* ======================================= */
@@ -101,10 +109,40 @@
 }
 
 .info {
-    background-color: #83888a; /* Un azul de información */
+    background-color: #a3a7a5; /* Un azul de información */
     color: rgb(0, 0, 0);
 }
 
 .info:hover {
     background-color: #5377ad;
+}
+
+.cancelar_edicion {
+    background-color: #fa6e5f; /* Color rojo */
+    color: rgb(0, 0, 0);
+    border-color: #000000;
+}
+
+.editar_pedido {
+    background-color: #88ca8e; /* Color amarillo */
+    color: rgb(0, 0, 0);
+    border-color: #000000;
+}
+
+.editar_pedido:hover {
+    background-color: #5fce5a;
+    border-color: #000000;
+    transform: translateY(-2px);
+}
+
+.cerrar_modal {
+    background-color: #ec6969; /* Color gris */
+    color: rgb(0, 0, 0);
+    border-color: #000000;
+}
+
+.cerrar_modal:hover {
+    background-color: #d44949;
+    border-color: #000000;
+    transform: translateY(-2px);
 }

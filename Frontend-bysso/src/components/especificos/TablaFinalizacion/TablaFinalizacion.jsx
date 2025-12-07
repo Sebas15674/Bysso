@@ -2,6 +2,7 @@
 import React from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaFinalizacion.module.css';
+import formatStatus from '../../../utils/formatStatus.jsx';
 
 const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
   return (
@@ -27,7 +28,7 @@ const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
                 <td>{pedido.bagId}</td>
                 <td>{pedido.cliente?.nombre}</td>
                 <td>{pedido.descripcion}</td>
-                <td>{pedido.estado}</td>
+                <td>{formatStatus(pedido.estado)}</td>
                 <td className={styles.acciones}>
 
                   <Boton tipo="info" onClick={() => alVerDetalles(pedido)}>

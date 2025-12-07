@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './DetallePedido.module.css';
+import baseStyles from '../../../styles/DetalleModalBase.module.css';
 import { updatePedido, getActiveWorkers } from '../../../services/pedidosService.js';
+import formatStatus from '../../../utils/formatStatus.jsx';
 
 const cleanSimpleNumber = (formattedValue) => {
     if (typeof formattedValue !== 'string') return '';
@@ -150,12 +152,11 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
         const value = datosEditables[name] ?? '';
         if (isEditing) {
              return (
-                <div className={styles.campoEditable}>
-                    <label htmlFor={name}><strong>{label}:</strong></label>
+                                 <div className={baseStyles.campoEditable}>                    <label htmlFor={name}><strong>{label}:</strong></label>
                     <input
                         id={name} name={name} type={type} value={value}
                         onChange={handleEditChange} required={isRequired}
-                        className={styles.inputCampo}
+                        className={baseStyles.inputCampo}
                     />
                 </div>
             );
@@ -183,17 +184,20 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
         const value = datosEditables[name] || '';
         if (isEditing) {
             return (
-                <div className={styles.campoEditable}>
-                    <label htmlFor={name}><strong>{label}:</strong></label>
-                    <select id={name} name={name} value={value} onChange={handleEditChange} required className={styles.inputCampo}>
+                    <div className={baseStyles.campoEditable}> <label htmlFor={name}><strong>{label}:</strong></label>
+                        <select id={name} name={name} value={value} onChange={handleEditChange} required className={baseStyles.inputCampo}>
                         <option value="">{`Seleccione ${label.toLowerCase()}`}</option>
-                        {options.map((opt) => (
-                            <option key={opt[optionValueKey]} value={opt[optionValueKey]}>
-                                {opt[optionLabelKey]}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                                {options.map((opt, index) => {
+                                        const keyValue = opt[optionValueKey];
+                                        const labelValue = opt[optionLabelKey];
+                                                
+                                            return (
+                                                    <option key={keyValue} value={keyValue}>
+                                                        {labelValue}
+                                                    </option>
+                                            );
+        })}             </select>
+                    </div>
             );
         }
         // Find the label for the selected value for display mode
@@ -213,56 +217,65 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
     const tipos = ['BORDADO', 'ESTAMPADO', 'ESTAMPADO_Y_BORDADO', 'OTROS'];
 
     return (
-        <div className={styles.contenedorDetalles}>
-            <h2 className={styles.titulo}>{isEditing ? 'Editar Pedido' : 'Detalles del Pedido'}</h2>
-            <div className={styles.info}>
-                <p><strong>NÚMERO DE BOLSA:</strong> {pedido.bagId}</p>
-                <p><strong>ESTADO:</strong> {pedido.estado}</p>
-                {renderValue('clienteNombre', 'CLIENTE', 'text', true)}
-                {renderValue('clienteCedula', 'CÉDULA')}
-                {renderValue('clienteCelular', 'CELULAR')}
-                {isEditing ? renderSelectValue('tipo', 'TIPO', tipos.map(t => ({ val: t, lab: t})), 'val', 'lab') : <p><strong>TIPO:</strong> {datosEditables.tipo}</p> }
+        <div className={baseStyles.modalDetalleContent}>
+            <div className={baseStyles.header}>
+                <h2 className={baseStyles.titulo}>{isEditing ? 'Editar Pedido' : 'Detalles del Pedido'}</h2>
+            </div>
+            <div className={baseStyles.body}>
+                <div className={baseStyles.info}>
+                    <p><strong>NÚMERO DE BOLSA:</strong> {pedido.bagId}</p>
+                    <p><strong>ESTADO:</strong> {formatStatus(pedido.estado)}</p>
+                    {renderValue('clienteNombre', 'CLIENTE', 'text', true)}
+                    {renderValue('clienteCedula', 'CÉDULA')}
+                    {renderValue('clienteCelular', 'CELULAR')}
+                    {isEditing ? renderSelectValue('tipo', 'TIPO', tipos.map(t => ({ val: t, lab: t})), 'val', 'lab'): <p><strong>TIPO:</strong> {datosEditables.tipo}</p> }
 
-                {isEditing ? (
-                    <div className={styles.campoEditable}>
-                        <label htmlFor="descripcion"><strong>DESCRIPCIÓN:</strong></label>
-                        <textarea id="descripcion" name="descripcion" value={datosEditables.descripcion || ''} onChange={handleEditChange} required className={styles.inputCampo}/>
-                    </div>
-                ) : <p><strong>DESCRIPCIÓN:</strong> {datosEditables.descripcion}</p>}
-                
-                {renderValue('fechaEntrega', 'FECHA DE ENTREGA', 'date')}
-                {renderSelectValue('trabajadorId', 'TRABAJADOR ASIGNADO', trabajadores, 'id', 'nombre')}
-                {renderValue('prendas', 'Nº PRENDAS', 'number')}
-                {renderValue('abono', 'ABONO')}
-                {renderValue('total', 'TOTAL')}
-                <div className={styles.contenedorImagen}>
-                    {imageURL ? (
-                        <><p><strong>Imagen del diseño:</strong></p><img src={imageURL} alt="Diseño del pedido" className={styles.imagen} /></>
-                    ) : <p><strong>Imagen del diseño:</strong> Sin imagen</p>}
+                    {isEditing ? (
+                        <div className={baseStyles.campoEditable}>
+                            <label htmlFor="descripcion"><strong>DESCRIPCIÓN:</strong></label>
+                            <textarea id="descripcion" name="descripcion" value={datosEditables.descripcion || ''} onChange={handleEditChange} required className={baseStyles.inputCampo}/>
+                        </div>
+                    ) : <p><strong>DESCRIPCIÓN:</strong> {datosEditables.descripcion}</p>}
+                    
+                    {renderValue('fechaEntrega', 'FECHA DE ENTREGA', 'date')}
+                    {renderSelectValue('trabajadorId', 'TRABAJADOR ASIGNADO', trabajadores, 'id', 'nombre')}
+                    {renderValue('prendas', 'Nº PRENDAS', 'number')}
+                    {renderValue('abono', 'ABONO')}
+                    {renderValue('total', 'TOTAL')}
                 </div>
-                {isEditing && (
-                    <div className={styles.contenedorArchivo}>
-                        <label htmlFor="inputArchivoEdicion" className={styles.etiquetaArchivo}>{imageURL ? 'Cambiar Imagen' : 'Seleccionar Imagen'}</label>
-                        <input id="inputArchivoEdicion" type="file" name="imagen" className={styles.inputArchivo} onChange={handleImageChange} />
-                        <span className={styles.nombreArchivo}>
-                            {datosEditables.imagen instanceof File ? datosEditables.imagen.name : (imageURL ? 'Imagen actual' : 'Sin archivo')}
-                        </span>
-                        {datosEditables.imagen && (
-                            <Boton tipo="peligro" onClick={handleBorrarImagen} className={styles.botonBorrarEdicion}>Quitar Imagen</Boton>
+                {(imageURL || isEditing) && ( // Only show media section if there's an image or in editing mode
+                    <div className={baseStyles.mediaSection}>
+                        {imageURL ? (
+                            <>
+                                <p><strong>Imagen del diseño:</strong></p>
+                                <img src={imageURL} alt="Diseño del pedido" className={baseStyles.imagen} />
+                            </>
+                        ) : <p><strong>Imagen del diseño:</strong> Sin imagen</p>}
+                        {isEditing && (
+                            <div className={styles.contenedorArchivo}>
+                                <label htmlFor="inputArchivoEdicion" className={styles.etiquetaArchivo}>{imageURL ? 'Cambiar Imagen' : 'Seleccionar Imagen'}</label>
+                                <input id="inputArchivoEdicion" type="file" name="imagen" className={styles.inputArchivo} onChange={handleImageChange} />
+                                <span className={styles.nombreArchivo}>
+                                    {datosEditables.imagen instanceof File ? datosEditables.imagen.name : (imageURL ? 'Imagen actual' : 'Sin archivo')}
+                                </span>
+                                {datosEditables.imagen && (
+                                    <Boton tipo="peligro" onClick={handleBorrarImagen} className={styles.botonBorrarEdicion}>Quitar Imagen</Boton>
+                                )}
+                            </div>
                         )}
                     </div>
                 )}
             </div>
-            <div className={styles.acciones}>
+            <div className={baseStyles.acciones}>
                 {isEditing ? (
                     <>
-                        <Boton tipo="neutro" onClick={() => setIsEditing(false)}>Cancelar Edición ❌</Boton>
+                        <Boton tipo="cancelar_edicion" onClick={() => setIsEditing(false)}>Cancelar Edición ❌</Boton>
                         <Boton tipo="primario" onClick={handleGuardarCambios}>Guardar Cambios ✅</Boton>
                     </>
                 ) : (
                     <>
-                        {puedeEditarse && (<Boton tipo="info" onClick={() => setIsEditing(true)}>Editar Pedido ✏️</Boton>)}
-                        <Boton tipo="primario" onClick={alCerrarModal}>Cerrar</Boton>
+                        {puedeEditarse && (<Boton tipo="editar_pedido" onClick={() => setIsEditing(true)}>Editar Pedido ✏️</Boton>)}
+                        <Boton tipo="cerrar_modal" onClick={alCerrarModal}>Cerrar</Boton>
                     </>
                 )}
             </div>

@@ -2,6 +2,7 @@
 import React from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaPedidos.module.css';
+import formatStatus from '../../../utils/formatStatus.jsx';
 
 const TablaPedidos = ({ 
     pedidos, 
@@ -70,7 +71,7 @@ const TablaPedidos = ({
                                 <td>{pedido.bagId}</td>
                                 <td>{pedido.tipo}</td>
                                 <td>{pedido.descripcion}</td>
-                                <td>{pedido.estado}</td>
+                                <td>{formatStatus(pedido.estado)}</td>
                                 <td className={styles.acciones}>
 
                                     <Boton tipo="info" onClick={() => alVerDetalles(pedido)} disabled={modoSeleccion}>

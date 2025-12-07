@@ -1,0 +1,51 @@
+/* src/pages/GestionUsuarios/GestionUsuarios.module.css */
+
+.contenedorPagina {
+  flex: 1;
+  padding: 2rem;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  margin-top: 4rem; /* Bajar el header */
+}
+
+.tituloPagina {
+  font-size: 3.0rem;
+  font-weight: 600;
+  color: #0b3675;
+  margin: 0;
+}
+
+.botonCrear {
+  background-color: #1c68cc;
+  color: rgb(255, 255, 255);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.botonCrear:hover {
+  background-color: #0056b3;
+}
+
+.mensajeError {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin: 1rem 0;
+}

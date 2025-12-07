@@ -51,7 +51,7 @@ export class CreateOrderDto {
   @IsString({
     message: 'La descripción del pedido debe ser una cadena de texto',
   })
-  @MaxLength(300, { message: 'La descripción no puede superar 300 caracteres' })
+  @MaxLength(1000, { message: 'La descripción no puede superar 300 caracteres' })
   descripcion: string;
 
   @Type(() => Number)

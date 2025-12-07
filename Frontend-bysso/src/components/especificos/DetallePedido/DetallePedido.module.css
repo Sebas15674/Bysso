@@ -1,115 +1,49 @@
 /* src/components/especificos/DetallePedido/DetallePedido.module.css */
 
-.contenedorDetalles {
-    padding: 2.5rem;
-    background-color: #fcfcfc;
-    border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    max-width: 700px; 
-    margin: 1rem auto;
-    font-family: 'Inter', sans-serif;
-    text-align: left;
-    max-height: 85vh; 
-    overflow-y: auto;
-}
+/* 
+  Los estilos para la sección de imagen han sido movidos a 
+  src/styles/DetalleModalBase.module.css.
+  Se mantienen los estilos específicos para el manejo de archivos.
+*/
 
-.titulo {
-    font-size: 3rem;
-    font-weight: 700;
-    color: #113681;
-    margin-bottom: 2.5rem;
-    text-align: center;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 1rem;
-}
-
-.info {
-    line-height: 1.6;
-    margin-bottom: 2rem;
-    display: flex; 
-    flex-direction: column;
-    gap: 1.5rem; /* Espacio entre bloques */
-}
-
-/* Estilo para los bloques de lectura (.info p) */
-.info p {
-    font-size: 1.5rem;
-    color: #454749;
-    margin: 0;
-    background-color: #f0f4f8; /* Fondo del bloque de lectura */
-    border-radius: 8px;
-    padding: 1rem;
-    text-align: left;
-    word-wrap: break-word;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.info strong {
-    color: #201066;
-    font-weight: 700;
-    display: block;
-    margin-bottom: 0.5rem; 
-    text-transform: uppercase; 
-}
-
-/* ------------------------------------------- */
-/* ESTILOS DE EDICIÓN (Clave para arreglar el diseño) */
-/* ------------------------------------------- */
-
-/* Contenedor del campo editable, replica el fondo y padding del modo lectura */
-.campoEditable {
-    background-color: #f0f4f8; 
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-    margin: 0;
-    font-size: 1.5rem; 
-    color: #454749;
-}
-
-/* Estilo de los inputs y selects dentro del modo edición */
-.inputCampo {
-    width: 100%;
-    padding: 0.75rem;
-    font-size: 1.2rem; 
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    background-color: white; /* Color de fondo del input para que resalte */
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.07);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    margin-top: 0.25rem; 
-    box-sizing: border-box; /* Importante para que el padding no desborde el 100% de ancho */
-}
-
-.inputCampo:focus {
-    border-color: #113681;
-    box-shadow: 0 0 0 3px rgba(17, 54, 129, 0.2);
-    outline: none;
-}
-
-/* El estilo de la etiqueta dentro del modo edición */
-.campoEditable label strong {
-    color: #201066;
-    font-weight: 700;
-    display: block;
-    margin-bottom: 0.5rem; 
-    text-transform: uppercase; 
-}
-
-/* ------------------------------------------- */
-/* Estilos de botones (Sin cambios)             */
-/* ------------------------------------------- */
-
-.acciones {
+.contenedorArchivo {
+    margin-top: 1rem;
     display: flex;
-    justify-content: center;
+    align-items: center;
     gap: 1rem;
-    margin-top: 2.5rem;
+    background-color: #f0f4f8;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
 }
 
-.acciones .boton {
-    padding: 0.9rem 2.2rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border-radius: 9999px;
+.etiquetaArchivo {
+    background-color: #3498db;
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 0.3s ease;
+}
+
+.etiquetaArchivo:hover {
+    background-color: #2980b9;
+}
+
+.inputArchivo {
+    display: none;
+}
+
+.nombreArchivo {
+    color: #5d6d7e;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+.botonBorrarEdicion {
+    margin-left: auto; /* Empuja el botón a la derecha */
 }

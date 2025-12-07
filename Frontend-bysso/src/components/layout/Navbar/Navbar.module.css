@@ -4,7 +4,7 @@
   justify-content: space-between; 
   align-items: center;
   padding: 0.7rem 2rem;
-  background: linear-gradient(90deg, #4d7c8f, #2b2a2a);
+  background: linear-gradient(90deg, #4d7c8f, #1d1c1c);
   color: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: sticky;
@@ -22,7 +22,7 @@
 .botonHamburguesa {
   background: none;
   border: none;
-  color: white;
+  color: rgb(255, 800, 255);
   font-size: 2rem;
   cursor: pointer;
   margin-right: 1.5rem;
@@ -30,20 +30,20 @@
 
 .tituloPagina {
   text-align: left;
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 600;
 }
 
-.logoContainer {
+.marcaContainer {
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.5s ease-in-out;
 }
 
-.logoContainer:hover {
-  transform: scale(1.05);
+.marcaContainer:hover {
+  transform: scale(1.20);
 }
 
-.logo {
-  height: 4rem; /* Ajusta el tamaño del logo */
+.marca{
+  height: 2.6rem; /* Ajusta el tamaño del logo */
   width: auto;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Modal.module.css';
 
-const Modal = ({ estaAbierto, alCerrar, children, cierraAlHacerClickAfuera }) => {
+const Modal = ({ estaAbierto, alCerrar, children, cierraAlHacerClickAfuera, customClass }) => {
   if (!estaAbierto) return null;
 
   const handleSuperposicionClick = (e) => {
@@ -18,7 +18,7 @@ const Modal = ({ estaAbierto, alCerrar, children, cierraAlHacerClickAfuera }) =>
       className={styles.superposicion}
       onClick={handleSuperposicionClick}
     >
-      <div className={styles.contenidoModal} onClick={(e) => e.stopPropagation()}>
+      <div className={`${styles.contenidoModal} ${customClass || ''}`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
