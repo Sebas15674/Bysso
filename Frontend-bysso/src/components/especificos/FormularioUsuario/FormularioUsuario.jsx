@@ -52,6 +52,7 @@ const FormularioUsuario = ({ initialData, onSave, onClose, errorMessageApi }) =>
   return (
     <form className={styles.formulario} onSubmit={handleSubmit}>
       <h2 className={styles.titulo}>{isEditMode ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</h2>
+      <button onClick={onClose} className={styles.closeButton} aria-label="Cerrar formulario">&times;</button>
 
       {errorMessageApi && <p className={styles.errorMessage}>{errorMessageApi}</p>}
 

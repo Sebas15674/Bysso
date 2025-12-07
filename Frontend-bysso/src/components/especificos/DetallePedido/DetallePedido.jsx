@@ -41,6 +41,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
                 prendas: pedido.prendas === 0 ? '' : (pedido.prendas ?? ''),
                 // Ensure imagenUrl is used
                 imagen: pedido.imagenUrl || null,
+                fechaEntrega: pedido.fechaEntrega ? pedido.fechaEntrega.split('T')[0] : '', // Formatear para input type="date"
             });
             setIsEditing(false); // Reset editing state when pedido changes
         }
@@ -165,7 +166,15 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
         // View Mode Logic
         let displayValue = value; // Default to the value from state
         if (name === 'fechaEntrega') {
-            displayValue = new Date(value).toLocaleDateString('es-CO');
+            // 'value' is typically something like "YYYY-MM-DDTHH:mm:ss.sssZ" from backend
+            // Extract YYYY, MM, DD
+            const dateParts = value.split('T')[0].split('-'); // ["YYYY", "MM", "DD"]
+            const year = parseInt(dateParts[0]);
+            const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed in JS Date
+            const day = parseInt(dateParts[2]);
+    
+            // Create a new Date object in local time using the extracted parts
+            displayValue = new Date(year, month, day).toLocaleDateString('es-CO');
         } else if (name === 'abono' || name === 'total') {
             // The value is already a formatted string from the state (e.g., "50.000")
             // Just add the currency symbol.
@@ -220,6 +229,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
         <div className={baseStyles.modalDetalleContent}>
             <div className={baseStyles.header}>
                 <h2 className={baseStyles.titulo}>{isEditing ? 'Editar Pedido' : 'Detalles del Pedido'}</h2>
+                <button onClick={alCerrarModal} className={baseStyles.closeButton} aria-label="Cerrar modal">&times;</button>
             </div>
             <div className={baseStyles.body}>
                 <div className={baseStyles.info}>

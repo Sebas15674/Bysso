@@ -13,6 +13,7 @@ import {
   IsDateString,
   Matches,
   IsUrl, // Novedad: para validar URL si viene
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { OrderStatus, OrderType } from '@prisma/client';
@@ -56,12 +57,14 @@ export class CreateOrderDto {
 
   @Type(() => Number)
   @IsNumber({}, { message: 'El abono debe ser un valor numérico' })
+  @Max(20000000, { message: 'El abono no debe superar 20,000,000' })
   @Min(0, { message: 'El abono no puede ser negativo' })
   abono: number;
 
   @Type(() => Number)
   @IsNumber({}, { message: 'El número de prendas debe ser un valor numérico' })
-  @Min(0, { message: 'El número de prendas no puede ser negativo' })
+  @Max(40000, { message: 'El numero de prendas no debe superar 40000 caracteres' })
+  @Min(1, { message: 'El número de prendas no puede ser menor a 1' })
   prendas: number;
 
   @IsDateString(
@@ -75,6 +78,7 @@ export class CreateOrderDto {
 
   @Type(() => Number)
   @IsNumber({}, { message: 'El total a pagar debe ser un valor numérico' })
+  @Max(20000000, { message: 'El total no debe superar 20,000,000' })
   @Min(0, { message: 'El total a pagar no puede ser negativo' })
   total: number;
 

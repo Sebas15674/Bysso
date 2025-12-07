@@ -49,6 +49,7 @@ const DetalleProduccion = ({ pedidoId, alCerrarModal }) => {
         <div className={baseStyles.modalDetalleContent}>
             <div className={baseStyles.header}>
                 <h2 className={baseStyles.titulo}>Detalles del Pedido para Producción</h2>
+                <button onClick={alCerrarModal} className={baseStyles.closeButton} aria-label="Cerrar modal">&times;</button>
             </div>
             <div className={baseStyles.body}>
                 <div className={baseStyles.info}>
@@ -57,7 +58,16 @@ const DetalleProduccion = ({ pedidoId, alCerrarModal }) => {
                     <p><strong>Tipo:</strong> {pedido.tipo}</p>
                     <p><strong>Trabajador Asignado:</strong> {pedido.trabajador?.nombre}</p>
                     <p><strong>Estado:</strong> {formatStatus(pedido.estado)}</p>
-                    <p><strong>Fecha de Entrega:</strong> {new Date(pedido.fechaEntrega).toLocaleDateString()}</p>
+                    <p><strong>Fecha de Entrega:</strong> {(() => {
+                        const dateString = pedido.fechaEntrega;
+                        if (!dateString) return 'N/A';
+                        const dateParts = dateString.split('T')[0].split('-');
+                        if (dateParts.length < 3) return 'Fecha inválida';
+                        const year = parseInt(dateParts[0]);
+                        const month = parseInt(dateParts[1]) - 1;
+                        const day = parseInt(dateParts[2]);
+                        return new Date(year, month, day).toLocaleDateString('es-CO');
+                    })()}</p>
                     <p><strong>Número de Prendas:</strong> {pedido.prendas}</p>
                 </div>
 

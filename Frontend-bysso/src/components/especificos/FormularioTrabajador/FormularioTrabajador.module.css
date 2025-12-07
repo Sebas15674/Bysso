@@ -5,6 +5,26 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Distinct shadow */
     max-width: 700px; /* Specific width for forms */
     margin: 2rem auto; /* Centering */
+    position: relative; /* Añadido para posicionar el botón de cerrar */
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    color: #f77171;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  
+  .closeButton:hover {
+    color: #ff1900;
+    transform: scale(1.4);
   }
   
   .tituloFormulario {
