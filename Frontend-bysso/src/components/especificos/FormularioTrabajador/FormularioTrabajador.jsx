@@ -52,6 +52,7 @@ const FormularioTrabajador = ({ onSave, onClose, initialData }) => {
       <h2 className={styles.tituloFormulario}>
         {isEditing ? 'Editar Trabajador' : 'Crear Nuevo Trabajador'}
       </h2>
+      <button onClick={onClose} className={styles.closeButton} aria-label="Cerrar formulario">&times;</button>
       <form className={styles.formulario} onSubmit={handleSubmit}>
         <div className={styles.grupoCampo}>
           <label htmlFor="nombre">Nombre Completo</label>

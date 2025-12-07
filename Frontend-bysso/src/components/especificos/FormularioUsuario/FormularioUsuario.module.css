@@ -11,6 +11,26 @@
   background-color: #ccc8c8; /* White background for the "modal box" */
   border-radius: 12px; /* Rounded corners */
   box-shadow: 0 10px 30px rgb(0, 0, 0); /* Distinct shadow */
+  position: relative; /* Añadido para posicionar el botón de cerrar */
+}
+
+.closeButton {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: #f37777;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.closeButton:hover {
+  color: #ff1900;
+  transform: scale(1.4);
 }
 
 .titulo {

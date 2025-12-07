@@ -24,6 +24,26 @@
 .header {
     padding: 3rem 3rem;
     border-bottom: 1px solid #ffffff;
+    position: relative; /* Clave para posicionar el botón de cerrar */
+}
+
+.closeButton {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background: transparent;
+    border: none;
+    font-size: 3rem;
+    line-height: 1;
+    color: #ee3a3ade;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.closeButton:hover {
+    color: #f11800fe;
+    transform: scale(1.1);
 }
 
 .titulo {

@@ -114,14 +114,12 @@ export class OrdersService {
       if (imageFile) {
         imageUrl = await this.saveImageFile(imageFile);
       }
-
-      const order = await tx.order.create({
-        data: {
-          ...orderData,
-          abono: new Decimal(orderData.abono),
-          total: new Decimal(orderData.total),
-          fechaEntrega: new Date(orderData.fechaEntrega),
-          bag: { connect: { id: bagId } },
+                          const order = await tx.order.create({
+                            data: {
+                              ...orderData,
+                              abono: new Decimal(orderData.abono),
+                              total: new Decimal(orderData.total),
+                              fechaEntrega: new Date(`${orderData.fechaEntrega}T00:00:00`),          bag: { connect: { id: bagId } },
           cliente: {
             connectOrCreate: {
               where: { cedula: clienteCedula },
@@ -291,7 +289,7 @@ export class OrdersService {
             : undefined,
         fechaEntrega:
           orderSpecificUpdates.fechaEntrega !== undefined
-            ? new Date(orderSpecificUpdates.fechaEntrega)
+            ? new Date(`${orderSpecificUpdates.fechaEntrega}T00:00:00`)
             : undefined,
         imagenUrl: newImageUrl,
       };
@@ -342,9 +340,12 @@ export class OrdersService {
   async updateStatusEntregado(id: string): Promise<Order> {
     const order = await this.validateTransition(id, OrderStatus.ENTREGADO);
     return this.prisma.$transaction(async (tx) => {
+      if (order.imagenUrl) {
+        await this.deleteImageFile(order.imagenUrl);
+      }
       const updatedOrder = await tx.order.update({
         where: { id },
-        data: { estado: OrderStatus.ENTREGADO, fechaEntregaReal: new Date() },
+        data: { estado: OrderStatus.ENTREGADO, fechaEntregaReal: new Date(), imagenUrl: null },
         include: { cliente: true, trabajador: true, bag: true },
       });
       await tx.bag.update({
@@ -358,9 +359,12 @@ export class OrdersService {
   async cancelOrder(id: string): Promise<Order> {
     const order = await this.validateTransition(id, OrderStatus.CANCELADO);
     return this.prisma.$transaction(async (tx) => {
+      if (order.imagenUrl) {
+        await this.deleteImageFile(order.imagenUrl);
+      }
       const updatedOrder = await tx.order.update({
         where: { id },
-        data: { estado: OrderStatus.CANCELADO, fechaCancelacion: new Date() },
+        data: { estado: OrderStatus.CANCELADO, fechaCancelacion: new Date(), imagenUrl: null },
         include: { cliente: true, trabajador: true, bag: true },
       });
       await tx.bag.update({
@@ -401,9 +405,17 @@ export class OrdersService {
           `No se pudieron encontrar o cancelar todos los pedidos. Bolsas no válidas o ya en estado final: ${notFoundBagIds.join(', ')}.`,
         );
       }
+      // Delete associated images before updating the database
+      for (const order of ordersToCancel) {
+        if (order.imagenUrl) {
+          // No need to await here, let them run in parallel
+          this.deleteImageFile(order.imagenUrl);
+        }
+      }
+
       await tx.order.updateMany({
         where: { id: { in: orderIdsToUpdate } },
-        data: { estado: OrderStatus.CANCELADO, fechaCancelacion: new Date() },
+        data: { estado: OrderStatus.CANCELADO, fechaCancelacion: new Date(), imagenUrl: null },
       });
       await tx.bag.updateMany({
         where: { id: { in: bagIds } },
