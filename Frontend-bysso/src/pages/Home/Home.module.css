@@ -19,14 +19,14 @@
 .historialBotonContenedor {
     position: absolute;
     top: 4.1rem; 
-    right: -350px; 
+    right: -500px; 
     z-index: 5;
-    background-color: #000000;
+    background: #020202;
 }
 
 
 .logoDashboard {
-    width: 160px;
+    width: 300px;
     height: auto;
 }
 
@@ -49,7 +49,7 @@
     font-weight: 700;
     color: #083f77;
     margin: 1;
-    margin-right: 2rem;
+    margin-right: 1rem;
 }
 
 .tarjetasResumen {
@@ -60,11 +60,26 @@
     margin-bottom: 5rem;
 }
 
+.totalPedidosEnFlujoContenedor {
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente el contenido */
+    margin-top: 3rem; /* Espacio superior para separarlo de las otras tarjetas */
+    margin-bottom: 5rem; /* Espacio inferior */
+}
+
+/* Hacer que la tarjeta individual dentro de este contenedor tome un ancho específico */
+.totalPedidosEnFlujoContenedor .tarjeta {
+    flex: 0 1 350px; /* Permitir que la tarjeta tenga un ancho fijo y no crezca/encoga agresivamente */
+    max-width: 300px; 
+    padding: 10px;/* Asegurar un ancho máximo para la tarjeta central */
+    align-items: center; /* Alinear el contenido al centro */
+}
+
 .tarjeta {
     flex: 1 1 280px;
     background-color: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 8px 15px rgba(125, 148, 190, 0.973);
+    box-shadow: 0 8px 15px rgba(151, 179, 233, 0.973);
     padding: 2rem;
     display: flex;
     flex-direction: column;
@@ -79,7 +94,7 @@
 
 .tarjeta:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 20px rgba(109, 101, 211, 0.5); 
+    box-shadow: 0 12px 20px rgba(24, 156, 156, 0.336); 
 }
 
 .tarjetaTitulo {

@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+
+// Auth Components
+import { useAuth } from './context/AuthContext.jsx';
+import Login from './pages/Login/Login.jsx';
+import ProtectedRoute from './components/ui/ProtectedRoute/ProtectedRoute.jsx';
 
 // Layout Components
 import Sidebar from './components/layout/Sidebar/Sidebar.jsx';
@@ -13,54 +18,45 @@ import Pedido from './pages/Pedido/Pedido.jsx';
 import Produccion from './pages/Produccion/Produccion.jsx';
 import Finalizacion from './pages/Finalizacion/Finalizacion.jsx';
 import Historial from './pages/Historial/Historial.jsx';
-import Trabajadores from './pages/Trabajadores/Trabajadores.jsx'; // Import new page
+import Trabajadores from './pages/Trabajadores/Trabajadores.jsx';
+import GestionUsuarios from './pages/GestionUsuarios/GestionUsuarios.jsx'; 
 
 // Form & Detail Components
 import FormularioPedido from './components/especificos/FormularioPedido/FormularioPedido.jsx';
-import FormularioTrabajador from './components/especificos/FormularioTrabajador/FormularioTrabajador.jsx'; // Import new form
+import formPedidoStyles from './components/especificos/FormularioPedido/FormularioPedido.module.css'; // Importar estilos del formulario de pedido
+import FormularioTrabajador from './components/especificos/FormularioTrabajador/FormularioTrabajador.jsx';
 import DetallePedido from './components/especificos/DetallePedido/DetallePedido.jsx';
-import DetalleProduccion from './components/especificos/DetalleProduccion/DetalleProduccion.jsx'; // Import production detail
+import DetalleProduccion from './components/especificos/DetalleProduccion/DetalleProduccion.jsx';
 import DetalleFinalizacion from './components/especificos/DetalleFinalizacion/DetalleFinalizacion.jsx';
+import detalleBaseStyles from './styles/DetalleModalBase.module.css'; // Importar estilos base para modales de detalle
+import formModalOverrides from './styles/FormModalOverrides.module.css'; // Importar overrides para modales de formulario
 
 // Services & Context
 import { createPedido } from './services/pedidosService';
 import { BagProvider, useBags } from './context/BagContext.jsx';
-import { WorkerProvider } from './context/WorkerContext.jsx'; // Import new provider
+import { WorkerProvider } from './context/WorkerContext.jsx';
 
 // Styles
 import './styles/main.css';
-
 
 const AppLayout = () => {
     const { refetchBags } = useBags();
     const [estaMenuAbierto, setEstaMenuAbierto] = useState(false);
     const location = useLocation();
+    const { logout } = useAuth(); // Obtener logout del contexto
 
-    // --- Generalized Modal State ---
     const [modalState, setModalState] = useState({
-        isOpen: false,
-        type: null, // e.g., 'PEDIDO_FORM', 'PEDIDO_DETAIL', 'TRABAJADOR_FORM'
-        data: null,   // Data for the modal content (e.g., a specific order or worker)
-        callbacks: {} // To handle onSave, onUpdate, etc.
+        isOpen: false, type: null, data: null, callbacks: {}
     });
-
     const [refreshDashboardKey, setRefreshDashboardKey] = useState(0);
 
-    const abrirModal = (type, data = null, callbacks = {}) => {
-        setModalState({ isOpen: true, type, data, callbacks });
-    };
+    const abrirModal = (type, data = null, callbacks = {}) => setModalState({ isOpen: true, type, data, callbacks });
+    const cerrarModal = () => setModalState({ isOpen: false, type: null, data: null, callbacks: {} });
 
-    const cerrarModal = () => {
-        setModalState({ isOpen: false, type: null, data: null, callbacks: {} });
-    };
-
-    // --- Handlers ---
     const handleAgregarPedido = async (formData) => {
         try {
             await createPedido(formData);
-            if (modalState.callbacks.onSave) {
-                modalState.callbacks.onSave();
-            }
+            if (modalState.callbacks.onSave) modalState.callbacks.onSave();
             refetchBags();
             setRefreshDashboardKey(prevKey => prevKey + 1);
             cerrarModal();
@@ -71,40 +67,30 @@ const AppLayout = () => {
     };
 
     const handleEditarPedido = () => {
-        if (modalState.callbacks.onUpdate) {
-            modalState.callbacks.onUpdate();
-        }
+        if (modalState.callbacks.onUpdate) modalState.callbacks.onUpdate();
         refetchBags();
         cerrarModal();
     };
-    
+
     const getTituloPagina = (path) => {
-        // Updated to include the new page
         if (path.startsWith('/pedidos')) return 'Orden de Pedidos';
         if (path.startsWith('/produccion')) return 'Producción';
         if (path.startsWith('/finalizacion')) return 'Pedidos para Entrega';
         if (path.startsWith('/historial')) return 'Historial de Entregas';
         if (path.startsWith('/trabajadores')) return 'Gestión de Trabajadores';
+        if (path.startsWith('/gestion-usuarios')) return 'Gestión de Usuarios'; // Título para la nueva página
         return 'Dashboard';
     };
 
-    // --- Modal Content Renderer ---
     const renderModalContent = () => {
         const { type, data, callbacks } = modalState;
-
         switch (type) {
-            case 'PEDIDO_FORM':
-                return <FormularioPedido alGuardar={handleAgregarPedido} alCancelar={cerrarModal} />;
-            case 'PEDIDO_DETAIL':
-                return <DetallePedido pedido={data} alCerrarModal={cerrarModal} alActualizar={handleEditarPedido} />;
-            case 'TRABAJADOR_FORM':
-                return <FormularioTrabajador initialData={data} onSave={callbacks.onSave} onClose={cerrarModal} />;
-            case 'PRODUCCION_DETAIL':
-                return <DetalleProduccion pedidoId={data} alCerrarModal={cerrarModal} />;
-            case 'FINALIZACION_DETAIL':
-                return <DetalleFinalizacion pedidoId={data} alCerrarModal={cerrarModal} />;
-            default:
-                return null;
+            case 'PEDIDO_FORM': return <FormularioPedido alGuardar={handleAgregarPedido} alCancelar={cerrarModal} />;
+            case 'PEDIDO_DETAIL': return <DetallePedido pedido={data} alCerrarModal={cerrarModal} alActualizar={handleEditarPedido} />;
+            case 'TRABAJADOR_FORM': return <FormularioTrabajador initialData={data} onSave={callbacks.onSave} onClose={cerrarModal} />;
+            case 'PRODUCCION_DETAIL': return <DetalleProduccion pedidoId={data} alCerrarModal={cerrarModal} />;
+            case 'FINALIZACION_DETAIL': return <DetalleFinalizacion pedidoId={data} alCerrarModal={cerrarModal} />;
+            default: return null;
         }
     };
 
@@ -115,6 +101,7 @@ const AppLayout = () => {
                 <Navbar
                     tituloPagina={getTituloPagina(location.pathname)}
                     alAbrirMenu={() => setEstaMenuAbierto(true)}
+                    onLogout={logout} // Pasar la función de logout al Navbar
                 />
                 <div className="content-area">
                     <Routes>
@@ -123,14 +110,26 @@ const AppLayout = () => {
                         <Route path="/produccion" element={<Produccion abrirModal={abrirModal} />} />
                         <Route path="/finalizacion" element={<Finalizacion abrirModal={abrirModal} />} />
                         <Route path="/historial" element={<Historial />} />
-                        <Route path="/trabajadores" element={<Trabajadores abrirModal={abrirModal} />} /> {/* New Route */}
+                        <Route path="/trabajadores" element={<Trabajadores abrirModal={abrirModal} />} />
+                        <Route path="/gestion-usuarios" element={<GestionUsuarios />} /> {/* Nueva ruta */}
+                        {/* Si se accede a una ruta no definida dentro del layout, redirigir al home */}
+                        <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                 </div>
-                <Footer/>
+                <Footer />
                 <Modal
                     estaAbierto={modalState.isOpen}
                     alCerrar={cerrarModal}
                     cierraAlHacerClickAfuera={!!modalState.data}
+                    customClass={
+                        modalState.type === 'PEDIDO_FORM'
+                            ? formPedidoStyles.modalPedido
+                            : modalState.type === 'TRABAJADOR_FORM'
+                                ? formModalOverrides.transparentContainer
+                                : (modalState.type === 'PEDIDO_DETAIL' || modalState.type === 'PRODUCCION_DETAIL' || modalState.type === 'FINALIZACION_DETAIL')
+                                    ? detalleBaseStyles.modalDetalleContent
+                                    : ''
+                    }
                 >
                     {renderModalContent()}
                 </Modal>
@@ -140,12 +139,21 @@ const AppLayout = () => {
 };
 
 function App() {
-    // Consolidate providers here
     return (
         <Router>
             <BagProvider>
                 <WorkerProvider>
-                    <AppLayout />
+                    <Routes>
+                        <Route path="/login" element={<Login />} />
+                        <Route 
+                            path="/*" 
+                            element={
+                                <ProtectedRoute>
+                                    <AppLayout />
+                                </ProtectedRoute>
+                            } 
+                        />
+                    </Routes>
                 </WorkerProvider>
             </BagProvider>
         </Router>
@@ -153,4 +161,3 @@ function App() {
 }
 
 export default App;
-

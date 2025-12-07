@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import Boton from '../../components/ui/Boton/Boton.jsx';
 import marcaLogo from '../../assets/images/marca.png';
-import { getDashboardStats } from '../../services/pedidosService'; // Import the new service
+import { getDashboardStats, getInFlowOrdersCount } from '../../services/dashboardService'; // Importar el nuevo servicio
 
 const statusMap = {
     PENDIENTE: { display: 'Pendiente', color: '#FACC15', route: '/pedidos', backendValue: 'PENDIENTE' },
@@ -16,20 +16,38 @@ const statusMap = {
 const Home = ({ abrirModal, refreshDashboardKey }) => {
     const navigate = useNavigate();
     const [dashboardStats, setDashboardStats] = useState({});
+    const [inFlowOrdersCount, setInFlowOrdersCount] = useState(0); // Nuevo estado para el conteo en flujo
     const [loading, setLoading] = useState(true);
+    const [inFlowLoading, setInFlowLoading] = useState(true); // Nuevo estado de carga para conteo en flujo
     const [error, setError] = useState(null);
+    const [inFlowError, setInFlowError] = useState(null); // Nuevo estado de error para conteo en flujo
 
     useEffect(() => {
         const fetchStats = async () => {
+            // Fetch Dashboard Status Counts
             try {
                 setLoading(true);
                 const stats = await getDashboardStats();
                 setDashboardStats(stats);
+                setError(null); // Clear previous errors
             } catch (err) {
                 console.error("Error fetching dashboard stats:", err);
                 setError("No se pudieron cargar las estadísticas del dashboard.");
             } finally {
                 setLoading(false);
+            }
+
+            // Fetch In-Flow Orders Count
+            try {
+                setInFlowLoading(true);
+                const count = await getInFlowOrdersCount();
+                setInFlowOrdersCount(count);
+                setInFlowError(null); // Clear previous errors
+            } catch (err) {
+                console.error("Error fetching in-flow orders count:", err);
+                setInFlowError("No se pudo cargar el conteo de pedidos en flujo.");
+            } finally {
+                setInFlowLoading(false);
             }
         };
 
@@ -65,12 +83,12 @@ const Home = ({ abrirModal, refreshDashboardKey }) => {
         }
     };
 
-    if (loading) {
+    if (loading || inFlowLoading) {
         return <div className={styles.contenedorHome}>Cargando estadísticas...</div>;
     }
 
-    if (error) {
-        return <div className={`${styles.contenedorHome} ${styles.error}`}>Error: {error}</div>;
+    if (error || inFlowError) {
+        return <div className={`${styles.contenedorHome} ${styles.error}`}>Error: {error || inFlowError}</div>;
     }
 
     return (
@@ -97,7 +115,7 @@ const Home = ({ abrirModal, refreshDashboardKey }) => {
             {/* 3. Botón Historial: Posicionado de forma absoluta para sobresalir */}
             <div className={styles.historialBotonContenedor}>
                 <Boton 
-                    tipo="neutro" 
+                    tipo="historial" 
                     onClick={irAHistorial}
                 >
                     Historial de Pedidos 📚
@@ -118,6 +136,17 @@ const Home = ({ abrirModal, refreshDashboardKey }) => {
                         <p className={styles.tarjetaNumero}>{conteos[statusEntry.display]}</p>
                     </div>
                 ))}
+            </div>
+
+            {/* Contenedor para la tarjeta de Pedidos en Flujo */}
+            <div className={styles.totalPedidosEnFlujoContenedor}>
+                <div 
+                    className={styles.tarjeta} 
+                    style={{ borderLeftColor: '#fc09c7ff' }} // Color distintivo
+                >
+                    <h3 className={styles.tarjetaTitulo}>Pedidos en Flujo</h3>
+                    <p className={styles.tarjetaNumero}>{inFlowOrdersCount}</p>
+                </div>
             </div>
         </div>
     );

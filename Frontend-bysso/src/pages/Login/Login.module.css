@@ -1,0 +1,79 @@
+/* src/pages/Login/Login.module.css */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #d3d7dd;
+}
+
+.loginForm {
+  padding: 2.5rem;
+  background: linear-gradient(90deg, #498299, #444343);
+  border-radius: 8px;
+  box-shadow: 0 4px 17px rgb(61, 118, 241);
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 2rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.input {
+  padding: 0.8rem 1rem;
+  border: 1px solid #000000;
+  border-radius: 4px;
+  font-size: 1.3rem;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.918);
+}
+
+.button {
+  padding: 0.9rem;
+  border: none;
+margin-top: 30px;
+  border-radius: 4px;
+  background-color: #f15959ec;
+  color: rgb(3, 3, 3);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #82b6ee;
+}
+
+.button:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  color: #e73b4c;
+  font-size: 20px;
+  background-color: #c7cdce;
+  border: 1px solid #e93b0f9c;
+  padding: 0.8rem;
+  border-radius: 4px;
+  text-align: center;
+}

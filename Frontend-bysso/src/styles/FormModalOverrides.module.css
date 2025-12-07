@@ -1,0 +1,9 @@
+/* Frontend-bysso/src/styles/FormModalOverrides.module.css */
+
+.transparentContainer {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: none !important; /* Permite que el contenido interno defina su propio ancho máximo */
+    margin: 0 !important; /* Asegura que el contenedor no tenga margen si lo tuviera */
+}

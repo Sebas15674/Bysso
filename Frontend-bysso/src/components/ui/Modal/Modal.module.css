@@ -5,23 +5,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.705);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(20px); /* Añadir esta línea */
+  -webkit-backdrop-filter: blur(5px); /* Para compatibilidad con Safari */
 }
 
-.contenidoModal {
-  background-color: #a7a1a1;
-  padding: 2.rem 2.5rem;
-  border-radius: 15px;
-  position: relative;
-  max-width: 900px;
-  width: 100%;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-  transition: all 0.3s ease-in-out;
-}
+
 
 .botonCerrar {
   position: absolute;
@@ -36,5 +29,8 @@
 }
 
 .botonCerrar:hover {
-  color: #000;
+  color: #646262;
+  transform: scale(1.1);
 }
+
+ 

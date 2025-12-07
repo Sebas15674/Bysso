@@ -1,0 +1,87 @@
+/* src/components/especificos/FormularioUsuario/FormularioUsuario.module.css */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 500px;       /* Specific width for forms */
+  margin: 2rem auto;      /* Centering */
+  min-width: 300px;
+  background-color: #ccc8c8; /* White background for the "modal box" */
+  border-radius: 12px; /* Rounded corners */
+  box-shadow: 0 10px 30px rgb(0, 0, 0); /* Distinct shadow */
+}
+
+.titulo {
+  font-size: 2.3rem;
+  font-weight: 600;
+  color: #161616da;
+  margin-bottom: 0.9rem;
+  text-align: center;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+}
+
+.input,
+.select {
+  padding: 0.9rem 0rem;
+  font-size: 1.3rem;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: #0966c9;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.botonesContainer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.boton {
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.guardar {
+  background-color: #007bff;
+  color: white;
+}
+
+.guardar:hover {
+  background-color: #0056b3;
+}
+
+.cancelar {
+  background-color: #c00c0ccc;
+  color: white;
+}
+
+.cancelar:hover {
+  background-color: #e40303e3;
+}
+
+.errorMessage {
+  color: #721c24;
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}
+
+

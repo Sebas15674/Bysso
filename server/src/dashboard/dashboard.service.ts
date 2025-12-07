@@ -35,5 +35,26 @@ export class DashboardService {
 
     return counts;
   }
+
+  async getInFlowOrdersCount(): Promise<number> {
+    // Definir los estados que se consideran "en flujo"
+    const inFlowStatuses: OrderStatus[] = [
+      OrderStatus.PENDIENTE,
+      OrderStatus.EN_PRODUCCION,
+      OrderStatus.EN_PROCESO,
+      OrderStatus.LISTO_PARA_ENTREGA,
+    ];
+
+    // Contar los pedidos que están en alguno de esos estados
+    const count = await this.prisma.order.count({
+      where: {
+        estado: {
+          in: inFlowStatuses, // Filtrar por los estados "en flujo"
+        },
+      },
+    });
+
+    return count;
+  }
 }
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Navbar.module.css';
-import logo from '../../../assets/images/Logo.png'; // Asegúrate de que esta ruta sea correcta
+import logo from '../../../assets/images/marca.png'; // Asegúrate de que esta ruta sea correcta
 
 const Navbar = ({ tituloPagina, alAbrirMenu }) => {
   const navigate = useNavigate();
@@ -14,11 +14,11 @@ const Navbar = ({ tituloPagina, alAbrirMenu }) => {
         </button>
         <h1 className={styles.tituloPagina}>{tituloPagina}</h1>
       </div>
-      <div className={styles.logoContainer} onClick={() => navigate('/')}>
+      <div className={styles.marcaContainer} onClick={() => navigate('/')}>
         <img
           src={logo}
           alt="Logo de la empresa"
-          className={styles.logo}
+          className={styles.marca}
         />
       </div>
     </header>

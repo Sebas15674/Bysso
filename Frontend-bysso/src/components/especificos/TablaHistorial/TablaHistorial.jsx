@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './TablaHistorial.module.css';
+import formatStatus from '../../../utils/formatStatus.jsx';
 
 const TablaHistorial = ({ 
     pedidos,
@@ -71,19 +72,9 @@ const TablaHistorial = ({
                                 </td>
                                 
                                 <td data-label="TRABAJADOR">{pedido.trabajador?.nombre || 'N/A'}</td>
-                               <td data-label="ESTADO" className={styles.colEstado}>
-                                <span 
-                                    className={
-                                        pedido.estado === 'CANCELADO' 
-                                            ? styles.badgeCancelado 
-                                            : pedido.estado === 'ENTREGADO'
-                                                ? styles.badgeEntregado
-                                                : ''
-                                    }
-                                >
-                                    {pedido.estado}
-                                </span>
-                            </td>
+                                <td data-label="ESTADO" className={styles.colEstado}>
+                                    {formatStatus(pedido.estado)}
+                                </td>
                             </tr>
                         ))
                     )}

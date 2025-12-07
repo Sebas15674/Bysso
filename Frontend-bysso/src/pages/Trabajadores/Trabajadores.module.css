@@ -24,7 +24,7 @@
     justify-content: space-between;
     align-items: baseline; /* Alinea los elementos a su línea base */
     width: 100%;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0rem;
 }
 
 .controlesAcciones { /* This class remains for the button container */
