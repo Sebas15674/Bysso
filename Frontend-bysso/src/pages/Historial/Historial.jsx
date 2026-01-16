@@ -3,8 +3,10 @@ import styles from './historial.module.css';
 import TablaHistorial from '../../components/especificos/TablaHistorial/TablaHistorial.jsx';
 import Boton from '../../components/ui/Boton/Boton.jsx';
 import { getPedidosByEstado, deleteMultiplePedidos } from '../../services/pedidosService';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const Historial = () => {
+    const { user } = useAuth();
     const [pedidos, setPedidos] = useState([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [loading, setLoading] = useState(false);
@@ -143,25 +145,33 @@ const Historial = () => {
                     <div className={styles.controlesAcciones}>
                         {!modoSeleccion ? (
                             <>
-                                <Boton tipo="secundario" onClick={handleToggleModoSeleccion} disabled={loading || pedidos.length === 0}>
-                                    Seleccionar
-                                </Boton>
-                                <Boton tipo="peligro" onClick={handleDeleteAll} disabled={loading || pedidos.length === 0}>
-                                    Borrar Todo
-                                </Boton>
+                                {user?.role?.toUpperCase() === 'SUPER_ADMIN' && (
+                                    <Boton tipo="secundario" onClick={handleToggleModoSeleccion} disabled={loading || pedidos.length === 0}>
+                                        Seleccionar
+                                    </Boton>
+
+                                )}
+
+                                {user?.role?.toUpperCase() === 'SUPER_ADMIN' && (
+                                    <Boton tipo="peligro" onClick={handleDeleteAll} disabled={loading || pedidos.length === 0}>
+                                        Borrar Todo
+                                    </Boton>
+                                )}
                             </>
                         ) : (
                             <>
                                 <Boton tipo="cancelar" onClick={handleToggleModoSeleccion} disabled={loading}>
                                     Cancelar
                                 </Boton>
-                                <Boton 
-                                    tipo="peligro" 
-                                    onClick={handleDeleteSelected} 
-                                    disabled={loading || pedidosSeleccionados.length === 0}
-                                >
-                                    Eliminar ({pedidosSeleccionados.length})
-                                </Boton>
+                                {user?.role?.toUpperCase() === 'SUPER_ADMIN' && (
+                                    <Boton 
+                                        tipo="peligro" 
+                                        onClick={handleDeleteSelected} 
+                                        disabled={loading || pedidosSeleccionados.length === 0}
+                                    >
+                                        Eliminar ({pedidosSeleccionados.length})
+                                    </Boton>
+                                )}
                             </>
                         )}
                     </div>

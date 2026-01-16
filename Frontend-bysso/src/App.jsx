@@ -88,7 +88,7 @@ const AppLayout = () => {
             case 'PEDIDO_FORM': return <FormularioPedido alGuardar={handleAgregarPedido} alCancelar={cerrarModal} />;
             case 'PEDIDO_DETAIL': return <DetallePedido pedido={data} alCerrarModal={cerrarModal} alActualizar={handleEditarPedido} />;
             case 'TRABAJADOR_FORM': return <FormularioTrabajador initialData={data} onSave={callbacks.onSave} onClose={cerrarModal} />;
-            case 'PRODUCCION_DETAIL': return <DetalleProduccion pedidoId={data} alCerrarModal={cerrarModal} />;
+            case 'PRODUCCION_DETAIL': return <DetalleProduccion pedidoId={data} alCerrarModal={cerrarModal} alActualizar={callbacks.onUpdate} />;
             case 'FINALIZACION_DETAIL': return <DetalleFinalizacion pedidoId={data} alCerrarModal={cerrarModal} />;
             default: return null;
         }

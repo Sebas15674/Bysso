@@ -61,7 +61,7 @@ const Produccion = ({ abrirModal }) => {
     }, [filtroTexto, estadoFiltrado]); // Also depend on estadoFiltrado for debounced search
 
     const verDetalles = (pedido) => {
-        abrirModal('PRODUCCION_DETAIL', pedido.id);
+        abrirModal('PRODUCCION_DETAIL', pedido.id, { onUpdate: fetchPedidosProduccion });
     };
 
     const pedidosFiltrados = useMemo(() => pedidos, [pedidos]);

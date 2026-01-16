@@ -3,6 +3,7 @@ import React from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaPedidos.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
+import { snakeToTitleCase } from '../../../utils/formatText.js';
 
 const TablaPedidos = ({ 
     pedidos, 
@@ -69,7 +70,7 @@ const TablaPedidos = ({
                                     </td>
                                 )}
                                 <td>{pedido.bagId}</td>
-                                <td>{pedido.tipo}</td>
+                                <td>{snakeToTitleCase(pedido.tipo)}</td>
                                 <td>{pedido.descripcion}</td>
                                 <td>{formatStatus(pedido.estado)}</td>
                                 <td className={styles.acciones}>
