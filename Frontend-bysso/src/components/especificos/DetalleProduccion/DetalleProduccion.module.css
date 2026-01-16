@@ -5,3 +5,43 @@
   src/styles/DetalleModalBase.module.css.
   Este archivo se mantiene por si se necesitan estilos específicos en el futuro.
 */
+
+.contenedorArchivo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    align-items: flex-start;
+}
+
+.etiquetaArchivo {
+    padding: 8px 15px;
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    border-radius: var(--border-radius-standard);
+    cursor: pointer;
+    text-align: center;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.etiquetaArchivo:hover {
+    background-color: var(--color-primario-dark);
+}
+
+.inputArchivo {
+    display: none;
+}
+
+.nombreArchivo {
+    font-style: italic;
+    font-size: 0.9em;
+    color: var(--color-texto-secundario);
+    margin-top: -5px;
+}
+
+.botonBorrarEdicion {
+    padding: 6px 12px;
+    font-size: 0.9em;
+    align-self: flex-start;
+}

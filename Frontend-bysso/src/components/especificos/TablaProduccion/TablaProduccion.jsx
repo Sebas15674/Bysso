@@ -3,8 +3,11 @@ import React from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaProduccion.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
+import { useAuth } from '../../../context/AuthContext.jsx';
 
 const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar }) => {
+  const { user } = useAuth();
+
   return (
     <div className={styles.contenedorTabla}>
       <table className={styles.tabla}>
@@ -38,7 +41,7 @@ const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar })
                       Tomar 
                     </Boton>
                   )}
-                  {pedido.estado === 'EN_PROCESO' && (
+                  {pedido.estado === 'EN_PROCESO' && user?.role?.toUpperCase() === 'SUPER_ADMIN' && (
                     <Boton tipo="exito" onClick={() => alFinalizar(pedido.bagId)}>
                       Completar
                     </Boton>

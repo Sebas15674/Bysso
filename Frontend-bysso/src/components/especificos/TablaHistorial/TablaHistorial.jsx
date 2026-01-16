@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './TablaHistorial.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
+import { snakeToTitleCase } from '../../../utils/formatText.js';
 
 const TablaHistorial = ({ 
     pedidos,
@@ -58,9 +59,9 @@ const TablaHistorial = ({
                                 </td>
                                 <td data-label="# BOLSA">{pedido.bagId}</td>
                                 <td data-label="CLIENTE">{pedido.cliente?.nombre}</td>
-                                <td data-label="TIPO">{pedido.tipo}</td>
+                                <td data-label="TIPO">{snakeToTitleCase(pedido.tipo)}</td>
                                 <td data-label="TOTAL">
-                                    ${( (Number(pedido.abono) || 0) + (Number(pedido.total) || 0) ).toLocaleString('es-CO')}
+                                    ${(Number(pedido.total) || 0).toLocaleString('es-CO')}
                                 </td>
                                 <td data-label="FECHA ENTREGADO/CANCELADO">
                                     {pedido.estado === 'ENTREGADO' && pedido.fechaEntregaReal

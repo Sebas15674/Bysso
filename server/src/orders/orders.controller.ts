@@ -14,6 +14,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { validate } from 'class-validator';
@@ -23,6 +24,10 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderQueryDto } from './dto/order-query.dto';
 import { CancelOrdersDto } from './dto/cancel-orders.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 import {
   ApiTags,
   ApiOperation,
@@ -207,6 +212,8 @@ export class OrdersController {
   }
 
   @Patch(':id/estado/listo-entrega')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('SUPER_ADMIN')
   @ApiOperation({
     summary: 'Cambia el estado de un pedido de EN_PROCESO a LISTO_PARA_ENTREGA',
   })
@@ -258,6 +265,8 @@ export class OrdersController {
   }
 
   @Delete('delete-multiple')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Elimina múltiples pedidos basado en una lista de IDs de pedidos. Solo para pedidos en estado ENTREGADO o CANCELADO.',

@@ -1,18 +1,13 @@
 
 import React from 'react';
+import { snakeToTitleCase } from './formatText.js';
 // Assuming we'll create this CSS module, adjust path if necessary
 import styles from '../styles/StatusBadge.module.css';
 
 const formatStatus = (status) => {
   if (!status) return null;
 
-  // Replace underscores with spaces and capitalize the first letter of each word
-  const formattedStatus = status
-    .replace(/_/g, ' ')
-    .toLowerCase()
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  const formattedStatus = snakeToTitleCase(status);
 
   let badgeClass = '';
   switch (status) {

@@ -119,7 +119,8 @@ export class OrdersService {
                               ...orderData,
                               abono: new Decimal(orderData.abono),
                               total: new Decimal(orderData.total),
-                              fechaEntrega: new Date(`${orderData.fechaEntrega}T00:00:00`),          bag: { connect: { id: bagId } },
+                              fechaEntrega: new Date(`${orderData.fechaEntrega}T00:00:00`),
+                              bag: { connect: { id: bagId } },
           cliente: {
             connectOrCreate: {
               where: { cedula: clienteCedula },
@@ -235,9 +236,13 @@ export class OrdersService {
     imageFile?: Express.Multer.File,
   ): Promise<Order> {
     const existingOrder = await this.findOne(id);
-    if (existingOrder.estado !== OrderStatus.PENDIENTE) {
+    if (
+      existingOrder.estado !== OrderStatus.PENDIENTE &&
+      existingOrder.estado !== OrderStatus.EN_PRODUCCION &&
+      existingOrder.estado !== OrderStatus.EN_PROCESO
+    ) {
       throw new ForbiddenException(
-        `El pedido con ID "${id}" solo puede ser actualizado si su estado es PENDIENTE. Estado actual: ${existingOrder.estado}.`,
+        `El pedido con ID "${id}" no puede ser actualizado en su estado actual (${existingOrder.estado}). Solo se permite la edición en los estados: PENDIENTE, EN_PRODUCCION, EN_PROCESO.`,
       );
     }
 
@@ -296,7 +301,6 @@ export class OrdersService {
 
       delete (dataToUpdate as any).bagId;
       delete (dataToUpdate as any).clienteId;
-      delete (dataToUpdate as any).trabajadorId;
       delete (dataToUpdate as any).clienteNombre;
       delete (dataToUpdate as any).clienteCelular;
       delete (dataToUpdate as any).clienteCedula;

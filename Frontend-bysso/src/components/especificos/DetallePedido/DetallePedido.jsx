@@ -4,6 +4,7 @@ import styles from './DetallePedido.module.css';
 import baseStyles from '../../../styles/DetalleModalBase.module.css';
 import { updatePedido, getActiveWorkers } from '../../../services/pedidosService.js';
 import formatStatus from '../../../utils/formatStatus.jsx';
+import { snakeToTitleCase } from '../../../utils/formatText.js';
 
 const cleanSimpleNumber = (formattedValue) => {
     if (typeof formattedValue !== 'string') return '';
@@ -238,7 +239,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
                     {renderValue('clienteNombre', 'CLIENTE', 'text', true)}
                     {renderValue('clienteCedula', 'CÉDULA')}
                     {renderValue('clienteCelular', 'CELULAR')}
-                    {isEditing ? renderSelectValue('tipo', 'TIPO', tipos.map(t => ({ val: t, lab: t})), 'val', 'lab'): <p><strong>TIPO:</strong> {datosEditables.tipo}</p> }
+                    {isEditing ? renderSelectValue('tipo', 'TIPO', tipos.map(t => ({ val: t, lab: snakeToTitleCase(t) })), 'val', 'lab') : <p><strong>TIPO:</strong> {snakeToTitleCase(datosEditables.tipo)}</p>}
 
                     {isEditing ? (
                         <div className={baseStyles.campoEditable}>
