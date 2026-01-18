@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useSearchParams, useLocation } from 'react-router-dom'; // Import useLocation
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from './Produccion.module.css';
 import TablaProduccion from '../../components/especificos/TablaProduccion/TablaProduccion.jsx';
+import Paginacion from '../../components/ui/Paginacion/Paginacion.jsx';
 import { getPedidosByEstado, updatePedidoToEnProceso, updatePedidoToListoParaEntrega } from '../../services/pedidosService';
 import { useBags } from '../../context/BagContext';
 
@@ -11,28 +12,27 @@ const Produccion = ({ abrirModal }) => {
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    // Estados de paginación y filtros
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const ITEMS_PER_PAGE = 8;
     const [filtroTexto, setFiltroTexto] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState(filtroTexto);
     const isInitialMount = useRef(true);
 
-    const location = useLocation(); // Get location object for filtering
+    const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
-    const estadoFiltrado = queryParams.get('estado'); // Get 'estado' query param
+    const estadoFiltrado = queryParams.get('estado');
 
-    const fetchPedidosProduccion = async (searchQuery = '') => {
+    const fetchPedidosProduccion = useCallback(async (searchQuery, page) => {
         setLoading(true);
         try {
-            let fetchedPedidos = [];
-            if (estadoFiltrado) {
-                // If a specific state is filtered, fetch only that state
-                const data = await getPedidosByEstado(estadoFiltrado, searchQuery);
-                fetchedPedidos = data.data;
-            } else {
-                // Default behavior: fetch both EN_PRODUCCION and EN_PROCESO
-                const enProduccion = await getPedidosByEstado('EN_PRODUCCION', searchQuery);
-                const enProceso = await getPedidosByEstado('EN_PROCESO', searchQuery);
-                fetchedPedidos = [...enProduccion.data, ...enProceso.data];
-            }
-            setPedidos(fetchedPedidos);
+            // Determina los estados a buscar: el filtrado específico o ambos por defecto.
+            const estadosABuscar = estadoFiltrado ? [estadoFiltrado] : ['EN_PRODUCCION', 'EN_PROCESO'];
+            const data = await getPedidosByEstado(estadosABuscar, searchQuery, page, ITEMS_PER_PAGE);
+            setPedidos(data.data);
+            setTotalPages(data.lastPage);
         } catch (err) {
             setError(err);
         } finally {
@@ -41,38 +41,51 @@ const Produccion = ({ abrirModal }) => {
                 setIsInitialLoading(false);
             }
         }
-    };
+    }, [estadoFiltrado, isInitialLoading]);
 
-    // Efecto para la carga inicial y re-fetch al cambiar filtro de URL
+    // useEffect para el debounce del buscador
     useEffect(() => {
-        fetchPedidosProduccion();
-    }, [estadoFiltrado]); // Depend on estadoFiltrado
+        const handler = setTimeout(() => {
+            setDebouncedSearch(filtroTexto);
+        }, 300);
+        return () => clearTimeout(handler);
+    }, [filtroTexto]);
 
-    // Efecto para la búsqueda debounced
+    // useEffect para resetear la página cuando cambian los filtros
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
             return;
         }
-        const debounceFetch = setTimeout(() => {
-            fetchPedidosProduccion(filtroTexto);
-        }, 300);
-        return () => clearTimeout(debounceFetch);
-    }, [filtroTexto, estadoFiltrado]); // Also depend on estadoFiltrado for debounced search
+        setCurrentPage(1);
+    }, [debouncedSearch, estadoFiltrado]);
 
-    const verDetalles = (pedido) => {
-        abrirModal('PRODUCCION_DETAIL', pedido.id, { onUpdate: fetchPedidosProduccion });
+    // useEffect principal para cargar datos
+    useEffect(() => {
+        fetchPedidosProduccion(debouncedSearch, currentPage);
+    }, [debouncedSearch, currentPage, estadoFiltrado, fetchPedidosProduccion]);
+
+    const handlePageChange = (newPage) => {
+        if (newPage > 0 && newPage <= totalPages && newPage !== currentPage) {
+            setCurrentPage(newPage);
+        }
     };
 
-    const pedidosFiltrados = useMemo(() => pedidos, [pedidos]);
+    const onSuccessfulUpdate = () => {
+        fetchPedidosProduccion(debouncedSearch, currentPage);
+        refetchBags();
+    };
+
+    const verDetalles = (pedido) => {
+        abrirModal('PRODUCCION_DETAIL', pedido.id, { onUpdate: onSuccessfulUpdate });
+    };
 
     const tomarPedido = async (nBolsa) => {
         const pedido = pedidos.find(p => p.bagId === nBolsa);
         if (pedido) {
             try {
                 await updatePedidoToEnProceso(pedido.id);
-                await fetchPedidosProduccion(filtroTexto);
-                refetchBags();
+                onSuccessfulUpdate();
             } catch (error) {
                 console.error("Error taking order:", error);
                 alert("Error al tomar el pedido.");
@@ -85,8 +98,7 @@ const Produccion = ({ abrirModal }) => {
         if(pedido) {
             try {
                 await updatePedidoToListoParaEntrega(pedido.id);
-                await fetchPedidosProduccion(filtroTexto);
-                refetchBags();
+                onSuccessfulUpdate();
             } catch (error) {
                 console.error("Error finalizing order:", error);
                 alert("Error al finalizar la producción.");
@@ -117,20 +129,26 @@ const Produccion = ({ abrirModal }) => {
                 <div className={styles.inputContainer}>
                     <input
                         type="text"
-                        placeholder="Buscar "
+                        placeholder="Buscar por bolsa, cliente, o tipo..."
                         value={filtroTexto}
                         onChange={(e) => setFiltroTexto(e.target.value)}
                         className={styles.inputFiltro}
-               
                     />
                 </div>
             </div>
 
             <TablaProduccion
-                pedidos={pedidosFiltrados}
+                pedidos={pedidos}
                 alVerDetalles={verDetalles}
                 alTomarPedido={tomarPedido}
                 alFinalizar={finalizarProduccion}
+                loading={loading}
+            />
+
+            <Paginacion
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
                 loading={loading}
             />
         </div>

@@ -43,11 +43,20 @@ export const getPedidoById = async (id) => {
  * @param {string} estado - El estado de los pedidos a filtrar.
  * @returns {Promise<Array>} Lista de pedidos con el estado especificado.
  */
-export const getPedidosByEstado = async (estado, search) => {
-    const params = { estado };
+export const getPedidosByEstado = async (estado, search, page, limit) => {
+    // Si estado es un array, lo convierte en un string separado por comas.
+    const estadoParam = Array.isArray(estado) ? estado.join(',') : estado;
+    
+    const params = { 
+        estado: estadoParam,
+        page, 
+        limit 
+    };
+
     if (search) {
         params.search = search;
     }
+
     const response = await axiosInstance.get('/pedidos', {
         params: params,
     });

@@ -156,8 +156,8 @@ export class OrdersService {
     lastPage: number;
   }> {
     const { search, estado } = query;
-    const orderBy = query.orderBy ?? 'createdAt';
-    const orderDirection = query.orderDirection ?? 'asc';
+    const orderBy = query.orderBy ?? 'updatedAt';
+    const orderDirection = query.orderDirection ?? 'desc';
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
     const skip = (page - 1) * limit;
@@ -315,7 +315,10 @@ export class OrdersService {
     await this.validateTransition(id, OrderStatus.EN_PRODUCCION);
     return this.prisma.order.update({
       where: { id },
-      data: { estado: OrderStatus.EN_PRODUCCION },
+      data: { 
+        estado: OrderStatus.EN_PRODUCCION,
+        updatedAt: new Date() 
+      },
       include: { cliente: true, trabajador: true, bag: true },
     });
   }
@@ -324,7 +327,10 @@ export class OrdersService {
     await this.validateTransition(id, OrderStatus.EN_PROCESO);
     return this.prisma.order.update({
       where: { id },
-      data: { estado: OrderStatus.EN_PROCESO },
+      data: { 
+        estado: OrderStatus.EN_PROCESO,
+        updatedAt: new Date() 
+      },
       include: { cliente: true, trabajador: true, bag: true },
     });
   }
@@ -336,6 +342,7 @@ export class OrdersService {
       data: {
         estado: OrderStatus.LISTO_PARA_ENTREGA,
         fechaFinalizacion: new Date(),
+        updatedAt: new Date(),
       },
       include: { cliente: true, trabajador: true, bag: true },
     });
@@ -349,7 +356,12 @@ export class OrdersService {
       }
       const updatedOrder = await tx.order.update({
         where: { id },
-        data: { estado: OrderStatus.ENTREGADO, fechaEntregaReal: new Date(), imagenUrl: null },
+        data: { 
+          estado: OrderStatus.ENTREGADO, 
+          fechaEntregaReal: new Date(), 
+          imagenUrl: null,
+          updatedAt: new Date()
+        },
         include: { cliente: true, trabajador: true, bag: true },
       });
       await tx.bag.update({
@@ -368,7 +380,12 @@ export class OrdersService {
       }
       const updatedOrder = await tx.order.update({
         where: { id },
-        data: { estado: OrderStatus.CANCELADO, fechaCancelacion: new Date(), imagenUrl: null },
+        data: { 
+          estado: OrderStatus.CANCELADO, 
+          fechaCancelacion: new Date(), 
+          imagenUrl: null,
+          updatedAt: new Date()
+        },
         include: { cliente: true, trabajador: true, bag: true },
       });
       await tx.bag.update({
