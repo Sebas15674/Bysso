@@ -1,33 +1,44 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from './Pedido.module.css';
 import Boton from '../../components/ui/Boton/Boton.jsx';
 import TablaPedidos from '../../components/especificos/TablaPedidos/TablaPedidos.jsx';
+import Paginacion from '../../components/ui/Paginacion/Paginacion.jsx';
 import { updatePedidoToEnProduccion, getPedidosByEstado, cancelMultiplePedidos } from '../../services/pedidosService';
 import { useBags } from '../../context/BagContext';
 
 const Pedido = ({ abrirModal }) => {
     const { refetchBags } = useBags();
     const [pedidos, setPedidos] = useState([]);
-    const [isInitialLoading, setIsInitialLoading] = useState(true); // Para la carga inicial
-    const [loading, setLoading] = useState(false); // Para las búsquedas
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    // Estado para paginación
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
+    const ITEMS_PER_PAGE = 8;
+
+    // Estados para filtros y selección
     const [bolsasSeleccionadas, setBolsasSeleccionadas] = useState([]);
     const [modoSeleccion, setModoSeleccion] = useState(false);
-    const [filtroTexto, setFiltroTexto] = useState('');
+    
+    // 1. Lógica de búsqueda mejorada
+    const [filtroTexto, setFiltroTexto] = useState(''); // Lo que el usuario escribe
+    const [debouncedSearch, setDebouncedSearch] = useState(filtroTexto); // El valor que se usa para buscar
+
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const estadoFiltrado = queryParams.get('estado');
     const isInitialMount = useRef(true);
 
-    const location = useLocation(); // Get location object
-    const queryParams = new URLSearchParams(location.search);
-    const estadoFiltrado = queryParams.get('estado'); // Get 'estado' query param
-
-    const fetchPedidos = async (searchQuery = '') => {
+    const fetchPedidos = useCallback(async (searchQuery, page) => {
         setLoading(true);
         try {
-            const estadoActual = estadoFiltrado || 'PENDIENTE'; // Use filtered state or default to PENDIENTE
-            const data = await getPedidosByEstado(estadoActual, searchQuery);
+            const estadoActual = estadoFiltrado || 'PENDIENTE';
+            const data = await getPedidosByEstado(estadoActual, searchQuery, page, ITEMS_PER_PAGE);
             setPedidos(data.data);
+            setTotalPages(data.lastPage);
         } catch (err) {
             setError(err);
         } finally {
@@ -36,26 +47,44 @@ const Pedido = ({ abrirModal }) => {
                 setIsInitialLoading(false);
             }
         }
-    };
+    }, [estadoFiltrado, isInitialLoading]);
 
-    // Efecto para la carga inicial de datos y re-fetch al cambiar filtro de URL
+    // 2. useEffect para el debounce: actualiza el término de búsqueda con retardo
     useEffect(() => {
-        fetchPedidos();
-    }, [estadoFiltrado]); // Depend on estadoFiltrado
+        const handler = setTimeout(() => {
+            setDebouncedSearch(filtroTexto);
+        }, 300);
 
-    // Efecto para la búsqueda debounced
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [filtroTexto]);
+
+    // 3. useEffect para resetear la página cuando los filtros cambian
     useEffect(() => {
         if (isInitialMount.current) {
             isInitialMount.current = false;
             return;
         }
+        setCurrentPage(1);
+    }, [debouncedSearch, estadoFiltrado]);
 
-        const debounceFetch = setTimeout(() => {
-            fetchPedidos(filtroTexto);
-        }, 300);
+    // 4. useEffect principal para cargar datos: se activa con el debouncedSearch o cambio de página
+    useEffect(() => {
+        fetchPedidos(debouncedSearch, currentPage);
+    }, [debouncedSearch, currentPage, estadoFiltrado, fetchPedidos]);
 
-        return () => clearTimeout(debounceFetch);
-    }, [filtroTexto, estadoFiltrado]);
+
+    const handlePageChange = (newPage) => {
+        if (newPage > 0 && newPage <= totalPages && newPage !== currentPage) {
+            setCurrentPage(newPage);
+        }
+    };
+    
+    const onSuccessfulUpdate = () => {
+        fetchPedidos(debouncedSearch, currentPage);
+        refetchBags();
+    }
 
     const toggleModoSeleccion = () => {
         setModoSeleccion(prev => !prev);
@@ -80,24 +109,19 @@ const Pedido = ({ abrirModal }) => {
     };
 
     const verDetalles = (pedido) => {
-        abrirModal('PEDIDO_DETAIL', pedido, { onUpdate: fetchPedidos });
+        abrirModal('PEDIDO_DETAIL', pedido, { onUpdate: onSuccessfulUpdate });
     };
 
     const enviarAProduccion = async (nBolsa) => {
         const pedidoAActualizar = pedidos.find(p => p.bagId === nBolsa);
-        if (!pedidoAActualizar) {
-            console.error(`No se encontró el pedido con bolsa ${nBolsa}`);
-            alert(`Error: No se encontró el pedido con bolsa ${nBolsa}`);
-            return;
-        }
+        if (!pedidoAActualizar) return;
 
         try {
             await updatePedidoToEnProduccion(pedidoAActualizar.id);
-            await fetchPedidos(); // Re-fetch all pending orders
-            refetchBags();
+            onSuccessfulUpdate();
             setBolsasSeleccionadas(prev => prev.filter(bolsa => bolsa !== nBolsa));
         } catch (error) {
-            console.error(`Error al enviar el pedido con bolsa ${nBolsa} a producción:`, error);
+            console.error(`Error al enviar a producción:`, error);
             alert(`Error al enviar a producción: ${error.message}`);
         }
     };
@@ -105,36 +129,29 @@ const Pedido = ({ abrirModal }) => {
     const handleCancelarSeleccionados = async () => {
         if (bolsasSeleccionadas.length === 0) return;
 
-        if (!window.confirm(`¿Estás seguro de que deseas CANCELAR ${bolsasSeleccionadas.length} pedido(s)? Se moverán al historial y se liberarán las bolsas.`)) {
+        if (!window.confirm(`¿Estás seguro de que deseas CANCELAR ${bolsasSeleccionadas.length} pedido(s)?`)) {
             return;
         }
 
         try {
-            if(bolsasSeleccionadas.length > 0) {
-                await cancelMultiplePedidos(bolsasSeleccionadas);
-                await fetchPedidos(); // Re-fetch all pending orders
-                refetchBags();
-            }
+            await cancelMultiplePedidos(bolsasSeleccionadas);
+            onSuccessfulUpdate();
             setBolsasSeleccionadas([]);
             setModoSeleccion(false);
         } catch (error) {
             console.error('Error al cancelar pedidos:', error);
-            if (error.response) {
-                console.error('Datos de error del servidor:', error.response.data);
-                console.error('Estado del error del servidor:', error.response.status);
-            }
-            alert('Error al cancelar pedidos. Consulta la consola para más detalles.');
+            alert('Error al cancelar pedidos.');
         }
     };
 
     const getTituloDisplay = (estado) => {
-        switch (estado) {
-            case 'PENDIENTE': return 'Pedidos (Pendientes)';
-            case 'EN_PRODUCCION': return 'Pedidos (En Producción)';
-            case 'EN_PROCESO': return 'Pedidos (En Proceso)';
-            case 'LISTO_PARA_ENTREGA': return 'Pedidos (Listos para Entrega)';
-            default: return 'Pedidos';
-        }
+        const titulos = {
+            PENDIENTE: 'Pedidos (Pendientes)',
+            EN_PRODUCCION: 'Pedidos (En Producción)',
+            EN_PROCESO: 'Pedidos (En Proceso)',
+            LISTO_PARA_ENTREGA: 'Pedidos (Listos para Entrega)',
+        };
+        return titulos[estado] || 'Pedidos';
     };
 
     if (isInitialLoading) return <div>Cargando pedidos...</div>;
@@ -147,7 +164,7 @@ const Pedido = ({ abrirModal }) => {
                 <div className={styles.controlesAcciones}>
                     <Boton
                         tipo="primario"
-                        onClick={() => abrirModal('PEDIDO_FORM', null, { onSave: fetchPedidos })}
+                        onClick={() => abrirModal('PEDIDO_FORM', null, { onSave: () => fetchPedidos(debouncedSearch, 1) })}
                         disabled={modoSeleccion}
                     >
                         Crear Pedido ✚
@@ -172,11 +189,10 @@ const Pedido = ({ abrirModal }) => {
             <div className={styles.barraFiltros}>
                 <input
                     type="text"
-                    placeholder="Buscar por bolsa o tipo "
+                    placeholder="Buscar por bolsa, cliente, o tipo..."
                     value={filtroTexto}
                     onChange={(e) => setFiltroTexto(e.target.value)}
                     className={styles.inputFiltro}
-                    
                 />
             </div>
 
@@ -190,8 +206,15 @@ const Pedido = ({ abrirModal }) => {
                 alToggleSeleccionarTodos={toggleSeleccionarTodos}
                 loading={loading}
             />
+            
+            <Paginacion
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                loading={loading}
+            />
         </div>
     );
-}; // <--- Missing closing brace added here
+};
 
 export default Pedido;

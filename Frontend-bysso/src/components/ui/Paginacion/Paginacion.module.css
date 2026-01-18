@@ -1,0 +1,13 @@
+.paginacionContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    gap: 15px;
+}
+
+.infoPagina {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
