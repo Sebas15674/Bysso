@@ -117,20 +117,12 @@ const AppLayout = () => {
                     </Routes>
                 </div>
                 <Footer />
-                <Modal
-                    estaAbierto={modalState.isOpen}
-                    alCerrar={cerrarModal}
-                    cierraAlHacerClickAfuera={!!modalState.data}
-                    customClass={
-                        modalState.type === 'PEDIDO_FORM'
-                            ? formPedidoStyles.modalPedido
-                            : modalState.type === 'TRABAJADOR_FORM'
-                                ? formModalOverrides.transparentContainer
-                                : (modalState.type === 'PEDIDO_DETAIL' || modalState.type === 'PRODUCCION_DETAIL' || modalState.type === 'FINALIZACION_DETAIL')
-                                    ? detalleBaseStyles.modalDetalleContent
-                                    : ''
-                    }
-                >
+            <Modal 
+                estaAbierto={modalState.isOpen} 
+                alCerrar={cerrarModal} 
+                cierraAlHacerClickAfuera={!['PEDIDO_FORM', 'PEDIDO_DETAIL', 'PRODUCCION_DETAIL', 'FINALIZACION_DETAIL'].includes(modalState.type)} 
+                customClass={modalState.type === 'PEDIDO_FORM' ? formPedidoStyles.modalWidth : ''}
+            >
                     {renderModalContent()}
                 </Modal>
             </div>

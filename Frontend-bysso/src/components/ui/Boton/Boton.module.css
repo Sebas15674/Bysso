@@ -44,6 +44,19 @@
 }
 /* ======================================= */
 
+/* Estilo para el botón de descargar PDF */
+.descargar {
+    background-color: #f5d87a; /* Un verde vibrante */
+    color: rgb(2, 2, 2);
+    border-color: #000000;
+}
+
+.descargar:hover {
+    background-color: #4ca9f5;
+    border-color: #080808;
+    transform: translateY(-2px);
+}
+
 /* Estilo para el botón primario (el predeterminado) */
 .primario {
     background-color: #7face7;

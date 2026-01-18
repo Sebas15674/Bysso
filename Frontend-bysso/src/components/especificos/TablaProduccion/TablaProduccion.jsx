@@ -4,9 +4,25 @@ import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaProduccion.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
 import { useAuth } from '../../../context/AuthContext.jsx';
+import useConfirm from '../../../hooks/useConfirm.jsx'; // Added useConfirm import
 
 const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar }) => {
   const { user } = useAuth();
+  const { openConfirm, ConfirmDialog } = useConfirm(); // Initialize useConfirm
+
+  const handleTomarPedido = (bagId) => {
+    openConfirm(
+      `¿Estás seguro de que deseas TOMAR el pedido con N° de Bolsa ${bagId}?`,
+      () => alTomarPedido(bagId) // Pass the original handler as the confirm callback
+    );
+  };
+
+  const handleCompletarPedido = (bagId) => {
+    openConfirm(
+      `¿Estás seguro de que deseas COMPLETAR/FINALIZAR el pedido con N° de Bolsa ${bagId}?`,
+      () => alFinalizar(bagId) // Pass the original handler as the confirm callback
+    );
+  };
 
   return (
     <div className={styles.contenedorTabla}>
@@ -37,12 +53,12 @@ const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar })
                     Ver
                   </Boton>
                   {pedido.estado === 'EN_PRODUCCION' && (
-                    <Boton tipo="primario" onClick={() => alTomarPedido(pedido.bagId)}> 
+                    <Boton tipo="primario" onClick={() => handleTomarPedido(pedido.bagId)}> 
                       Tomar 
                     </Boton>
                   )}
                   {pedido.estado === 'EN_PROCESO' && user?.role?.toUpperCase() === 'SUPER_ADMIN' && (
-                    <Boton tipo="exito" onClick={() => alFinalizar(pedido.bagId)}>
+                    <Boton tipo="exito" onClick={() => handleCompletarPedido(pedido.bagId)}>
                       Completar
                     </Boton>
                   )}
@@ -52,6 +68,7 @@ const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar })
           )}
         </tbody>
       </table>
+      <ConfirmDialog /> {/* Render the ConfirmDialog component */}
     </div>
   );
 };

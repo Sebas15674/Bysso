@@ -213,7 +213,7 @@ const DetalleProduccion = ({ pedidoId, alCerrarModal, alActualizar }) => {
                 <div className={baseStyles.info}>
                     <p><strong>NÚMERO DE BOLSA:</strong> {pedido.bagId}</p>
                     <p><strong>ESTADO:</strong> {formatStatus(pedido.estado)}</p>
-                    {renderValue('clienteNombre', 'CLIENTE', 'text')}
+                    <p><strong>CLIENTE:</strong> {datosEditables.clienteNombre || 'N/A'}</p>
                     
                     {isEditing ? (
                         <div className={baseStyles.campoEditable}>
@@ -223,8 +223,8 @@ const DetalleProduccion = ({ pedidoId, alCerrarModal, alActualizar }) => {
                     ) : <p><strong>DESCRIPCIÓN:</strong> {datosEditables.descripcion}</p>}
 
                     {isEditing ? renderSelectValue('tipo', 'TIPO', tipos.map(t => ({ val: t, lab: snakeToTitleCase(t) })), 'val', 'lab') : <p><strong>TIPO:</strong> {snakeToTitleCase(datosEditables.tipo)}</p>}
-                    {renderSelectValue('trabajadorId', 'TRABAJADOR ASIGNADO', trabajadores, 'id', 'nombre')}
-                    {renderValue('fechaEntrega', 'FECHA DE ENTREGA', 'date')}
+                    <p><strong>TRABAJADOR ASIGNADO:</strong> {pedido.trabajador?.nombre || 'N/A'}</p>
+                    <p><strong>FECHA DE ENTREGA:</strong> {datosEditables.fechaEntrega ? new Date(datosEditables.fechaEntrega.split('T')[0]).toLocaleDateString('es-CO') : 'N/A'}</p>
                     {renderValue('prendas', 'Nº PRENDAS', 'number')}
                     {renderValue('abono', 'ABONO')}
                     {renderValue('total', 'TOTAL')}

@@ -4,6 +4,7 @@ import styles from './FormularioPedido.module.css';
 import { getClienteByCedula } from '../../../services/pedidosService.js';
 import { useBags } from '../../../context/BagContext';
 import { useWorkers } from '../../../context/WorkerContext.jsx';
+import useConfirm from '../../../hooks/useConfirm.jsx'; // Import useConfirm
 
 const cleanSimpleNumber = (formattedValue) => {
     if (typeof formattedValue !== 'string') return '';
@@ -15,6 +16,7 @@ const cleanSimpleNumber = (formattedValue) => {
 const FormularioPedido = ({ alGuardar, alCancelar }) => {
     const { bolsasDisponibles } = useBags();
     const { workers: trabajadores, loading: workersLoading } = useWorkers();
+    const { openConfirm, ConfirmDialog } = useConfirm(); // Initialize useConfirm
 
     const [datosFormulario, setDatosFormulario] = useState(() => {
         const today = new Date();
@@ -103,8 +105,7 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
         if (fileInput) fileInput.value = '';
     };
 
-    const manejarEnvio = (e) => {
-        e.preventDefault();
+    const ejecutarGuardado = () => { // New function to encapsulate saving logic
         const abonoLimpio = cleanSimpleNumber(datosFormulario.abono);
         const totalLimpio = cleanSimpleNumber(datosFormulario.total);
         const { imagen, ...restoDatos } = datosFormulario;
@@ -123,6 +124,11 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
         }
         formData.append('pedido', JSON.stringify(datosDeTexto));
         alGuardar(formData);
+    };
+
+    const manejarEnvio = (e) => {
+        e.preventDefault();
+        openConfirm('¿Estás seguro de que deseas crear este pedido?', ejecutarGuardado);
     };
 
     return (
@@ -239,6 +245,7 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
                     <Boton tipo="exito" type="submit">Guardar</Boton>
                 </div>
             </form>
+            <ConfirmDialog /> {/* Render the ConfirmDialog component */}
         </div>
     );
 };

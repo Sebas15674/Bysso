@@ -1,0 +1,27 @@
+/* Frontend-bysso/src/components/ui/ConfirmDialog/ConfirmDialog.module.css */
+.dialogContainer {
+    padding: 20px;
+    text-align: center;
+    background-color: #e2dede;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(230, 223, 223, 0.2);
+    width: 350px; /* Fixed width for better appearance */
+}
+
+.message {
+    font-size: 1.7rem;
+    color: var(--color-text);
+    margin-bottom: 25px;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* Custom styles for the Modal when used by ConfirmDialog */
+.customModalClass {
+    max-width: 400px; /* Ensure the modal itself is not too wide */
+    padding: 0; /* Remove default padding as dialogContainer handles it */
+}

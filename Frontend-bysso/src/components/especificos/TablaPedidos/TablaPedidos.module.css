@@ -113,13 +113,12 @@
 /* ✅ Alineación de botones (usando 'left' según tu entorno) */
 /* ======================================= */
 .acciones {
+    height: 100%; /* Asegura que el td ocupe toda la altura de la fila */
     display: flex; 
     width: 100%; 
-    justify-content: left; /* Mueve a la derecha en tu entorno */
-    align-items: center; /* Centrado vertical interno del Flexbox */
+    align-items: center; /* Centra los botones verticalmente */
     gap: 0.8rem; 
     white-space: nowrap;
-    /* ❌ CAMBIO CLAVE: Eliminamos height: 100% para confiar solo en vertical-align del TD */
     padding: 0;
 }
 
