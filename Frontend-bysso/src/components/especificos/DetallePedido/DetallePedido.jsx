@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './DetallePedido.module.css';
 import baseStyles from '../../../styles/DetalleModalBase.module.css';
 import { updatePedido, getActiveWorkers } from '../../../services/pedidosService.js';
 import formatStatus from '../../../utils/formatStatus.jsx';
 import { snakeToTitleCase } from '../../../utils/formatText.js';
+import html2pdf from 'html2pdf.js';
+import ComprobantePedido from '../ComprobantePedido/ComprobantePedido.jsx';
 
 const cleanSimpleNumber = (formattedValue) => {
     if (typeof formattedValue !== 'string') return '';
@@ -26,25 +28,23 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
     const [imageURL, setImageURL] = useState(null);
     const [trabajadores, setTrabajadores] = useState([]);
     const [datosEditables, setDatosEditables] = useState({});
+    const receiptRef = useRef(null);
 
     useEffect(() => {
         if (pedido) {
             setDatosEditables({
                 ...pedido,
-                // Flatten nested objects for easier form handling
                 clienteNombre: pedido.cliente?.nombre || '',
                 clienteCedula: pedido.cliente?.cedula || '',
                 clienteCelular: pedido.cliente?.celular || '',
                 trabajadorId: pedido.trabajador?.id || '',
-                // Format numbers for display
-                abono: formatCurrency(pedido.abono),
-                total: formatCurrency(pedido.total),
+                abono: pedido.abono === 0 ? '' : (pedido.abono ?? ''), // Store raw number, not formatted string
+                total: pedido.total === 0 ? '' : (pedido.total ?? ''), // Store raw number, not formatted string
                 prendas: pedido.prendas === 0 ? '' : (pedido.prendas ?? ''),
-                // Ensure imagenUrl is used
                 imagen: pedido.imagenUrl || null,
-                fechaEntrega: pedido.fechaEntrega ? pedido.fechaEntrega.split('T')[0] : '', // Formatear para input type="date"
+                fechaEntrega: pedido.fechaEntrega ? pedido.fechaEntrega.split('T')[0] : '',
             });
-            setIsEditing(false); // Reset editing state when pedido changes
+            setIsEditing(false);
         }
     }, [pedido]);
 
@@ -68,17 +68,31 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
             const url = URL.createObjectURL(imagenActual);
             setImageURL(url);
             return () => URL.revokeObjectURL(url);
-        }
-        else if (typeof imagenActual === 'string') {
-            // Assuming backend serves images from a base URL
+        } else if (typeof imagenActual === 'string') {
             setImageURL(`http://localhost:3000${imagenActual}`);
-            console.log("Intentando cargar imagen desde:", `http://localhost:3000${imagenActual}`);
-        }
-        else {
+        } else {
             setImageURL(null);
         }
     }, [datosEditables.imagen]);
 
+    const handleDownloadPdf = () => {
+        console.log("handleDownloadPdf called!"); // Debugging log
+        const element = receiptRef.current;
+        if (!element) {
+            console.error("El elemento del comprobante no está disponible.");
+            return;
+        }
+
+        const opt = {
+          margin:       0,
+          filename: `Comprobante_Bysso_Bolsa_${pedido.bagId}.pdf`,
+          image: { type: 'jpeg', quality: 1.0 },
+          html2canvas: { scale: 3, useCORS: true, logging: false },
+          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().from(element).set(opt).save();
+    };
 
     if (!pedido) {
         return null;
@@ -88,40 +102,38 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
 
     const handleEditChange = (e) => {
         const { name, value } = e.target;
+        let newValue = value;
+
+        if (name === 'prendas') {
+            newValue = parseInt(value, 10) || '';
+        } else if (name === 'abono' || name === 'total') {
+            const cleanedValue = value.replace(/[^0-9]/g, '');
+            newValue = parseInt(cleanedValue, 10) || '';
+        }
+        
         setDatosEditables(prev => ({
             ...prev,
-            [name]: value
+            [name]: newValue
         }));
     };
-
+    
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
-            setDatosEditables(prev => ({
-                ...prev,
-                imagen: e.target.files[0]
-            }));
+            setDatosEditables(prev => ({ ...prev, imagen: e.target.files[0] }));
         }
     };
 
-
     const handleBorrarImagen = () => {
-        setDatosEditables(prev => ({
-            ...prev,
-            imagen: null
-        }));
+        setDatosEditables(prev => ({ ...prev, imagen: null }));
         const fileInput = document.getElementById('inputArchivoEdicion');
         if (fileInput) fileInput.value = '';
     };
 
     const handleGuardarCambios = async () => {
         const formData = new FormData();
-
-        // 1. Handle image
         if (datosEditables.imagen instanceof File) {
             formData.append('imagen', datosEditables.imagen);
         }
-        
-        // 2. Prepare text data for the 'pedido' field
         const datosDeTexto = {
             clienteNombre: datosEditables.clienteNombre,
             clienteCelular: datosEditables.clienteCelular,
@@ -130,19 +142,14 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
             fechaEntrega: datosEditables.fechaEntrega,
             trabajadorId: datosEditables.trabajadorId,
             prendas: Number(datosEditables.prendas) || 0,
-            abono: cleanSimpleNumber(datosEditables.abono) || 0,
-            total: cleanSimpleNumber(datosEditables.total) || 0,
-            // If the image is null, it means we want to remove it
+            abono: Number(datosEditables.abono) || 0,
+            total: Number(datosEditables.total) || 0,
             imagenUrl: datosEditables.imagen === null ? null : undefined,
         };
-
         formData.append('pedido', JSON.stringify(datosDeTexto));
-
         try {
             await updatePedido(pedido.id, formData);
-            if (alActualizar) {
-                alActualizar();
-            }
+            if (alActualizar) alActualizar();
             alCerrarModal();
         } catch (error) {
             console.error("Error updating order:", error);
@@ -153,40 +160,29 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
     const renderValue = (name, label, type = "text", isRequired = false) => {
         const value = datosEditables[name] ?? '';
         if (isEditing) {
+            // In edit mode, for type="number" inputs, always show the raw number (which is now stored in state)
+            // No cleaning needed here as state stores raw numbers
              return (
-                                 <div className={baseStyles.campoEditable}>                    <label htmlFor={name}><strong>{label}:</strong></label>
+                <div className={baseStyles.campoEditable}>
+                    <label htmlFor={name}><strong>{label}:</strong></label>
                     <input
-                        id={name} name={name} type={type} value={value}
+                        id={name} name={name} type={type} value={String(value)} // value is already raw number or ''
                         onChange={handleEditChange} required={isRequired}
                         className={baseStyles.inputCampo}
                     />
                 </div>
             );
         }
-
-        // View Mode Logic
-        let displayValue = value; // Default to the value from state
-        if (name === 'fechaEntrega') {
-            // 'value' is typically something like "YYYY-MM-DDTHH:mm:ss.sssZ" from backend
-            // Extract YYYY, MM, DD
-            const dateParts = value.split('T')[0].split('-'); // ["YYYY", "MM", "DD"]
-            const year = parseInt(dateParts[0]);
-            const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed in JS Date
-            const day = parseInt(dateParts[2]);
-    
-            // Create a new Date object in local time using the extracted parts
-            displayValue = new Date(year, month, day).toLocaleDateString('es-CO');
+        let displayValue = value;
+        if (name === 'fechaEntrega' && value) {
+            const date = new Date(value);
+            const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+            displayValue = new Date(date.getTime() + userTimezoneOffset).toLocaleDateString('es-CO');
         } else if (name === 'abono' || name === 'total') {
-            // The value is already a formatted string from the state (e.g., "50.000")
-            // Just add the currency symbol.
-            displayValue = `$${value}`;
-        } else if (name === 'clienteNombre' || name.includes('Celular') || name.includes('Cedula')) {
-            // clienteNombre, Celular, Cedula should not be uppercase
-            displayValue = value;
-        } else if (value && typeof value === 'string') {
+            displayValue = `$${formatCurrency(value)}`; // Format raw number from state for display
+        } else if (value && typeof value === 'string' && !['clienteNombre', 'clienteCedula', 'clienteCelular'].includes(name)) {
             displayValue = value.toUpperCase();
         }
-
         return <p><strong>{label}:</strong> {displayValue || 'N/A'}</p>;
     };
 
@@ -194,33 +190,16 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
         const value = datosEditables[name] || '';
         if (isEditing) {
             return (
-                    <div className={baseStyles.campoEditable}> <label htmlFor={name}><strong>{label}:</strong></label>
-                        <select id={name} name={name} value={value} onChange={handleEditChange} required className={baseStyles.inputCampo}>
+                <div className={baseStyles.campoEditable}>
+                    <label htmlFor={name}><strong>{label}:</strong></label>
+                    <select id={name} name={name} value={value} onChange={handleEditChange} required className={baseStyles.inputCampo}>
                         <option value="">{`Seleccione ${label.toLowerCase()}`}</option>
-                                {options.map((opt, index) => {
-                                        const keyValue = opt[optionValueKey];
-                                        const labelValue = opt[optionLabelKey];
-                                                
-                                            return (
-                                                    <option key={keyValue} value={keyValue}>
-                                                        {labelValue}
-                                                    </option>
-                                            );
-        })}             </select>
-                    </div>
+                        {options.map((opt) => (<option key={opt[optionValueKey]} value={opt[optionValueKey]}>{opt[optionLabelKey]}</option>))}
+                    </select>
+                </div>
             );
         }
-        // Find the label for the selected value for display mode
-        let displayValue = value;
-        if (name === 'trabajadorId') {
-            // For display mode, get the name directly from the full pedido object
-            // as the 'trabajadores' list is only fetched in edit mode.
-            displayValue = pedido.trabajador?.nombre || value;
-        } else {
-            const selectedOption = null; // Placeholder for other potential select fields
-            displayValue = selectedOption ? selectedOption.nombre : value;
-        }
-
+        let displayValue = pedido.trabajador?.nombre || value;
         return <p><strong>{label}:</strong> {displayValue}</p>;
     };
 
@@ -228,6 +207,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
 
     return (
         <div className={baseStyles.modalDetalleContent}>
+            {/* Contenido visible del modal */}
             <div className={baseStyles.header}>
                 <h2 className={baseStyles.titulo}>{isEditing ? 'Editar Pedido' : 'Detalles del Pedido'}</h2>
                 <button onClick={alCerrarModal} className={baseStyles.closeButton} aria-label="Cerrar modal">&times;</button>
@@ -240,21 +220,19 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
                     {renderValue('clienteCedula', 'CÉDULA')}
                     {renderValue('clienteCelular', 'CELULAR')}
                     {isEditing ? renderSelectValue('tipo', 'TIPO', tipos.map(t => ({ val: t, lab: snakeToTitleCase(t) })), 'val', 'lab') : <p><strong>TIPO:</strong> {snakeToTitleCase(datosEditables.tipo)}</p>}
-
                     {isEditing ? (
                         <div className={baseStyles.campoEditable}>
                             <label htmlFor="descripcion"><strong>DESCRIPCIÓN:</strong></label>
                             <textarea id="descripcion" name="descripcion" value={datosEditables.descripcion || ''} onChange={handleEditChange} required className={baseStyles.inputCampo}/>
                         </div>
                     ) : <p><strong>DESCRIPCIÓN:</strong> {datosEditables.descripcion}</p>}
-                    
                     {renderValue('fechaEntrega', 'FECHA DE ENTREGA', 'date')}
                     {renderSelectValue('trabajadorId', 'TRABAJADOR ASIGNADO', trabajadores, 'id', 'nombre')}
                     {renderValue('prendas', 'Nº PRENDAS', 'number')}
                     {renderValue('abono', 'ABONO')}
                     {renderValue('total', 'TOTAL')}
                 </div>
-                {(imageURL || isEditing) && ( // Only show media section if there's an image or in editing mode
+                {(imageURL || isEditing) && (
                     <div className={baseStyles.mediaSection}>
                         {imageURL ? (
                             <>
@@ -269,9 +247,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
                                 <span className={styles.nombreArchivo}>
                                     {datosEditables.imagen instanceof File ? datosEditables.imagen.name : (imageURL ? 'Imagen actual' : 'Sin archivo')}
                                 </span>
-                                {datosEditables.imagen && (
-                                    <Boton tipo="peligro" onClick={handleBorrarImagen} className={styles.botonBorrarEdicion}>Quitar Imagen</Boton>
-                                )}
+                                {datosEditables.imagen && (<Boton tipo="peligro" onClick={handleBorrarImagen} className={styles.botonBorrarEdicion}>Quitar Imagen</Boton>)}
                             </div>
                         )}
                     </div>
@@ -285,10 +261,18 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
                     </>
                 ) : (
                     <>
+                    
+                        <Boton tipo="descargar" onClick={handleDownloadPdf}>Descargar PDF 📄</Boton>
                         {puedeEditarse && (<Boton tipo="editar_pedido" onClick={() => setIsEditing(true)}>Editar Pedido ✏️</Boton>)}
+                      
                         <Boton tipo="cerrar_modal" onClick={alCerrarModal}>Cerrar</Boton>
                     </>
                 )}
+            </div>
+
+            {/* Componente de comprobante oculto para la generación del PDF */}
+            <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+                <ComprobantePedido ref={receiptRef} pedido={pedido} />
             </div>
         </div>
     );

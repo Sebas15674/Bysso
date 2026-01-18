@@ -3,8 +3,18 @@ import React from 'react';
 import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaFinalizacion.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
+import useConfirm from '../../../hooks/useConfirm.jsx'; // Added useConfirm import
 
 const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
+  const { openConfirm, ConfirmDialog } = useConfirm(); // Initialize useConfirm
+
+  const handleEntregarPedido = (bagId) => {
+    openConfirm(
+      `¿Estás seguro que deseas ENTREGAR el pedido con N° de Bolsa ${bagId}? Esta acción no se puede deshacer.`,
+      () => alEntregarPedido(bagId) // Pass the original handler as the confirm callback
+    );
+  };
+
   return (
     <div className={styles.contenedorTabla}>
       <table className={styles.tabla}>
@@ -35,7 +45,7 @@ const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
                     Ver
                   </Boton>
                   
-                  <Boton tipo="exito" onClick={() => alEntregarPedido(pedido.bagId)}>
+                  <Boton tipo="exito" onClick={() => handleEntregarPedido(pedido.bagId)}>
                     Entregar
                   </Boton>
                 </td>
@@ -44,6 +54,7 @@ const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
           )}
         </tbody>
       </table>
+      <ConfirmDialog /> {/* Render the ConfirmDialog component */}
     </div>
   );
 };

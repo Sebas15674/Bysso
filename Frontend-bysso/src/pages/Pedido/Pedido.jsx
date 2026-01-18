@@ -6,6 +6,7 @@ import TablaPedidos from '../../components/especificos/TablaPedidos/TablaPedidos
 import Paginacion from '../../components/ui/Paginacion/Paginacion.jsx';
 import { updatePedidoToEnProduccion, getPedidosByEstado, cancelMultiplePedidos } from '../../services/pedidosService';
 import { useBags } from '../../context/BagContext';
+import useConfirm from '../../hooks/useConfirm.jsx'; // Added useConfirm import
 
 const Pedido = ({ abrirModal }) => {
     const { refetchBags } = useBags();
@@ -31,6 +32,7 @@ const Pedido = ({ abrirModal }) => {
     const queryParams = new URLSearchParams(location.search);
     const estadoFiltrado = queryParams.get('estado');
     const isInitialMount = useRef(true);
+    const { openConfirm, ConfirmDialog } = useConfirm(); // Initialize useConfirm
 
     const fetchPedidos = useCallback(async (searchQuery, page) => {
         setLoading(true);
@@ -112,36 +114,42 @@ const Pedido = ({ abrirModal }) => {
         abrirModal('PEDIDO_DETAIL', pedido, { onUpdate: onSuccessfulUpdate });
     };
 
-    const enviarAProduccion = async (nBolsa) => {
+    const enviarAProduccion = (nBolsa) => {
         const pedidoAActualizar = pedidos.find(p => p.bagId === nBolsa);
         if (!pedidoAActualizar) return;
 
-        try {
-            await updatePedidoToEnProduccion(pedidoAActualizar.id);
-            onSuccessfulUpdate();
-            setBolsasSeleccionadas(prev => prev.filter(bolsa => bolsa !== nBolsa));
-        } catch (error) {
-            console.error(`Error al enviar a producción:`, error);
-            alert(`Error al enviar a producción: ${error.message}`);
-        }
+        openConfirm(
+            `¿Seguro de que deseas enviar el pedido con N° de Bolsa ${nBolsa} a producción?`,
+            async () => {
+                try {
+                    await updatePedidoToEnProduccion(pedidoAActualizar.id);
+                    onSuccessfulUpdate();
+                    setBolsasSeleccionadas(prev => prev.filter(bolsa => bolsa !== nBolsa));
+                } catch (error) {
+                    console.error(`Error al enviar a producción:`, error);
+                    alert(`Error al enviar a producción: ${error.message}`);
+                }
+            }
+        );
     };
 
-    const handleCancelarSeleccionados = async () => {
+    const handleCancelarSeleccionados = () => { // Changed to non-async to wrap logic in openConfirm
         if (bolsasSeleccionadas.length === 0) return;
 
-        if (!window.confirm(`¿Estás seguro de que deseas CANCELAR ${bolsasSeleccionadas.length} pedido(s)?`)) {
-            return;
-        }
-
-        try {
-            await cancelMultiplePedidos(bolsasSeleccionadas);
-            onSuccessfulUpdate();
-            setBolsasSeleccionadas([]);
-            setModoSeleccion(false);
-        } catch (error) {
-            console.error('Error al cancelar pedidos:', error);
-            alert('Error al cancelar pedidos.');
-        }
+        openConfirm(
+            `¿Estás seguro de que deseas CANCELAR ${bolsasSeleccionadas.length} pedido(s)?`,
+            async () => { // onConfirm callback is async now
+                try {
+                    await cancelMultiplePedidos(bolsasSeleccionadas);
+                    onSuccessfulUpdate();
+                    setBolsasSeleccionadas([]);
+                    setModoSeleccion(false);
+                } catch (error) {
+                    console.error('Error al cancelar pedidos:', error);
+                    alert('Error al cancelar pedidos.');
+                }
+            }
+        );
     };
 
     const getTituloDisplay = (estado) => {
@@ -213,6 +221,7 @@ const Pedido = ({ abrirModal }) => {
                 onPageChange={handlePageChange}
                 loading={loading}
             />
+            <ConfirmDialog /> {/* Render the ConfirmDialog component */}
         </div>
     );
 };

@@ -1,0 +1,96 @@
+/* ComprobantePedido.module.css */
+.comprobante {
+    font-family: 'Arial', sans-serif;
+    width: 7.5in; /* Ligeramente más grande para llenar mejor la página carta */
+    height: auto; /* Altura automática para el contenido */
+    padding: 0.5in;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    color: #333;
+
+    /* Centrado horizontal en la página PDF */
+    margin: 0 auto; /* Centrar el bloque en la página */
+    
+    display: block; /* Volver a ser un bloque normal */
+    text-align: left; /* Restablecer la alineación a la izquierda por defecto */
+}
+
+/* Contenedor interno para el contenido real del comprobante */
+.comprobante > div:first-of-type {
+    max-width: 6.5in; /* Ancho máximo del contenido para que esté centrado dentro del 7.5in */
+    width: 100%;
+}
+
+
+.header {
+    text-align: center;
+    margin-bottom: 25px; /* Ligeramente más grande */
+    border-bottom: 2px solid #eee;
+    padding-bottom: 20px; /* Ligeramente más grande */
+}
+
+.logo {
+    max-width: 110px;
+    margin-bottom: 12px; /* Ligeramente más grande */
+}
+
+.titulo {
+    font-size: 26px; /* Ligeramente más grande */
+    font-weight: bold;
+    margin: 0;
+    color: #063869;
+}
+
+.subtitulo {
+    font-size: 17px; /* Ligeramente más grande */
+    color: #555;
+}
+
+.infoGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 30px; /* Ligeramente más grande */
+    margin-bottom: 25px; /* Ligeramente más grande */
+    text-align: left; /* Restablecer la alineación a la izquierda para los elementos del grid */
+}
+
+.infoItem {
+    background-color: #f9f9f9;
+    border-left: 4px solid #527cbb;
+    padding: 12px 18px; /* Ligeramente más grande */
+    border-radius: 4px;
+    font-size: 15px; /* Ligeramente más grande */
+    word-wrap: break-word;
+    text-align: left; /* Asegurar que el texto dentro del infoItem esté a la izquierda */
+}
+
+.infoItem strong {
+    display: block;
+    font-size: 13px; /* Ligeramente más grande */
+    text-transform: uppercase;
+    color: #063869;
+    margin-bottom: 5px; /* Ligeramente más grande */
+    font-weight: bold;
+}
+
+.descripcion {
+    grid-column: 1 / -1;
+}
+
+/* --- Eliminar estilos de imagen --- */
+
+.footer {
+    margin-top: 35px; /* Ligeramente más grande */
+    text-align: center; /* Mantener centrado el texto del footer */
+    font-size: 13px; /* Ligeramente más grande */
+    color: #888;
+    border-top: 1px solid #eee;
+    padding-top: 18px; /* Ligeramente más grande */
+}
+
+.disclaimer {
+    font-weight: bold;
+    color: #a00; /* Un color de advertencia sutil */
+    margin-top: 15px;
+    font-size: 12px;
+}
