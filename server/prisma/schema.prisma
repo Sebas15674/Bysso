@@ -37,6 +37,7 @@ enum BagStatus {
 enum Role {
   SUPER_ADMIN
   ADMIN
+  TRABAJADOR
 }
 
 // ================================================================

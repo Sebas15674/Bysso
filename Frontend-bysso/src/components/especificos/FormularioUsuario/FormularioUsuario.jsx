@@ -93,6 +93,7 @@ const FormularioUsuario = ({ initialData, onSave, onClose, errorMessageApi }) =>
         >
           <option value="ADMIN">Administrador (Recepcionista)</option>
           <option value="SUPER_ADMIN">Super Administrador</option>
+          <option value="TRABAJADOR">Trabajador</option>
         </select>
       </div>
 

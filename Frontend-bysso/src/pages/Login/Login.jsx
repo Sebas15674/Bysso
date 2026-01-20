@@ -19,10 +19,12 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
-      // La redirección puede ser manejada globalmente en un componente superior
-      // que observe el estado de autenticación, pero por ahora, la hacemos aquí.
-      navigate('/'); // Redirige al home o al dashboard después del login
+      const loggedInUser = await login(email, password); // login function should return the user or update context
+      if (loggedInUser && loggedInUser.role === 'TRABAJADOR') {
+        navigate('/produccion');
+      } else {
+        navigate('/'); // Redirige al home o al dashboard después del login
+      }
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión. Verifique sus credenciales.');
     } finally {

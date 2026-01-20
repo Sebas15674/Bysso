@@ -45,6 +45,8 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Crear un nuevo pedido' })
   @ApiConsumes('multipart/form-data')
@@ -99,6 +101,8 @@ export class OrdersController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.TRABAJADOR)
   @ApiOperation({
     summary: 'Obtener una lista de pedidos con paginación y filtros',
   })
@@ -108,6 +112,8 @@ export class OrdersController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.TRABAJADOR)
   @ApiOperation({ summary: 'Obtener un pedido por su ID' })
   @ApiResponse({ status: 200, description: 'Pedido encontrado.' })
   @ApiResponse({ status: 404, description: 'Pedido no encontrado.' })
@@ -116,6 +122,8 @@ export class OrdersController {
   }
 
   @Patch('cancelar')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @ApiOperation({
     summary: 'Cancela múltiples pedidos basado en una lista de IDs de bolsas',
   })
@@ -130,6 +138,8 @@ export class OrdersController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.TRABAJADOR)
   @ApiOperation({
     summary: 'Actualizar datos de un pedido en estado PENDIENTE',
   })
@@ -192,6 +202,8 @@ export class OrdersController {
   }
 
   @Patch(':id/estado/en-produccion')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @ApiOperation({
     summary: 'Cambia el estado de un pedido de PENDIENTE a EN_PRODUCCION',
   })
@@ -202,6 +214,8 @@ export class OrdersController {
   }
 
   @Patch(':id/estado/en-proceso')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.TRABAJADOR)
   @ApiOperation({
     summary: 'Cambia el estado de un pedido de EN_PRODUCCION a EN_PROCESO',
   })
@@ -227,6 +241,8 @@ export class OrdersController {
   }
 
   @Patch(':id/estado/entregado')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @ApiOperation({
     summary: 'Cambia el estado de un pedido de LISTO_PARA_ENTREGA a ENTREGADO',
   })
@@ -240,6 +256,8 @@ export class OrdersController {
   }
 
   @Patch(':id/estado/cancelado')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @ApiOperation({ summary: 'Cancela un pedido individual' })
   @ApiResponse({
     status: 200,
@@ -251,6 +269,8 @@ export class OrdersController {
   }
 
   @Patch('cancelar')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @ApiOperation({
     summary: 'Cancela múltiples pedidos basado en una lista de IDs de bolsas',
   })
@@ -281,6 +301,8 @@ export class OrdersController {
   }
 
   @Delete('reset')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   @ApiOperation({
     summary:
       'Resetea el sistema, borrando todos los pedidos y liberando todas las bolsas. ¡USAR CON PRECAUCIÓN!',

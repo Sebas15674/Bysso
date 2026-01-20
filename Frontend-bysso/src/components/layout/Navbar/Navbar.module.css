@@ -1,7 +1,6 @@
 .navbar {
   display: flex;
-  /* Espacia los elementos del inicio y del final */
-  justify-content: space-between; 
+  justify-content: space-between;
   align-items: center;
   padding: 0.7rem 2rem;
   background: linear-gradient(90deg, #4d7c8f, #1d1c1c);
@@ -11,12 +10,35 @@
   top: 0;
   z-index: 500;
   height: 4rem;
+  position: relative; /* Needed for absolute positioning of centerContent */
 }
 
 .leftContent {
-  /* Alinea el botón de hamburguesa y el título */
   display: flex;
   align-items: center;
+  /* flex-grow: 1; /* Remove flex-grow from leftContent */
+}
+
+.centerContent {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Remove flex-grow from centerContent as it's absolutely positioned */
+}
+
+.userRoleBadge {
+  background-color: #d7faeb; /* Light background */
+  color: #161616; /* Dark text for contrast */
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px; /* Pill shape */
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .botonHamburguesa {
@@ -32,7 +54,18 @@
   text-align: left;
   font-size: 2.5rem;
   font-weight: 600;
+  margin-right: 2rem; /* Add some space if there's text after it */
 }
+
+/* Remove or adjust .loggedInUser as it's no longer used */
+/*
+.loggedInUser {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #c9e0ed;
+  margin-left: 2rem;
+}
+*/
 
 .marcaContainer {
   cursor: pointer;
@@ -44,6 +77,6 @@
 }
 
 .marca{
-  height: 2.6rem; /* Ajusta el tamaño del logo */
+  height: 2.6rem;
   width: auto;
 }
