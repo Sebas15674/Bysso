@@ -115,6 +115,11 @@
   background-color: #159734; /* Success Green */
 }
 
+.trabajador {
+  background-color: #ffc107; /* Warning Yellow */
+  color: #343a40; /* Dark text for contrast on yellow */
+}
+
 .mensajeVacio {
   text-align: center !important;
   padding: 40px 20px;

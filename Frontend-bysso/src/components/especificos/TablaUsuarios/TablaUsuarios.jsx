@@ -26,8 +26,8 @@ const TablaUsuarios = ({ usuarios, onEdit, onDelete }) => {
               <tr key={user.id}>
                 <td>{user.email}</td>
                 <td>
-                  <span className={`${styles.roleBadge} ${user.role === 'SUPER_ADMIN' ? styles.superAdmin : styles.admin}`}>
-                    {user.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
+                  <span className={`${styles.roleBadge} ${user.role === 'SUPER_ADMIN' ? styles.superAdmin : user.role === 'ADMIN' ? styles.admin : styles.trabajador}`}>
+                    {user.role === 'SUPER_ADMIN' ? 'Super Admin' : user.role === 'ADMIN' ? 'Admin' : 'Trabajador'}
                   </span>
                 </td>
                 <td>{new Date(user.createdAt).toLocaleDateString()}</td>

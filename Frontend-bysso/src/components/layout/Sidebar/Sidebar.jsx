@@ -1,10 +1,65 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext'; // Importar el hook de autenticación
+import useConfirm from '../../../hooks/useConfirm'; // Importar el hook useConfirm
 import styles from './Sidebar.module.css';
 
 const Sidebar = ({ estaAbierto, alCerrarMenu }) => {
   const { user, logout } = useAuth(); // Obtener el usuario y la función logout del contexto
+  const { openConfirm, ConfirmDialog } = useConfirm(); // Obtener funciones del hook useConfirm
+
+  // Define menu items with roles that can access them
+  const menuItems = [
+    {
+      path: "/",
+      label: "Dashboard",
+      allowedRoles: ["SUPER_ADMIN", "ADMIN"]
+    },
+    {
+      path: "/pedidos",
+      label: "Orden de Pedido",
+      allowedRoles: ["SUPER_ADMIN", "ADMIN"]
+    },
+    {
+      path: "/produccion",
+      label: "Orden de Producción",
+      allowedRoles: ["SUPER_ADMIN", "ADMIN", "TRABAJADOR"]
+    },
+    {
+      path: "/finalizacion",
+      label: "Orden de Finalización",
+      allowedRoles: ["SUPER_ADMIN", "ADMIN"]
+    },
+    {
+      path: "/historial",
+      label: "Historial de pedidos",
+      allowedRoles: ["SUPER_ADMIN", "ADMIN"]
+    },
+    {
+      path: "/trabajadores",
+      label: "Gestion de trabajadores",
+      allowedRoles: ["SUPER_ADMIN", "ADMIN"]
+    },
+    {
+      path: "/gestion-usuarios",
+      label: "Gestión de Usuarios",
+      allowedRoles: ["SUPER_ADMIN"]
+    }
+  ];
+
+  const handleLogoutClick = () => {
+    openConfirm(
+      '¿Estás seguro de que quieres cerrar tu sesión?',
+      () => {
+        logout(); // Función de logout del AuthContext
+        alCerrarMenu(); // Cierra el menú después de cerrar sesión
+      },
+      () => {
+        // Opcional: acciones si el usuario cancela el logout
+        console.log('Cierre de sesión cancelado.');
+      }
+    );
+  };
 
   return (
     <aside className={`${styles.menu} ${estaAbierto ? styles.abierto : ''}`}>
@@ -13,51 +68,28 @@ const Sidebar = ({ estaAbierto, alCerrarMenu }) => {
         <button className={styles.botonCerrar} onClick={alCerrarMenu}>&times;</button>
       </div>
       <ul className={styles.listaMenu}>
-        <li>
-          <NavLink to="/" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)}>
-            Dashboard
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/pedidos" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)}>
-            Orden de Pedido
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/produccion" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)}>
-            Orden de Producción
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/finalizacion" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)}>
-            Orden de Finalización
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/historial" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)}>
-            Historial de pedidos
-          </NavLink>
-        </li>
-        <li>
-          <NavLink to="/trabajadores" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)}>
-            Gestion de trabajadores
-          </NavLink>
-        </li>
-        {/* Renderizado condicional para el enlace de Gestión de Usuarios */}
-        {user && user.role === 'SUPER_ADMIN' && (
-          <li>
-            <NavLink to="/gestion-usuarios" className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)}>
-              Gestión de Usuarios
-            </NavLink>
-          </li>
-        )}
+        {user && menuItems.map((item) => {
+          if (item.allowedRoles.includes(user.role)) {
+            return (
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) => (isActive ? `${styles.enlaceMenu} ${styles.activo}` : styles.enlaceMenu)}
+                >
+                  {item.label}
+                </NavLink>
+              </li>
+            );
+          }
+          return null;
+        })}
       </ul>
-      
+
       {/* Contenedor del botón de logout */}
       <div className={styles.logoutContainer}>
-        <button 
-          className={`${styles.boton} ${styles.peligro}`} 
-          onClick={logout}
+        <button
+          className={`${styles.boton} ${styles.peligro}`}
+          onClick={handleLogoutClick} // Llama al handler con la confirmación
         >
           Cerrar Sesión
         </button>
@@ -67,6 +99,7 @@ const Sidebar = ({ estaAbierto, alCerrarMenu }) => {
         <p>BYSSO Software</p>
         <p>v1.0.0</p>
       </div>
+      <ConfirmDialog /> {/* Renderiza el componente de diálogo de confirmación */}
     </aside>
   );
 };
