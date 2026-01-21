@@ -143,7 +143,7 @@ const DetalleProduccion = ({ pedidoId, alCerrarModal, alActualizar }) => {
 
         try {
             await updatePedido(pedido.id, formData);
-            if (alActualizar) alActualizar(); // Notifica al padre que refresque su lista
+            if (alActualizar) alActualizar(pedido.id); // Notifica al padre que refresque su lista
             alCerrarModal(); // Cierra el modal
         } catch (error) {
             console.error("Error updating order:", error);

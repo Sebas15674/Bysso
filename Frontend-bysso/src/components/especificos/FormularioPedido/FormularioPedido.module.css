@@ -121,6 +121,12 @@
   margin: 0;
 }
 
+.errorMensaje {
+  color: #d9534f;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
 /* Contenedor del input de archivo */
 .contenedorArchivo {
   display: flex;

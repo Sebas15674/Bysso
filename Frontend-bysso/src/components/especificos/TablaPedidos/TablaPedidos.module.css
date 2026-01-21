@@ -92,6 +92,17 @@
     background-color: #ffeccf !important; /* Un color suave para indicar selección */
 }
 
+/* Estilo para fila resaltada */
+.highlightedRow {
+    background-color: #b3e0ff; /* Un azul claro */
+    animation: fadeHighlight 3s forwards; /* Duración y que se mantenga al final */
+}
+
+@keyframes fadeHighlight {
+    0% { background-color: #b3e0ff; } /* Azul claro */
+    100% { background-color: #ffffff; } /* Vuelve al color original del fondo de la fila */
+}
+
 .tabla tbody tr:last-child {
     border-bottom: none;
 }

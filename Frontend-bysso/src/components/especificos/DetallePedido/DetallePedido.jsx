@@ -149,7 +149,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
         formData.append('pedido', JSON.stringify(datosDeTexto));
         try {
             await updatePedido(pedido.id, formData);
-            if (alActualizar) alActualizar();
+            if (alActualizar) alActualizar(pedido.id);
             alCerrarModal();
         } catch (error) {
             console.error("Error updating order:", error);

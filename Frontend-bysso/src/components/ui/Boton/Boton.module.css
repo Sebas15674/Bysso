@@ -159,3 +159,19 @@
     border-color: #000000;
     transform: translateY(-2px);
 }
+
+.boton:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  border-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.boton:disabled:hover {
+    background-color: #cccccc;
+    color: #666666;
+    border-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}

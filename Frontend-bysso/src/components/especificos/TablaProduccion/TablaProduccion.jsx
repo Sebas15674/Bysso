@@ -6,7 +6,7 @@ import formatStatus from '../../../utils/formatStatus.jsx';
 import { useAuth } from '../../../context/AuthContext.jsx';
 import useConfirm from '../../../hooks/useConfirm.jsx'; // Added useConfirm import
 
-const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar }) => {
+const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar, highlightedPedidoId }) => {
   const { user } = useAuth();
   const { openConfirm, ConfirmDialog } = useConfirm(); // Initialize useConfirm
 
@@ -43,7 +43,7 @@ const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar })
             </tr>
           ) : (
             pedidos.map(pedido => (
-              <tr key={pedido.id}>
+              <tr key={pedido.id} className={pedido.id === highlightedPedidoId ? styles.highlightedRow : ''}>
                 <td>{pedido.bagId}</td>
                 <td>{pedido.descripcion}</td>
                 <td>{pedido.trabajador?.nombre}</td>

@@ -8,7 +8,7 @@ import { updatePedidoToEnProduccion, getPedidosByEstado, cancelMultiplePedidos }
 import { useBags } from '../../context/BagContext';
 import useConfirm from '../../hooks/useConfirm.jsx'; // Added useConfirm import
 
-const Pedido = ({ abrirModal }) => {
+const Pedido = ({ abrirModal, highlightedPedidoId }) => {
     const { refetchBags } = useBags();
     const [pedidos, setPedidos] = useState([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -213,6 +213,7 @@ const Pedido = ({ abrirModal }) => {
                 alToggleSeleccion={toggleSeleccion}
                 alToggleSeleccionarTodos={toggleSeleccionarTodos}
                 loading={loading}
+                highlightedPedidoId={highlightedPedidoId}
             />
             
             <Paginacion

@@ -13,7 +13,8 @@ const TablaPedidos = ({
     bolsasSeleccionadas, 
     alToggleSeleccion, 
     alToggleSeleccionarTodos,
-    loading // <--- Añadida la prop loading
+    loading,
+    highlightedPedidoId // <--- Añadida la prop highlightedPedidoId
 }) => {
     
     // Calcular si todos los pedidos visibles están seleccionados
@@ -56,7 +57,7 @@ const TablaPedidos = ({
                         pedidos.map(pedido => (
                             <tr 
                                 key={pedido.id} // Use the unique order ID as key
-                                className={`${bolsasSeleccionadas.includes(pedido.bagId) ? styles.filaSeleccionada : ''} ${modoSeleccion ? styles.modoSeleccion : ''}`}
+                                className={`${bolsasSeleccionadas.includes(pedido.bagId) ? styles.filaSeleccionada : ''} ${modoSeleccion ? styles.modoSeleccion : ''} ${pedido.id === highlightedPedidoId ? styles.highlightedRow : ''}`}
                             >
                                 {/* CHECKBOX INDIVIDUAL (Solo visible en modoSeleccion) */}
                                 {modoSeleccion && (
