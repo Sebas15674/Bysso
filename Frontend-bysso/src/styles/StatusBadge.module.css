@@ -44,3 +44,11 @@
 .statusDefault {
   background-color: #6c757d; /* Grey for default/unknown */
 }
+
+.statusDisponible {
+  background-color: #28a745; /* Green for available */
+}
+
+.statusOcupada {
+  background-color: #f55945; /* Orange for occupied */
+}

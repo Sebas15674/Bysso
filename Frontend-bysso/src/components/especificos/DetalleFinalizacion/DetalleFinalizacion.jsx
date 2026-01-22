@@ -4,6 +4,7 @@ import styles from './DetalleFinalizacion.module.css';
 import baseStyles from '../../../styles/DetalleModalBase.module.css';
 import { getPedidoById } from '../../../services/pedidosService.js';
 import formatStatus from '../../../utils/formatStatus.jsx';
+import idBadgeStyles from '../../../styles/IdBadge.module.css';
 
 const formatCurrency = (num) => {
     const numberValue = Number(num);
@@ -58,7 +59,7 @@ const DetalleFinalizacion = ({ pedidoId, alCerrarModal }) => {
             </div>
             <div className={baseStyles.body}>
                 <div className={baseStyles.info}>
-                    <p><strong>Número de Bolsa:</strong> {pedido.bagId}</p>
+                    <p><strong>Número de Bolsa:</strong> <span className={idBadgeStyles.idBadge}>{pedido.bagId}</span></p>
                     <p><strong>Cliente:</strong> {pedido.cliente?.nombre}</p>
                     <p><strong>Celular:</strong> {pedido.cliente?.celular}</p>
                     <p><strong>Descripción:</strong> {pedido.descripcion}</p>

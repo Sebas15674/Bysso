@@ -42,6 +42,7 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
     });
 
     const [isSearchingClient, setIsSearchingClient] = useState(false);
+    const [errores, setErrores] = useState({});
 
     const previewUrl = datosFormulario.imagen
         ? URL.createObjectURL(datosFormulario.imagen)
@@ -79,13 +80,30 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
         };
     }, [previewUrl]);
 
+    useEffect(() => {
+        const abonoNumerico = cleanSimpleNumber(datosFormulario.abono);
+        const totalNumerico = cleanSimpleNumber(datosFormulario.total);
+
+        // Solo validar si ambos campos tienen valores que se pueden comparar.
+        if (abonoNumerico > 0 && totalNumerico > 0 && abonoNumerico > totalNumerico) {
+            setErrores(prev => ({ ...prev, abono: 'El abono no puede ser mayor que el total.' }));
+        } else {
+            // Si la condición no se cumple, nos aseguramos de que no haya un error de 'abono'.
+            setErrores(prev => {
+                const { abono, ...rest } = prev;
+                return rest;
+            });
+        }
+    }, [datosFormulario.abono, datosFormulario.total]);
+
+
     const manejarCambio = (e) => {
         const { name, value } = e.target;
         let valorCorregido = value;
 
         if (name === 'prendas') {
             valorCorregido = value === '' ? '' : Number(value);
-        } else if (name === 'clienteCedula' || name === 'clienteCelular') {
+        } else if (name === 'clienteCedula' || name === 'clienteCelular' || name === 'abono' || name === 'total') {
             valorCorregido = value.replace(/[^0-9]/g, '');
         }
 
@@ -194,13 +212,14 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
 
                     <div className={styles.campo}>
                         <label htmlFor="abono">Abono</label>
-                        <input id="abono" type="text" name="abono" placeholder="Ej: 20000" className={styles.entrada} onChange={manejarCambio} value={datosFormulario.abono} />
+                        <input id="abono" type="text" name="abono" placeholder="Ej: 20000" className={styles.entrada} onChange={manejarCambio} required value={datosFormulario.abono} />
+                        {errores.abono && <p className={styles.errorMensaje}>{errores.abono}</p>}
                     </div>
                     
                     {/* --- Campo Total --- */}
                     <div className={styles.campo}>
                         <label htmlFor="total">Total</label>
-                        <input id="total" type="text" name="total" placeholder="Ej: 50000" className={styles.entrada} onChange={manejarCambio} value={datosFormulario.total} />
+                        <input id="total" type="text" name="total" placeholder="Ej: 50000" className={styles.entrada} onChange={manejarCambio} required value={datosFormulario.total} />
                     </div>
                 </div> {/* Fin de columnaCampos */}
 
@@ -242,7 +261,7 @@ const FormularioPedido = ({ alGuardar, alCancelar }) => {
                 {/* --- Acciones (ocupa toda la fila de la grilla principal) --- */}
                 <div className={`${styles.acciones} ${styles.spanFull}`}>
                     <Boton tipo="peligro" onClick={alCancelar}>Cancelar</Boton>
-                    <Boton tipo="exito" type="submit">Guardar</Boton>
+                    <Boton tipo="exito" type="submit" disabled={Object.keys(errores).length > 0}>Guardar</Boton>
                 </div>
             </form>
             <ConfirmDialog /> {/* Render the ConfirmDialog component */}

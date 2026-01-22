@@ -7,6 +7,7 @@ import formatStatus from '../../../utils/formatStatus.jsx';
 import { snakeToTitleCase } from '../../../utils/formatText.js';
 import html2pdf from 'html2pdf.js';
 import ComprobantePedido from '../ComprobantePedido/ComprobantePedido.jsx';
+import idBadgeStyles from '../../../styles/IdBadge.module.css';
 
 const cleanSimpleNumber = (formattedValue) => {
     if (typeof formattedValue !== 'string') return '';
@@ -149,7 +150,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
         formData.append('pedido', JSON.stringify(datosDeTexto));
         try {
             await updatePedido(pedido.id, formData);
-            if (alActualizar) alActualizar();
+            if (alActualizar) alActualizar(pedido.id);
             alCerrarModal();
         } catch (error) {
             console.error("Error updating order:", error);
@@ -214,7 +215,7 @@ const DetallePedido = ({ pedido, alCerrarModal, alActualizar }) => {
             </div>
             <div className={baseStyles.body}>
                 <div className={baseStyles.info}>
-                    <p><strong>NÚMERO DE BOLSA:</strong> {pedido.bagId}</p>
+                    <p><strong>NÚMERO DE BOLSA:</strong> <span className={idBadgeStyles.idBadge}>{pedido.bagId}</span></p>
                     <p><strong>ESTADO:</strong> {formatStatus(pedido.estado)}</p>
                     {renderValue('clienteNombre', 'CLIENTE', 'text', true)}
                     {renderValue('clienteCedula', 'CÉDULA')}

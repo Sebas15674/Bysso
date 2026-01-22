@@ -182,7 +182,7 @@ const Historial = () => {
                             </>
                         ) : (
                             <>
-                                <Boton tipo="cancelar" onClick={handleToggleModoSeleccion} disabled={loading}>
+                                <Boton tipo="peligro" onClick={handleToggleModoSeleccion} disabled={loading}>
                                     Cancelar
                                 </Boton>
                                 {user?.role?.toUpperCase() === 'SUPER_ADMIN' && (

@@ -4,6 +4,7 @@ import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaPedidos.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
 import { snakeToTitleCase } from '../../../utils/formatText.js';
+import idBadgeStyles from '../../../styles/IdBadge.module.css';
 
 const TablaPedidos = ({ 
     pedidos, 
@@ -13,7 +14,8 @@ const TablaPedidos = ({
     bolsasSeleccionadas, 
     alToggleSeleccion, 
     alToggleSeleccionarTodos,
-    loading // <--- Añadida la prop loading
+    loading,
+    highlightedPedidoId // <--- Añadida la prop highlightedPedidoId
 }) => {
     
     // Calcular si todos los pedidos visibles están seleccionados
@@ -56,7 +58,7 @@ const TablaPedidos = ({
                         pedidos.map(pedido => (
                             <tr 
                                 key={pedido.id} // Use the unique order ID as key
-                                className={`${bolsasSeleccionadas.includes(pedido.bagId) ? styles.filaSeleccionada : ''} ${modoSeleccion ? styles.modoSeleccion : ''}`}
+                                className={`${bolsasSeleccionadas.includes(pedido.bagId) ? styles.filaSeleccionada : ''} ${modoSeleccion ? styles.modoSeleccion : ''} ${pedido.id === highlightedPedidoId ? styles.highlightedRow : ''}`}
                             >
                                 {/* CHECKBOX INDIVIDUAL (Solo visible en modoSeleccion) */}
                                 {modoSeleccion && (
@@ -69,7 +71,7 @@ const TablaPedidos = ({
                                         />
                                     </td>
                                 )}
-                                <td>{pedido.bagId}</td>
+                                <td><span className={idBadgeStyles.idBadge}>{pedido.bagId}</span></td>
                                 <td>{snakeToTitleCase(pedido.tipo)}</td>
                                 <td>{pedido.descripcion}</td>
                                 <td>{formatStatus(pedido.estado)}</td>

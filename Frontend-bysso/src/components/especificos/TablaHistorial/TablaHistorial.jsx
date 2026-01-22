@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './TablaHistorial.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
 import { snakeToTitleCase } from '../../../utils/formatText.js';
+import idBadgeStyles from '../../../styles/IdBadge.module.css';
 
 const TablaHistorial = ({ 
     pedidos,
@@ -57,7 +58,7 @@ const TablaHistorial = ({
                                         className={styles.checkboxControl}
                                     />
                                 </td>
-                                <td data-label="# BOLSA">{pedido.bagId}</td>
+                                <td data-label="# BOLSA"><span className={idBadgeStyles.idBadge}>{pedido.bagId}</span></td>
                                 <td data-label="CLIENTE">{pedido.cliente?.nombre}</td>
                                 <td data-label="TIPO">{snakeToTitleCase(pedido.tipo)}</td>
                                 <td data-label="TOTAL">

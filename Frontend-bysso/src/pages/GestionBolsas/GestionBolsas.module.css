@@ -1,0 +1,105 @@
+/* src/pages/GestionBolsas/GestionBolsas.module.css */
+
+.contenedorPagina {
+  flex: 1;
+  padding: 2rem;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  margin-top: 4rem; /* Bajar el header */
+}
+
+.tituloPagina {
+  font-size: 3.0rem;
+  font-weight: 600;
+  color: #0b3675;
+  margin: 0;
+}
+
+.botonCrear {
+  background-color: #1c68cc;
+  color: rgb(255, 255, 255);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+}
+
+.botonCrear:hover {
+  background-color: #0056b3;
+}
+
+.mensajeError {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.barraFiltros {
+    margin: 2rem 0;
+    padding: 0.5rem 1.4rem;
+    background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+    border-radius: 8px;
+    border: 1px solid #afacac;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.inputContainer {
+    position: relative;
+    flex-grow: 1;
+    max-width: 450px;
+}
+
+.inputFiltro {
+    width: 40%;
+    padding: 0.7rem 1rem;
+    border: 1px solid #6c6f72;
+    border-radius: 10px;
+    font-size: 1.2rem;
+}
+
+.statusButtons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.statusButtons button {
+    background-color: #e1f0b9;
+    color: #000000;
+    border: 1px solid #000000;
+    padding: 0.7rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.statusButtons button:hover {
+    background-color: #dee2e6;
+}
+
+.statusButtons button.activeFilter {
+    background-color: #00ff6298;
+    color: white;
+    border-color: #000000;
+}
+

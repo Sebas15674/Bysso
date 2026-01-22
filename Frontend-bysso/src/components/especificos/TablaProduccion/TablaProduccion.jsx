@@ -5,8 +5,9 @@ import styles from './TablaProduccion.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
 import { useAuth } from '../../../context/AuthContext.jsx';
 import useConfirm from '../../../hooks/useConfirm.jsx'; // Added useConfirm import
+import idBadgeStyles from '../../../styles/IdBadge.module.css';
 
-const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar }) => {
+const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar, highlightedPedidoId }) => {
   const { user } = useAuth();
   const { openConfirm, ConfirmDialog } = useConfirm(); // Initialize useConfirm
 
@@ -43,8 +44,8 @@ const TablaProduccion = ({ pedidos, alVerDetalles, alTomarPedido, alFinalizar })
             </tr>
           ) : (
             pedidos.map(pedido => (
-              <tr key={pedido.id}>
-                <td>{pedido.bagId}</td>
+              <tr key={pedido.id} className={pedido.id === highlightedPedidoId ? styles.highlightedRow : ''}>
+                <td><span className={idBadgeStyles.idBadge}>{pedido.bagId}</span></td>
                 <td>{pedido.descripcion}</td>
                 <td>{pedido.trabajador?.nombre}</td>
                 <td>{formatStatus(pedido.estado)}</td>

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
-import { getBagsByStatus } from '../services/pedidosService';
+import { getBags } from '../services/bagsService';
 
 // Función de ordenamiento alfanumérico (ej: '1a' < '1v' < '2a' < '21').
 const sortBags = (a, b) => {
@@ -41,7 +41,7 @@ export const BagProvider = ({ children }) => {
     const fetchBags = useCallback(async () => {
         try {
             setLoadingBags(true);
-            const allBags = await getBagsByStatus(); 
+            const allBags = await getBags(); 
             
             const disponibles = allBags
                 .filter(bag => bag.status === 'DISPONIBLE')

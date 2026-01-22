@@ -6,7 +6,7 @@ import Paginacion from '../../components/ui/Paginacion/Paginacion.jsx';
 import { getPedidosByEstado, updatePedidoToEnProceso, updatePedidoToListoParaEntrega } from '../../services/pedidosService';
 import { useBags } from '../../context/BagContext';
 
-const Produccion = ({ abrirModal }) => {
+const Produccion = ({ abrirModal, highlightedPedidoId }) => {
     const { refetchBags } = useBags();
     const [pedidos, setPedidos] = useState([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -143,6 +143,7 @@ const Produccion = ({ abrirModal }) => {
                 alTomarPedido={tomarPedido}
                 alFinalizar={finalizarProduccion}
                 loading={loading}
+                highlightedPedidoId={highlightedPedidoId}
             />
 
             <Paginacion
