@@ -44,6 +44,11 @@ const Sidebar = ({ estaAbierto, alCerrarMenu }) => {
       path: "/gestion-usuarios",
       label: "Gestión de Usuarios",
       allowedRoles: ["SUPER_ADMIN"]
+    },
+    {
+      path: "/bolsas",
+      label: "Gestión de Bolsas",
+      allowedRoles: ["SUPER_ADMIN", "ADMIN"]
     }
   ];
 

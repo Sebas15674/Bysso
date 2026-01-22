@@ -1,0 +1,106 @@
+/* src/components/especificos/TablaBolsas/TablaBolsas.module.css */
+
+.contenedorTabla {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.726);
+  margin: 90px auto;
+  width: 100%;
+  max-width: 1500px;
+  overflow: hidden;
+}
+
+.tabla {
+  min-width: 700px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.4rem;
+  table-layout: fixed;
+}
+
+.tabla thead {
+  background: linear-gradient(90deg, #4d7c8f, #0a0a0a);
+  color: #fdf8f8;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.tabla th,
+.tabla td {
+  padding: 16px;
+  vertical-align: middle;
+  text-align: center;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.tabla th {
+  letter-spacing: 1px;
+}
+
+.tabla th:first-child {
+    border-top-left-radius: 12px;
+}
+
+.tabla th:last-child {
+    border-top-right-radius: 12px;
+}
+
+/* Anchos de columna para TablaBolsas */
+.tabla th:nth-child(1), .tabla td:nth-child(1) { width: 30%; } /* ID */
+.tabla th:nth-child(2), .tabla td:nth-child(2) { width: 40%; } /* Estado */
+.tabla th:nth-child(3), .tabla td:nth-child(3) { width: 30%; } /* Acciones */
+
+
+.tabla tbody tr {
+  border-bottom: 1px solid #d6d1d1;
+  transition: background-color 0.2s ease;
+}
+
+.tabla tbody tr:hover {
+  background-color: #e3ecf5;
+}
+
+.tabla tbody tr:last-child {
+  border-bottom: none;
+}
+
+.columnaAcciones {
+  display: flex;
+  justify-content: center;
+  gap: 1.9rem;
+  white-space: nowrap;
+}
+
+.botonAccion {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.4rem;
+  transition: transform 0.2s;
+}
+
+.botonAccion:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+}
+
+
+.botonAccion:hover:not(:disabled) {
+  transform: scale(1.2);
+}
+
+.eliminar {
+  color: #dc3545;
+}
+
+.mensajeVacio {
+  text-align: center !important;
+  padding: 40px 20px;
+  color: #888;
+  font-style: italic;
+  font-size: 1.4rem;
+  background-color: #f9f9f9;
+}

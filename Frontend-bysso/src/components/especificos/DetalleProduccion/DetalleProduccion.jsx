@@ -5,6 +5,7 @@ import baseStyles from '../../../styles/DetalleModalBase.module.css';
 import { getPedidoById, updatePedido, getActiveWorkers } from '../../../services/pedidosService.js';
 import formatStatus from '../../../utils/formatStatus.jsx';
 import { snakeToTitleCase } from '../../../utils/formatText.js';
+import idBadgeStyles from '../../../styles/IdBadge.module.css';
 
 // --- Helper functions recycled from DetallePedido ---
 const cleanSimpleNumber = (formattedValue) => {
@@ -211,7 +212,7 @@ const DetalleProduccion = ({ pedidoId, alCerrarModal, alActualizar }) => {
             </div>
             <div className={baseStyles.body}>
                 <div className={baseStyles.info}>
-                    <p><strong>NÚMERO DE BOLSA:</strong> {pedido.bagId}</p>
+                    <p><strong>NÚMERO DE BOLSA:</strong> <span className={idBadgeStyles.idBadge}>{pedido.bagId}</span></p>
                     <p><strong>ESTADO:</strong> {formatStatus(pedido.estado)}</p>
                     <p><strong>CLIENTE:</strong> {datosEditables.clienteNombre || 'N/A'}</p>
                     

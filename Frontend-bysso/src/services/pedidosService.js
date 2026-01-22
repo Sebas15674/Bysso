@@ -187,19 +187,3 @@ export const getActiveWorkers = async () => {
     });
     return response.data;
 };
-
-// ======================================================================
-// BOLSAS
-// ======================================================================
-
-/**
- * Obtiene todas las bolsas o filtra por estado.
- * @param {string} [status] - Opcional. El estado de las bolsas a filtrar ('DISPONIBLE' o 'OCUPADA').
- * @returns {Promise<Array>} Lista de bolsas.
- */
-export const getBagsByStatus = async (status) => {
-    const response = await axiosInstance.get('/bags', {
-        params: { status },
-    });
-    return response.data;
-};

@@ -1,0 +1,86 @@
+.contenedorFormulario {
+    padding: 2rem;
+    background-color: #cfcbcb;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-width: 700px;
+    margin: 2rem auto;
+    position: relative;
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    color: #f77171;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+  }
+  
+  .closeButton:hover {
+    color: #ff1900;
+    transform: scale(1.4);
+  }
+  
+  .tituloFormulario {
+    text-align: center;
+    font-size: 2.8rem;
+    margin-bottom: 3rem;
+    color: var(--color-primary-dark);
+    font-weight: 700;
+  }
+  
+  .formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 2.0rem;
+  }
+  
+  .grupoCampo {
+    display: flex;
+    padding: 30px;
+    align-items: center;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+  
+  .grupoCampo label {
+    font-weight: 700;
+    color: #000000;
+  }
+  
+  .entrada {
+    padding: 0.85rem;
+    border: 1px solid #363636;
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 30%;
+  }
+  
+  .acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+  }
+  
+  .error, .apiError {
+    color: #dc3545;
+    text-align: center;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+
+  .helpText {
+    font-size: 1.1rem;
+    color: #0468ff;
+    text-align: center;
+  }
+   

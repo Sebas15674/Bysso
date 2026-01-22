@@ -4,6 +4,7 @@ import Boton from '../../ui/Boton/Boton.jsx';
 import styles from './TablaFinalizacion.module.css';
 import formatStatus from '../../../utils/formatStatus.jsx';
 import useConfirm from '../../../hooks/useConfirm.jsx'; // Added useConfirm import
+import idBadgeStyles from '../../../styles/IdBadge.module.css';
 
 const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
   const { openConfirm, ConfirmDialog } = useConfirm(); // Initialize useConfirm
@@ -35,7 +36,7 @@ const TablaFinalizacion = ({ pedidos, alVerDetalles, alEntregarPedido }) => {
           ) : (
             pedidos.map(pedido => (
               <tr key={pedido.id}>
-                <td>{pedido.bagId}</td>
+                <td><span className={idBadgeStyles.idBadge}>{pedido.bagId}</span></td>
                 <td>{pedido.cliente?.nombre}</td>
                 <td>{pedido.descripcion}</td>
                 <td>{formatStatus(pedido.estado)}</td>

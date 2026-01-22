@@ -20,6 +20,7 @@ import Finalizacion from './pages/Finalizacion/Finalizacion.jsx';
 import Historial from './pages/Historial/Historial.jsx';
 import Trabajadores from './pages/Trabajadores/Trabajadores.jsx';
 import GestionUsuarios from './pages/GestionUsuarios/GestionUsuarios.jsx'; 
+import GestionBolsas from './pages/GestionBolsas/GestionBolsas.jsx';
 
 // Form & Detail Components
 import FormularioPedido from './components/especificos/FormularioPedido/FormularioPedido.jsx';
@@ -99,7 +100,8 @@ const AppLayout = () => {
         if (path.startsWith('/finalizacion')) return 'Pedidos para Entrega';
         if (path.startsWith('/historial')) return 'Historial de Entregas';
         if (path.startsWith('/trabajadores')) return 'Gestión de Trabajadores';
-        if (path.startsWith('/gestion-usuarios')) return 'Gestión de Usuarios'; // Título para la nueva página
+        if (path.startsWith('/gestion-usuarios')) return 'Gestión de Usuarios';
+        if (path.startsWith('/bolsas')) return 'Gestión de Bolsas';
         return 'Dashboard';
     };
 
@@ -132,7 +134,8 @@ const AppLayout = () => {
                         <Route path="/finalizacion" element={<Finalizacion abrirModal={abrirModal} />} />
                         <Route path="/historial" element={<Historial />} />
                         <Route path="/trabajadores" element={<Trabajadores abrirModal={abrirModal} />} />
-                        <Route path="/gestion-usuarios" element={<GestionUsuarios />} /> {/* Nueva ruta */}
+                        <Route path="/gestion-usuarios" element={<GestionUsuarios />} />
+                        <Route path="/bolsas" element={<GestionBolsas />} />
                         {/* Si se accede a una ruta no definida dentro del layout, redirigir al home */}
                         <Route path="*" element={<Navigate to="/" />} />
                     </Routes>

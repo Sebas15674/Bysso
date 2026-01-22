@@ -1,0 +1,28 @@
+.idBadge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.35em 0.9em;
+  font-weight: 700;
+  font-size: 0.97em;
+  color: #fffdfd;
+
+  background: linear-gradient(135deg, #aaadad, #6486f3);
+  border-radius: 999px;
+
+  min-width: 42px;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+}
+
+/* “nudo” de la bolsa */
+.idBadge::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  width: 9px;
+  height: 8px;
+  background: #f10c0c;
+  border-radius: 50%;
+}
